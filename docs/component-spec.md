@@ -288,7 +288,7 @@ them without editing a test.
 
 ## 7. What scripts/check.sh enforces
 
-Four gates, in order. Any failure stops the run.
+Six gates, in order. Any failure stops the run.
 
 1. **Vitest** — `tests/objective.spec.ts` (frontmatter conforms, no vendor token,
    demo matches reference), `tests/unit/frontmatter.spec.ts` (the validator itself),
@@ -296,8 +296,17 @@ Four gates, in order. Any failure stops the run.
 2. **Portability lint** — `scripts/lint-portability.mjs`, over `skills/` only:
    `${CLAUDE_PLUGIN_ROOT}`, `disable-model-invocation:`, `hint:`, backslash paths,
    framework names, preprocessor names, package imports, install instructions.
-3. **Plugin validation** — `claude plugin validate . --strict`.
-4. **Playwright** — the browser suite, including axe-core on every demo.
+3. **No external resources** — nothing under `skills/` may carry `src`, `srcset`,
+   a `<link href>`, an `@import` or a `url()`. A component split across sibling
+   files runs under headless Chrome and then fails in a real browser opened from
+   disk, so without this the automated gate is looser than the manual one.
+4. **Demos match their references** — `scripts/build-demos.mjs --check`. The
+   component's code exists twice, and this is what keeps the two copies identical.
+5. **Plugin validation** — `claude plugin validate . --strict`.
+6. **Playwright** — the browser suite, including axe-core on every demo.
+
+`bash scripts/check.sh --prove` additionally runs deliberately broken fixtures
+through the gate, so each check is known to be able to fail.
 
 ## 8. Checklist
 

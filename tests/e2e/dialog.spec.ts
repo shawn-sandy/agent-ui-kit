@@ -90,6 +90,44 @@ test('4.1.2 Name, Role, Value: the dialog is a named modal', async ({ page }) =>
   await expect(page.getByRole('button', { name: 'Close dialog' })).toBeVisible();
 });
 
+test('2.4.3 Focus Order: focus is placed deliberately when the opener is gone', async ({ page }) => {
+  // A row deleted, a list re-rendered: the element that opened the dialog can be
+  // removed while it is open. Doing nothing drops focus to <body> by accident, which
+  // is what the skill promises not to do.
+  await page.goto(demoUrl('dialog'));
+  await page.evaluate(() => {
+    const dialog = document.getElementById('confirm-delete')!;
+    const landing = document.createElement('button');
+    landing.id = 'fallback-landing';
+    landing.textContent = 'Fallback';
+    document.body.append(landing);
+    dialog.setAttribute('data-dialog-fallback', 'fallback-landing');
+  });
+
+  await page.locator('#open-top').click();
+  await page.evaluate(() => document.getElementById('open-top')!.remove());
+  await page.keyboard.press('Escape');
+
+  expect(await activeId(page), 'focus was not placed on the declared fallback').toBe(
+    'fallback-landing',
+  );
+});
+
+test('2.4.3 Focus Order: focus is not dropped when there is no fallback either', async ({ page }) => {
+  await page.goto(demoUrl('dialog'));
+  await page.locator('#open-top').click();
+  await page.evaluate(() => document.getElementById('open-top')!.remove());
+  await page.keyboard.press('Escape');
+
+  // Body is not focusable by default; landing there has to be a decision, not a gap.
+  const landed = await page.evaluate(() => ({
+    onBody: document.activeElement === document.body,
+    focusable: document.body.getAttribute('tabindex') === '-1',
+  }));
+  expect(landed.onBody, 'focus went nowhere in particular').toBe(true);
+  expect(landed.focusable, 'body was not made focusable, so focus was merely dropped').toBe(true);
+});
+
 test('1.4.3 Contrast (Minimum): the open dialog passes', async ({ page }) => {
   await page.locator('#open-top').click();
   const results = await new AxeBuilder({ page }).withRules(['color-contrast']).analyze();

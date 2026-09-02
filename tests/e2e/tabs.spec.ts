@@ -97,6 +97,31 @@ test('4.1.2 Name, Role, Value: every tab is paired to its panel both ways', asyn
   await expect(page.getByRole('tab', { selected: true })).toHaveCount(1);
 });
 
+test('a panel id that is not a legal CSS selector still resolves', async ({ page }) => {
+  // "panel:billing" is legal HTML but querySelector('#panel:billing') throws, which
+  // would take out the whole tab set rather than just missing the panel.
+  await page.goto(demoUrl('tabs'));
+  const rewired = await page.evaluate(() => {
+    const panel = document.getElementById('panel-billing')!;
+    const tab = document.querySelector('[aria-controls="panel-billing"]')!;
+    panel.id = 'panel:billing';
+    tab.setAttribute('aria-controls', 'panel:billing');
+    try {
+      (window as unknown as { initTabs: (el: Element) => void }).initTabs(
+        document.getElementById('settings-tabs')!,
+      );
+      return { threw: false };
+    } catch (error) {
+      return { threw: true, message: String(error) };
+    }
+  });
+  expect(rewired.threw, `initTabs threw: ${rewired.message ?? ''}`).toBe(false);
+
+  await page.locator('#tab-profile').focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('#panel\\:billing')).toBeVisible();
+});
+
 test('1.4.3 Contrast (Minimum): selected and unselected tabs both pass', async ({ page }) => {
   const results = await new AxeBuilder({ page }).withRules(['color-contrast']).analyze();
   expect(results.violations.map((v) => v.nodes.map((n) => n.html))).toEqual([]);

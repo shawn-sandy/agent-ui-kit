@@ -10,6 +10,9 @@ const file = process.argv[2] || 'evals/results/skills-isolated.json';
 const rows = JSON.parse(readFileSync(resolve(ROOT, file), 'utf8'));
 
 const score = (r) => {
+  // Kept in step with run-evals.mjs deliberately: a run that errored never reached a
+  // model, so it cannot count as a pass however quiet the skills were.
+  if (r.error) return false;
   const ours = r.invoked.filter((n) => n.startsWith('agent-ui-kit'));
   const fired = ours.some((n) => n.endsWith(':' + r.skill));
   return r.expect === null ? !fired : fired;

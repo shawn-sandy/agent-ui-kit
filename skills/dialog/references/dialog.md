@@ -6,7 +6,7 @@
 | --- | --- |
 | Element | `<dialog>` |
 | Role | implicit `dialog`, with implicit `aria-modal="true"` once opened by `showModal()` |
-| Props | `id` — string — required, referenced by openers; `aria-labelledby` — id reference — required, points at the dialog heading; `aria-describedby` — id reference — optional; `data-dialog-open="<id>"` — on any opener element — required; `data-dialog-close` — boolean attribute on any descendant — optional; `autofocus` — boolean attribute on one descendant — optional |
+| Props | `id` — string — required, referenced by openers; `aria-labelledby` — id reference — required, points at the dialog heading; `aria-describedby` — id reference — optional; `data-dialog-open="<id>"` — on any opener element — required; `data-dialog-close` — boolean attribute on any descendant — optional; `autofocus` — boolean attribute on one descendant — optional; `data-dialog-fallback` — id reference — optional, where focus lands if the opener is gone |
 | Slots | `data-part="header"`; `data-part="body"`; `data-part="footer"` |
 | Variants | `none` |
 | Behaviour | `initDialog(dialog)` — wires openers, closers, backdrop dismissal and focus restoration; returns a teardown |
@@ -156,6 +156,9 @@ meantime. Storing the opener costs one line and removes the whole class of probl
  * descendant carrying `data-dialog-close`. Initial focus is left to the browser,
  * which honours the native `autofocus` attribute and draws a focus ring for it.
  *
+ * On close, focus returns to the opener. If the opener has been removed from the
+ * document meanwhile, it goes to `data-dialog-fallback` instead.
+ *
  * @param {HTMLDialogElement} dialog - the dialog element, which must have an id
  * @returns {() => void} teardown that removes every listener this added
  */
@@ -167,11 +170,15 @@ export function initDialog(dialog) {
   let opener = null;
 
   function open(event) {
+    // Openers are any element, so an anchor would navigate and a submit button
+    // would submit its form the moment after the dialog opened.
+    event.preventDefault();
     opener = event.currentTarget;
     dialog.showModal();
   }
 
-  function close() {
+  function close(event) {
+    if (event) event.preventDefault();
     dialog.close();
   }
 
@@ -185,7 +192,23 @@ export function initDialog(dialog) {
   // Fires for every close path, including Escape, which the browser routes through
   // `cancel` and then `close`.
   function onClose() {
-    if (opener && opener.isConnected) opener.focus();
+    if (opener && opener.isConnected) {
+      opener.focus();
+    } else {
+      // The opener was removed while the dialog was open - a row deleted, a list
+      // re-rendered. Doing nothing drops focus to <body>, which is the accident this
+      // component promises to avoid, so land somewhere the author chose.
+      const fallback = dialog.getAttribute('data-dialog-fallback');
+      const target = fallback ? document.getElementById(fallback) : null;
+      if (target) {
+        target.focus();
+      } else {
+        // Last resort, still deliberate: body is not focusable by default, so make
+        // it so rather than leaving focus nowhere.
+        document.body.setAttribute('tabindex', '-1');
+        document.body.focus();
+      }
+    }
     opener = null;
   }
 
@@ -230,6 +253,9 @@ export function initDialog(dialog) {
 - On open, the browser moves focus to the element carrying `autofocus`, which is set
   to the non-destructive choice. Leaving this to the browser rather than calling
   `focus()` is what keeps the focus ring visible for keyboard users.
+- On close, focus returns to the opener. If the opener is gone - a deleted row, a
+  re-rendered list - focus goes to `data-dialog-fallback`, or to a
+  programmatically-focusable `<body>` as a last resort. It is never simply dropped.
 - While open, the page behind is inert. That is `showModal()` doing it, not a
   hand-rolled trap, which is why `show()` is banned in this component.
 - On close, focus returns to the stored opener. The `isConnected` check avoids

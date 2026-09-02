@@ -141,6 +141,9 @@ h2.section { font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.0
  * descendant carrying `data-dialog-close`. Initial focus is left to the browser,
  * which honours the native `autofocus` attribute and draws a focus ring for it.
  *
+ * On close, focus returns to the opener. If the opener has been removed from the
+ * document meanwhile, it goes to `data-dialog-fallback` instead.
+ *
  * @param {HTMLDialogElement} dialog - the dialog element, which must have an id
  * @returns {() => void} teardown that removes every listener this added
  */
@@ -152,11 +155,15 @@ function initDialog(dialog) {
   let opener = null;
 
   function open(event) {
+    // Openers are any element, so an anchor would navigate and a submit button
+    // would submit its form the moment after the dialog opened.
+    event.preventDefault();
     opener = event.currentTarget;
     dialog.showModal();
   }
 
-  function close() {
+  function close(event) {
+    if (event) event.preventDefault();
     dialog.close();
   }
 
@@ -170,7 +177,23 @@ function initDialog(dialog) {
   // Fires for every close path, including Escape, which the browser routes through
   // `cancel` and then `close`.
   function onClose() {
-    if (opener && opener.isConnected) opener.focus();
+    if (opener && opener.isConnected) {
+      opener.focus();
+    } else {
+      // The opener was removed while the dialog was open - a row deleted, a list
+      // re-rendered. Doing nothing drops focus to <body>, which is the accident this
+      // component promises to avoid, so land somewhere the author chose.
+      const fallback = dialog.getAttribute('data-dialog-fallback');
+      const target = fallback ? document.getElementById(fallback) : null;
+      if (target) {
+        target.focus();
+      } else {
+        // Last resort, still deliberate: body is not focusable by default, so make
+        // it so rather than leaving focus nowhere.
+        document.body.setAttribute('tabindex', '-1');
+        document.body.focus();
+      }
+    }
     opener = null;
   }
 

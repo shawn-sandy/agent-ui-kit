@@ -118,7 +118,10 @@ function initTabs(root) {
   const tabs = Array.from(root.querySelectorAll('[role="tab"]'));
   if (tabs.length === 0) throw new Error('initTabs found no [role="tab"] inside the root');
 
-  const panelFor = (tab) => root.querySelector('#' + tab.getAttribute('aria-controls'));
+  // getElementById, not querySelector('#' + id): ids are document-unique, and an id
+  // that is legal HTML but not a legal CSS selector - "panel:billing", "2fa" - makes
+  // the selector form throw rather than miss.
+  const panelFor = (tab) => document.getElementById(tab.getAttribute('aria-controls'));
 
   /**
    * Make one tab the selected tab and the only one in the page's tab order.

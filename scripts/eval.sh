@@ -27,7 +27,7 @@ case "${1:-}" in
       const s = doc.scenarios[Number(i)];
       if (!s) { console.error("no scenario at index " + i); process.exit(2); }
       console.log("scenario : " + s.id + "  (" + s.kind + ")");
-      console.log("expects  : " + (s.expect ? "skill " + s.expect + " fires" : "NO skill from this kit fires"));
+      console.log("expects  : " + (s.expect ? "skill " + s.expect + " fires" : "skill " + s.skill + " stays quiet"));
       console.log("baseline : " + s.baselineFailure);
       console.log("");
       console.log("--- paste from here ---");

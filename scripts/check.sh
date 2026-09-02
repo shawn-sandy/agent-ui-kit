@@ -30,7 +30,7 @@ gate() {
 no_external_refs() {
   local dir="${1:-skills}"
   local hits
-  hits=$(grep -rnE '<link[^>]+href=|[[:space:]]src=|@import|url\(' "$dir" 2>/dev/null \
+  hits=$(grep -rnE '<link[^>]+href=|[[:space:]]srcset?=|@import|url\(' "$dir" 2>/dev/null \
          | grep -vE 'src="data:|url\(data:|url\(#')
   [ -z "$hits" ] && return 0
   printf '%s\n' "$hits" | sed 's/^/   /'
@@ -63,7 +63,11 @@ if [ "${1:-}" = "--prove" ]; then
   fi
 
   frontmatter_out=$(npx vitest run tests/unit/frontmatter.spec.ts --reporter=verbose 2>&1)
-  if printf '%s' "$frontmatter_out" | grep -q 'rejects tests/fixtures/bad-skill'; then
+  frontmatter_status=$?
+  # The title alone is not enough: the verbose reporter prints it for a FAILING test
+  # too, so a broken suite could otherwise report a false success here.
+  if [ "$frontmatter_status" -eq 0 ] \
+     && printf '%s' "$frontmatter_out" | grep -q 'rejects tests/fixtures/bad-skill'; then
     printf '   ok: frontmatter validator rejects the broken fixture\n'
   else
     printf '   FAILED: frontmatter validator did not reject the broken fixture\n'

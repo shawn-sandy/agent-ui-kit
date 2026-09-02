@@ -20,17 +20,29 @@ const OUT = resolve(ROOT, 'evals/results');
 const SANDBOX = process.env.EVAL_SANDBOX || tmpdir();
 const FIXTURE_PROJECT = process.env.EVAL_PROJECT || null;
 
-/** A fresh working copy of the fixture project, or the shared sandbox if there is none. */
+/**
+ * A private working directory for one run, holding a fresh copy of the fixture
+ * project when there is one.
+ *
+ * Never the shared sandbox: runs execute concurrently under `--permission-mode
+ * acceptEdits`, so a shared directory lets one scenario edit files another is
+ * reading, and which result you get then depends on scheduling.
+ */
 function workspaceFor(label) {
-  mkdirSync(SANDBOX, { recursive: true });
-  if (!FIXTURE_PROJECT) return SANDBOX;
   const dir = resolve(SANDBOX, 'run-' + label.replace(/[^a-z0-9]+/gi, '-'));
   rmSync(dir, { recursive: true, force: true });
-  cpSync(FIXTURE_PROJECT, dir, { recursive: true });
+  mkdirSync(dir, { recursive: true });
+  if (FIXTURE_PROJECT) cpSync(FIXTURE_PROJECT, dir, { recursive: true });
   return dir;
 }
 const MODELS = (process.env.EVAL_MODELS || 'haiku,sonnet,opus').split(',');
 const CONCURRENCY = Number(process.env.EVAL_CONCURRENCY || 4);
+if (!Number.isInteger(CONCURRENCY) || CONCURRENCY < 1) {
+  // Zero workers would write an empty result file and exit 0, which reads exactly
+  // like a completed sweep.
+  console.error(`EVAL_CONCURRENCY must be a positive integer, got ${JSON.stringify(process.env.EVAL_CONCURRENCY)}`);
+  process.exit(2);
+}
 const mode = process.argv[2];
 // "isolated" loads only this plugin's skills, which measures the descriptions.
 // "crowded" additionally loads whatever the operator already has installed, which
@@ -89,7 +101,15 @@ async function baselineOne(sc, model) {
     '-p', '--model', model, '--disable-slash-commands', '--strict-mcp-config',
     `${BASELINE_PREAMBLE}\n\n${sc.prompt}`,
   ]);
-  return { id: sc.id, skill: sc.skill, kind: sc.kind, model, ...classify(out, sc.detect), chars: out.length, output: out };
+  return {
+    id: sc.id, skill: sc.skill, kind: sc.kind, model, error: isError(out),
+    ...classify(out, sc.detect), chars: out.length, output: out,
+  };
+}
+
+/** True when the CLI never produced a usable answer - a spawn failure or non-zero exit. */
+function isError(output) {
+  return output.startsWith('__EVAL_ERROR__');
 }
 
 // The Skill tool call is the activation signal. stream-json emits one assistant
@@ -120,14 +140,22 @@ async function skillsOne(sc, model) {
     ...(ISOLATE ? ['--setting-sources', 'project'] : []),
     sc.prompt,
   ], 420000, cwd);
+  const error = isError(out);
   const invoked = skillsInvoked(out);
   const ours = invoked.filter((n) => n.startsWith('agent-ui-kit'));
   const fired = ours.some((n) => n.endsWith(':' + sc.skill));
   // An adjacent scenario asserts that THIS skill stays quiet. Another skill in the
   // kit answering instead is a correct outcome, not a miss - "blocks the page until
   // they confirm" really is the dialog's job, and the alert must not claim it.
-  const correct = sc.expect === null ? !fired : fired;
-  return { id: sc.id, skill: sc.skill, kind: sc.kind, expect: sc.expect, model, mode: LABEL, invoked, correct };
+  //
+  // A run that never reached a model is never correct. Without this an adjacent
+  // scenario would score as a pass precisely because the CLI crashed and nothing
+  // fired, which is the one outcome that proves nothing.
+  const correct = error ? false : sc.expect === null ? !fired : fired;
+  return {
+    id: sc.id, skill: sc.skill, kind: sc.kind, expect: sc.expect,
+    model, mode: LABEL, invoked, error, correct,
+  };
 }
 
 async function pool(items, worker) {
