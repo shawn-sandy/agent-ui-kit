@@ -121,6 +121,10 @@ describe.each(skills)('skills/%s', (name) => {
 
   it('demo stylesheet ends with the reference css, byte for byte', () => {
     const css = fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!;
+    // Guard the guard: every string ends with '', so an emptied fence would make the
+    // assertion below pass against any demo at all.
+    expect(css.trim().length, 'reference css block is empty').toBeGreaterThan(0);
+
     const style = htmlBlock(readFileSync(demoPath, 'utf8'), 'style');
     expect(style, 'demo has no <style> block').not.toBeNull();
     expect(style!.trimEnd().endsWith(css.trim()), 'demo css has drifted from the reference').toBe(true);
@@ -145,9 +149,13 @@ describe.each(skills)('skills/%s', (name) => {
   it('demo script begins with the reference module, exports stripped', () => {
     const js = fencedBlock(readFileSync(referencePath, 'utf8'), 'js');
     if (js === null) return; // CSS-only component
+    const stripped = js.replace(/^export /gm, '').trim();
+    // Same trap as the css above: every string starts with ''. `js === null` catches a
+    // missing fence but not an empty one.
+    expect(stripped.length, 'reference js block is empty').toBeGreaterThan(0);
+
     const script = htmlBlock(readFileSync(demoPath, 'utf8'), 'script');
     expect(script, 'demo has no <script> block').not.toBeNull();
-    const stripped = js.replace(/^export /gm, '').trim();
     expect(script!.trimStart().startsWith(stripped), 'demo module has drifted from the reference').toBe(true);
   });
 
