@@ -1,0 +1,27 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      # Gate 3 of scripts/check.sh needs the Claude Code CLI. Everything else runs
+      # from the repo's own dependencies.
+      - run: npm install -g @anthropic-ai/claude-code
+
+      - run: bash scripts/check.sh --prove

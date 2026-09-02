@@ -1,5 +1,5 @@
 ---
-status: todo
+status: in-progress
 type: feature
 created: 2026-09-02
 modified: 2026-09-02
@@ -66,23 +66,23 @@ GitHub Actions is frequently billing-blocked on this account, so every check mus
 
 ### Phase: Foundation
 
-1. Create package.json and install vitest, @playwright/test, @axe-core/playwright and gray-matter. Why: every later step needs a test runner, and an earlier draft of this plan called `npm ci` in a repo that had no package.json at all. Verify: `npm ci && npx vitest run --passWithNoTests` exits zero and `npx playwright install chromium` completes.
-2. Write docs/component-spec.md defining both halves of the authoring contract — what belongs in SKILL.md (standard frontmatter keys only, a third-person description, a body under 60 lines, no component code) and what belongs in the reference (element, role, props, slots, variants, behaviour, WCAG criteria, plus the five body sections Structure, Styles, Behaviour, Accessibility and Demo). Why: every later step writes against this contract, and the split between the two files is currently undefined, so drafting a component first would bake in an accidental format. Verify: hand the spec and nothing else to a fresh Claude and ask it to write the button reference — a clarifying question about structure means the spec is incomplete and gets fixed before step 3.
-3. Write three evaluation scenarios per component in evals/ and record a baseline run, with no skills installed, in docs/evaluations.md. Why: Anthropic's authoring guidance puts evaluations before documentation so a skill closes an observed gap rather than an imagined one, and without a baseline nothing proves the skill improved anything. Verify: docs/evaluations.md holds twelve baseline results naming concrete failures such as missing focus restoration or a wrong live-region setting; a scenario that already passes with no skill is too easy and gets rewritten.
-4. Build scripts/check.sh running four gates in order — the Vitest unit suite, a portability lint over every file under skills/, `claude plugin validate . --strict`, and the Playwright browser suite. Why: naming the check before the work stops the harness being quietly shaped to pass whatever the components happen to do. Verify: a deliberately broken fixture at tests/fixtures/bad-skill/ makes the run exit non-zero naming both faults separately, and the portability lint scans only skills/ so the fixture never trips the real gate.
+1. [x] Create package.json and install vitest, @playwright/test, @axe-core/playwright and gray-matter. Why: every later step needs a test runner, and an earlier draft of this plan called `npm ci` in a repo that had no package.json at all. Verify: `npm ci && npx vitest run --passWithNoTests` exits zero and `npx playwright install chromium` completes.
+2. [ ] Write docs/component-spec.md defining both halves of the authoring contract — what belongs in SKILL.md (standard frontmatter keys only, a third-person description, a body under 60 lines, no component code) and what belongs in the reference (element, role, props, slots, variants, behaviour, WCAG criteria, plus the five body sections Structure, Styles, Behaviour, Accessibility and Demo). Why: every later step writes against this contract, and the split between the two files is currently undefined, so drafting a component first would bake in an accidental format. Verify: hand the spec and nothing else to a fresh Claude and ask it to write the button reference — a clarifying question about structure means the spec is incomplete and gets fixed before step 3.
+3. [x] Write three evaluation scenarios per component in evals/ and record a baseline run, with no skills installed, in docs/evaluations.md. Why: Anthropic's authoring guidance puts evaluations before documentation so a skill closes an observed gap rather than an imagined one, and without a baseline nothing proves the skill improved anything. Verify: docs/evaluations.md holds twelve baseline results naming concrete failures such as missing focus restoration or a wrong live-region setting; a scenario that already passes with no skill is too easy and gets rewritten.
+4. [x] Build scripts/check.sh running four gates in order — the Vitest unit suite, a portability lint over every file under skills/, `claude plugin validate . --strict`, and the Playwright browser suite. Why: naming the check before the work stops the harness being quietly shaped to pass whatever the components happen to do. Verify: a deliberately broken fixture at tests/fixtures/bad-skill/ makes the run exit non-zero naming both faults separately, and the portability lint scans only skills/ so the fixture never trips the real gate.
 
 ### Phase: Components
 
-5. Write skills/button/ with no JavaScript, lifting from acss-kit the decision to use `aria-disabled` instead of the native disabled attribute so a disabled button stays in the keyboard tab order. Why: the simplest possible component proves the format end to end before any behaviour complexity arrives. Verify: check.sh passes, and tests/e2e/button.spec.ts confirms zero axe violations plus a disabled button that is reachable by Tab but does not fire on Enter, with all three button evaluations passing.
-6. Write skills/alert/ as an ARIA live region (the mechanism that makes a screen reader announce content appearing after page load), still with no JavaScript. Why: its entire value is the accessibility contract, so a wrong live-region setting is invisible to the eye and only a test catches it. Verify: tests/e2e/alert.spec.ts confirms zero axe violations, the alert role present, the live-region setting resolving to assertive, and the region already in the page before any content arrives.
-7. Write skills/dialog/ using the native dialog element plus a dependency-free ES module for focus management. Why: this is the hardest accessibility case in the set, so if the format cannot express focus trapping, inertness, Escape handling and focus restoration, that has to surface now rather than at component twenty. Verify: tests/e2e/dialog.spec.ts confirms focus moves inside on open, Tab cycles only within the dialog, Escape closes it, and focus returns to the exact element that opened it.
-8. Write skills/tabs/ using roving tabindex (keeping exactly one tab in the keyboard tab order and moving it with the arrow keys), with no acss-kit source to lift from. Why: every other component is an extraction, so this one tests whether the specification from step 2 stands on its own with nothing to copy. Verify: tests/e2e/tabs.spec.ts confirms one tab in the tab order at a time, arrow keys moving selection, Home and End jumping to the ends, and each tab paired to its panel by aria-controls and aria-labelledby.
+5. [x] Write skills/button/ with no JavaScript, lifting from acss-kit the decision to use `aria-disabled` instead of the native disabled attribute so a disabled button stays in the keyboard tab order. Why: the simplest possible component proves the format end to end before any behaviour complexity arrives. Verify: check.sh passes, and tests/e2e/button.spec.ts confirms zero axe violations plus a disabled button that is reachable by Tab but does not fire on Enter, with all three button evaluations passing.
+6. [x] Write skills/alert/ as an ARIA live region (the mechanism that makes a screen reader announce content appearing after page load), still with no JavaScript. Why: its entire value is the accessibility contract, so a wrong live-region setting is invisible to the eye and only a test catches it. Verify: tests/e2e/alert.spec.ts confirms zero axe violations, the alert role present, the live-region setting resolving to assertive, and the region already in the page before any content arrives.
+7. [x] Write skills/dialog/ using the native dialog element plus a dependency-free ES module for focus management. Why: this is the hardest accessibility case in the set, so if the format cannot express focus trapping, inertness, Escape handling and focus restoration, that has to surface now rather than at component twenty. Verify: tests/e2e/dialog.spec.ts confirms focus moves inside on open, Tab cycles only within the dialog, Escape closes it, and focus returns to the exact element that opened it.
+8. [x] Write skills/tabs/ using roving tabindex (keeping exactly one tab in the keyboard tab order and moving it with the arrow keys), with no acss-kit source to lift from. Why: every other component is an extraction, so this one tests whether the specification from step 2 stands on its own with nothing to copy. Verify: tests/e2e/tabs.spec.ts confirms one tab in the tab order at a time, arrow keys moving selection, Home and End jumping to the ends, and each tab paired to its panel by aria-controls and aria-labelledby.
 
 ### Phase: Proof
 
-9. Run all twelve evaluations against Haiku, Sonnet and Opus and record every result beside the baseline in docs/evaluations.md. Why: a description that triggers reliably on Opus can fail to trigger on Haiku, and triggering is the entire discovery mechanism, so skipping this ships descriptions tuned to one model. Verify: every scenario fires its intended skill on all three models, or the miss is named as a known limitation after two description rewrites — fixes go in the description, never the body, which loads too late to affect triggering.
-10. Install the plugin into Claude Code from the local directory, place the same skills tree where Codex looks for it, and write down what happened in docs/vendor-support.md. Why: every other check tests the files, and this is the only step that tests the README's actual claim that one tree serves two vendors. Verify: docs/vendor-support.md records both results including anything that failed, because a Codex discovery failure is a finding to document rather than a step to quietly skip.
-11. Update README.md, bump both plugin manifests to 0.2.0, and add .github/workflows/check.yml running scripts/check.sh. Why: the README still says components do not exist, and Claude Code only offers users an update when the manifest version changes. Verify: check.sh exits zero from a clean clone in a temporary directory; a failing Actions run is read with `gh run view --log-failed` first, because a billing block fails every job in seconds with no test output and is not a code defect.
+9. [x] Run all twelve evaluations against Haiku, Sonnet and Opus and record every result beside the baseline in docs/evaluations.md. Why: a description that triggers reliably on Opus can fail to trigger on Haiku, and triggering is the entire discovery mechanism, so skipping this ships descriptions tuned to one model. Verify: every scenario fires its intended skill on all three models, or the miss is named as a known limitation after two description rewrites — fixes go in the description, never the body, which loads too late to affect triggering.
+10. [x] Install the plugin into Claude Code from the local directory, place the same skills tree where Codex looks for it, and write down what happened in docs/vendor-support.md. Why: every other check tests the files, and this is the only step that tests the README's actual claim that one tree serves two vendors. Verify: docs/vendor-support.md records both results including anything that failed, because a Codex discovery failure is a finding to document rather than a step to quietly skip.
+11. [x] Update README.md, bump both plugin manifests to 0.2.0, and add .github/workflows/check.yml running scripts/check.sh. Why: the README still says components do not exist, and Claude Code only offers users an update when the manifest version changes. Verify: check.sh exits zero from a clean clone in a temporary directory; a failing Actions run is read with `gh run view --log-failed` first, because a billing block fails every job in seconds with no test output and is not a code defect.
 
 ## Tests
 
@@ -95,18 +95,28 @@ Tier 1 — This plan changes application code
 
 ## Acceptance Criteria
 
-- [ ] `npm ci` succeeds from a clean clone and `scripts/check.sh` exits zero
+- [x] `npm ci` succeeds from a clean clone and `scripts/check.sh` exits zero
 - [ ] docs/component-spec.md defines both the SKILL.md contract and the reference format, and a fresh agent writes a conforming component from it without asking a clarifying question
-- [ ] Four skills exist: button, alert, dialog and tabs
-- [ ] Every skill's frontmatter passes this repo's validator, and the validator is itself proven by fixtures that fail each rule
-- [ ] No skill contains `${CLAUDE_PLUGIN_ROOT}`, `disable-model-invocation`, `hint:` or a backslash path
-- [ ] No component's HTML, CSS or JavaScript references a framework, a preprocessor or an external package
-- [ ] Every themeable CSS value is a `var(--auk-*, fallback)` and every component renders correctly with no custom properties defined at all
-- [ ] Every WCAG criterion claimed in a reference has a passing assertion in tests/e2e/
-- [ ] Each skill has at least three evaluations, with baseline results recorded from before the skill existed
-- [ ] All twelve evaluations trigger the correct skill on Haiku, Sonnet and Opus, or the miss is documented as a known limitation
-- [ ] The four skills load and are invocable in Claude Code
-- [ ] The Codex discovery result is recorded in docs/vendor-support.md whether it worked or not
+
+  **Not met.** The first half holds; the second does not. Eight fresh-agent passes were
+  run, each handed only the spec and asked to author a component from it. The count of
+  format questions fell from 26 to 4 - and every remaining item is a narrow CSS-naming
+  edge on a deliberately hard composite component, not a structural gap. Passes 1 to 3
+  used button and disclosure; passes 4 to 8 used a combobox, chosen because it is
+  composite, has internal parts, a named content region and module-written state. All
+  four v1 components were authored from the spec with no ambiguity. The four questions
+  from pass 8 have been answered in the spec, but no ninth pass was run, so the
+  criterion is recorded as unverified rather than met.
+- [x] Four skills exist: button, alert, dialog and tabs
+- [x] Every skill's frontmatter passes this repo's validator, and the validator is itself proven by fixtures that fail each rule
+- [x] No skill contains `${CLAUDE_PLUGIN_ROOT}`, `disable-model-invocation`, `hint:` or a backslash path
+- [x] No component's HTML, CSS or JavaScript references a framework, a preprocessor or an external package
+- [x] Every themeable CSS value is a `var(--auk-*, fallback)` and every component renders correctly with no custom properties defined at all
+- [x] Every WCAG criterion claimed in a reference has a passing assertion in tests/e2e/
+- [x] Each skill has at least three evaluations, with baseline results recorded from before the skill existed
+- [x] All twelve evaluations trigger the correct skill on Haiku, Sonnet and Opus, or the miss is documented as a known limitation
+- [x] The four skills load and are invocable in Claude Code
+- [x] The Codex discovery result is recorded in docs/vendor-support.md whether it worked or not
 
 ## Verification
 

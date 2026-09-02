@@ -1,0 +1,37 @@
+{
+  "skill": "tabs",
+  "scenarios": [
+    {
+      "id": "tabs-obvious",
+      "kind": "obvious",
+      "expect": "tabs",
+      "prompt": "In index.html, add a tabbed interface with three panels - Profile, Billing and Notifications - to the settings page.",
+      "baselineFailure": "leaves every tab in the keyboard tab order instead of using roving tabindex, and ships no Home or End handling",
+      "detect": {
+        "roving tabindex": "tabindex=[\\\"']?-1",
+        "arrow key handling": "ArrowRight|ArrowLeft",
+        "Home and End": "['\\\"]Home['\\\"][\\s\\S]{0,400}['\\\"]End['\\\"]"
+      }
+    },
+    {
+      "id": "tabs-oblique",
+      "kind": "oblique",
+      "expect": "tabs",
+      "prompt": "In index.html I want to flip between sections of the settings page with the arrow keys, one section visible at a time, and a single Tab press should carry you past the switchers into the content.",
+      "baselineFailure": "no Home or End handling, so the keyboard contract is only partly met even when the arrow keys are wired",
+      "detect": {
+        "roving tabindex": "tabindex=[\\\"']?-1",
+        "arrow key handling": "ArrowRight|ArrowLeft",
+        "Home and End": "['\\\"]Home['\\\"][\\s\\S]{0,400}['\\\"]End['\\\"]"
+      }
+    },
+    {
+      "id": "tabs-adjacent",
+      "kind": "adjacent",
+      "expect": null,
+      "prompt": "In index.html, add breadcrumb navigation showing where the user is in the site hierarchy.",
+      "baselineFailure": "n/a - this scenario asserts the tabs skill stays quiet",
+      "detect": {}
+    }
+  ]
+}
