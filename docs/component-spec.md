@@ -6,8 +6,14 @@ This is the authoring contract for every skill under `skills/`. It defines the t
 files a component ships, what belongs in each, and the rules a component must satisfy
 to be portable across agent vendors.
 
-Read this before writing a component. Every check in `scripts/check.sh` enforces
-something stated here.
+Read this before writing a component. Every gate named here enforces something stated
+here.
+
+**Harness status.** The gates this document names — `scripts/check.sh`, the
+frontmatter validator, the manifest check in `tests/objective.spec.ts` — are stated in
+the normative present, as requirements this specification places on the repository.
+Where a gate is not yet implemented, the requirement still stands: the gap is a defect
+in the harness, not permission to ship a component that would fail it.
 
 ## 1. Files
 
@@ -61,7 +67,7 @@ Standard [Agent Skills](https://agentskills.io/specification) keys only.
 |---|---|---|
 | `name` | yes | 1–64 characters; lowercase alphanumerics and hyphens only; identical to the parent directory name; no leading, trailing or consecutive hyphens |
 | `description` | yes | 1–1024 characters; written as a trigger (§2.2) |
-| `license` | no | licence name, or the name of a bundled licence file |
+| `license` | no | a license name (for example `MIT`). The standard also permits naming a bundled license file; this kit does not, because §1 fixes the skill directory at three files and the repository is licensed at its root |
 | `compatibility` | no | 1–500 characters; environment requirements |
 | `metadata` | no | a map of string keys to string values |
 | `allowed-tools` | no | **space-separated** string of pre-approved tools (experimental) |
@@ -230,9 +236,7 @@ passing control.
 The consequence is that the automated gate is more permissive than the manual one. A
 component split across files would pass an automated browser suite and still fail the
 manual verification of opening the demo in a browser. The portability gate in
-`scripts/check.sh` must therefore reject any external reference under `skills/`. That
-gate is a requirement this specification places on the harness; it is not described
-here as already implemented.
+`scripts/check.sh` must therefore reject any external reference under `skills/`.
 
 ### 4.2 CSS naming
 
