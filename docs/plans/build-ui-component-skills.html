@@ -1,479 +1,2473 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-status="todo" data-effort="high">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Build vendor-neutral UI component skills</title>
+<script>
+/* Runs in <head> before the first paint, on purpose: a plan opened from
+   file:// has no server to stamp the attribute, and a flash of the wrong
+   theme on every load is worse than having no dark mode at all. Storage
+   throws in some sandboxed file:// contexts — fall through to
+   prefers-color-scheme rather than blocking the render. */
+try {
+  var t = localStorage.getItem('plan-theme');
+  if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+} catch (e) { /* no storage — prefers-color-scheme decides */ }
+</script>
+<meta name="plan-status" content="todo">
+<meta name="plan-effort" content="high">
+<meta name="plan-type" content="feature">
+<meta name="plan-created" content="2026-09-02">
+<meta name="plan-repo" content="agent-ui-kit">
+<meta name="plan-file" content="build-ui-component-skills.html">
+<meta name="plan-path" content="docs/plans/build-ui-component-skills.html">
+<meta name="plan-md" content="docs/plans/build-ui-component-skills.md">
+<meta name="plan-implement" content="Read and implement all steps in the plan at docs/plans/build-ui-component-skills.md — Build vendor-neutral UI component skills. Verify against the plan&#39;s Tests, Verification, and Acceptance Criteria before reporting done. If everything passed, mark completion in docs/plans/build-ui-component-skills.md — tick each step&#39;s [x] marker and each criterion&#39;s - [x], set status: completed — and re-render the HTML from the spec. If any check failed, leave status: in-progress and say which. This plan is published at https://claude.ai/code/artifact/aabf412c-2636-4254-9a21-615215b8c4ce — after re-rendering, republish it to that same URL so the shared page matches the spec.">
+<meta name="plan-goal" content="Achieve this goal: Build vendor-neutral UI component skills. The plan at docs/plans/build-ui-component-skills.md describes one approach — use it as reference, but optimize for the outcome. Verify against the plan&#39;s Tests, Verification, and Acceptance Criteria before reporting done. If everything passed, mark completion in docs/plans/build-ui-component-skills.md — tick each step&#39;s [x] marker and each criterion&#39;s - [x], set status: completed — and re-render the HTML from the spec. If any check failed, leave status: in-progress and say which. This plan is published at https://claude.ai/code/artifact/aabf412c-2636-4254-9a21-615215b8c4ce — after re-rendering, republish it to that same URL so the shared page matches the spec.">
+<title>Plan: Build vendor-neutral UI component skills</title>
 <style>
-/* markdown-to-html v2.1.0 — generated from reference/html-spec.md */
-body.theme-default {
-  --color-header-bg: #1e293b;
-  --color-header-text: #f8fafc;
-  --color-nav-bg: #f1f5f9;
-  --color-nav-text: #334155;
-  --color-nav-hover: #2563eb;
-  --color-accent: #2563eb;
-  --color-body-bg: #ffffff;
-  --color-body-text: #1e293b;
-  --color-muted: #64748b;
-  --color-border: #e2e8f0;
-  --color-card-bg: #f8fafc;
-  --color-code-bg: #e2e8f0;
-}
+/* ── Design tokens ─────────────────────────────────────────────────
+     Indigo-violet lead on warm-neutral paper. Status is carried by form
+     (soft fill + rule) rather than a second colour scale, so every status
+     chip inherits the theme instead of pinning white text onto a hue that
+     only works on one background. Type has three roles: --mono for every
+     structural label, --ui for chrome, --prose for reading text.
+     Contrast is a hard constraint, not a preference — every text token
+     below clears 4.5:1 on the surfaces it is used against in BOTH
+     palettes, and tests/plugins/test-plan-redesign.mjs measures it. ── */
+  :root {
+    --paper:      #fbfbfd;
+    --panel:      #ffffff;
+    --sunk:       #f4f4f8;
+    --ink:        #14141c;
+    --ink-2:      #494959;
+    --ink-3:      #63637a;
+    --rule:       #e4e4ee;
+    --rule-soft:  #f0f0f6;
+    --accent:     #3730c4;
+    --accent-soft:#eeedfb;
+    --accent-line:#c6c2f0;
+    --on-accent:  #ffffff;
+    --moss:       #2c6a44;
+    --moss-soft:  #ecf4ef;
+    --moss-line:  #c0dccb;
+    --signal:     #8a5209;
+    --signal-soft:#fbf3e6;
+    --signal-line:#e8d3ac;
+    --red:        #b42318;
+    --red-bg:     #fdf1f0;
+    --red-border: #edc4bf;
+    --purple:     #3730c4;
+    --purple-bg:  #eeedfb;
+    --purple-border:#c6c2f0;
+    --wish-bg:    #f4f4f8;
+    --wish-border:#c6c2f0;
+    --radius:     4px;
+    --shadow:     0 1px 2px rgba(20,20,28,.05);
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --ui:   system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    /* Prose is the UI stack on purpose. It used to be Georgia, which collided
+       with the mono code spans that saturate plan prose — the corpus carries
+       3,000+ of them, so a serif/mono clash was the page's dominant texture.
+       No webfont: the Artifact CSP blocks font CDNs, and inlining a face as a
+       data URI would add six figures of bytes to each of ~100 committed plan
+       files. Character comes from scale, weight, and tracking instead. */
+    --prose: var(--ui);
+  }
 
-body.theme-developer {
-  --color-header-bg: #0d1117;
-  --color-header-text: #e6edf3;
-  --color-nav-bg: #161b22;
-  --color-nav-text: #8b949e;
-  --color-nav-hover: #3fb950;
-  --color-accent: #3fb950;
-  --color-body-bg: #0d1117;
-  --color-body-text: #e6edf3;
-  --color-muted: #8b949e;
-  --color-border: #30363d;
-  --color-card-bg: #161b22;
-  --color-code-bg: #21262d;
-}
+  /* Dark palette. Written twice on purpose: an explicit choice
+     ([data-theme]) has to beat the OS preference, and plain CSS has no way
+     to share one declaration block between an attribute selector and a
+     media query. Keep the two lists in sync — the redesign test asserts
+     both selectors define the same token names. */
+  :root[data-theme="dark"] {
+    --paper:      #0f0f16;
+    --panel:      #17171f;
+    --sunk:       #1d1d27;
+    --ink:        #ecebf2;
+    --ink-2:      #b2b0c2;
+    --ink-3:      #8a889c;
+    --rule:       #2a2a36;
+    --rule-soft:  #22222c;
+    --accent:     #a8a2f5;
+    --accent-soft:#1f1d33;
+    --accent-line:#454070;
+    --on-accent:  #14141c;
+    --moss:       #7cc099;
+    --moss-soft:  #17271e;
+    --moss-line:  #2e4838;
+    --signal:     #e0a86a;
+    --signal-soft:#271e12;
+    --signal-line:#4a3820;
+    --red:        #f4998f;
+    --red-bg:     #2a1918;
+    --red-border: #4c2a26;
+    --purple:     #a8a2f5;
+    --purple-bg:  #1f1d33;
+    --purple-border:#454070;
+    --wish-bg:    #1f1d33;
+    --wish-border:#454070;
+    --shadow:     0 1px 2px rgba(0,0,0,.4);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #0f0f16;
+      --panel:      #17171f;
+      --sunk:       #1d1d27;
+      --ink:        #ecebf2;
+      --ink-2:      #b2b0c2;
+      --ink-3:      #8a889c;
+      --rule:       #2a2a36;
+      --rule-soft:  #22222c;
+      --accent:     #a8a2f5;
+      --accent-soft:#1f1d33;
+      --accent-line:#454070;
+      --on-accent:  #14141c;
+      --moss:       #7cc099;
+      --moss-soft:  #17271e;
+      --moss-line:  #2e4838;
+      --signal:     #e0a86a;
+      --signal-soft:#271e12;
+      --signal-line:#4a3820;
+      --red:        #f4998f;
+      --red-bg:     #2a1918;
+      --red-border: #4c2a26;
+      --purple:     #a8a2f5;
+      --purple-bg:  #1f1d33;
+      --purple-border:#454070;
+      --wish-bg:    #1f1d33;
+      --wish-border:#454070;
+      --shadow:     0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+  /* Native controls (checkboxes, scrollbars) follow the resolved theme. */
+  :root { color-scheme: light; }
+  :root[data-theme="dark"] { color-scheme: dark; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { color-scheme: dark; }
+  }
 
-body.theme-document {
-  --color-header-bg: #4a3728;
-  --color-header-text: #fdf6ec;
-  --color-nav-bg: #fdf6ec;
-  --color-nav-text: #4a3728;
-  --color-nav-hover: #8b5e3c;
-  --color-accent: #8b5e3c;
-  --color-body-bg: #fdf6ec;
-  --color-body-text: #2c1a0e;
-  --color-muted: #6b4c38;
-  --color-border: #d4b896;
-  --color-card-bg: #f5eddf;
-  --color-code-bg: #ede0cc;
-}
+  /* ── Reset & base ──────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--ui);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  a { color: var(--accent); }
+  code, pre {
+    font-family: var(--mono);
+    font-size: .875em;
+  }
+  /* Inline spans rendered from backtick markers in plan prose. Scoped to .md
+     so the bare <code> carrying file paths and copyable prompts keeps its own
+     layout — those live inside chips and rows that already style themselves.
+     No backticks in this comment: the whole stylesheet is a JS template. */
+  /* Deliberately quiet. A plan paragraph routinely carries five or six of
+     these; with a fill AND a border each they turned running prose into a
+     barcode, which was the loudest thing on the page. Tint only, no border,
+     and a hair smaller than the surrounding text. */
+  code.md {
+    background: var(--sunk);
+    border-radius: 3px;
+    padding: .1em .3em;
+    font-size: .85em;
+    color: var(--ink);
+    /* Long paths must wrap rather than force the card into a sideways scroll. */
+    overflow-wrap: anywhere;
+  }
+  strong.md { font-weight: 650; color: var(--ink); }
+  em.md { font-style: italic; }
+  pre {
+    background: var(--sunk);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: .75rem 1rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
 
-body.theme-minimal {
-  --color-header-bg: #000000;
-  --color-header-text: #ffffff;
-  --color-nav-bg: #ffffff;
-  --color-nav-text: #000000;
-  --color-nav-hover: #333333;
-  --color-accent: #000000;
-  --color-body-bg: #ffffff;
-  --color-body-text: #000000;
-  --color-muted: #555555;
-  --color-border: #dddddd;
-  --color-card-bg: #f9f9f9;
-  --color-code-bg: #eeeeee;
-}
+  /* ── SVG icon helper ────────────────────────────────────────────── */
+  .icon {
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
 
+  /* ── Skip link ─────────────────────────────────────────────────── */
+  .skip-link {
+    position: absolute;
+    left: -9999px; top: auto;
+    width: 1px; height: 1px;
+    overflow: hidden;
+  }
+  .skip-link:focus {
+    position: fixed;
+    left: 1rem; top: 1rem;
+    width: auto; height: auto;
+    overflow: visible;
+    background: var(--accent);
+    color: var(--on-accent);
+    padding: .5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 700;
+    z-index: 9999;
+    text-decoration: none;
+  }
 
-.skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
-.skip-link:focus{position:static;width:auto;height:auto;padding:.5rem 1rem;background:var(--color-accent);color:#fff;z-index:100}
-:focus-visible{outline:3px solid var(--color-accent);outline-offset:2px}
-html{scroll-behavior:smooth}
-body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--color-body-bg);color:var(--color-body-text)}
-header{background:var(--color-header-bg);color:var(--color-header-text);padding:1.5rem 2rem 1rem}
-header h1{margin:.5rem 0 .25rem;font-size:1.5rem;color:var(--color-header-text)}
-.metadata-row{font-size:.8rem;opacity:.75;margin-top:.5rem}
-.status-badge{display:inline-block;padding:.2em .7em;border-radius:9999px;font-size:.75rem;font-weight:600;color:#fff}
-.status-todo,.status-unknown{background:#6b7280}
-.status-in-progress{background:#d97706}
-.status-completed{background:#16a34a}
-.progress-bar{width:100%;height:4px;background:rgba(255,255,255,.2)}
-.progress-fill{height:100%;background:#6b7280;transition:width .3s ease}
-.layout{display:grid;grid-template-columns:220px 1fr;gap:2rem;max-width:1024px;margin:0 auto;padding:1.5rem}
-nav{position:sticky;top:1rem;align-self:start;background:var(--color-nav-bg);border-radius:8px;padding:.75rem 0}
-nav ul{list-style:none;padding:0 0 0 1rem;margin:0}
-nav a{display:flex;align-items:center;min-height:44px;padding:.35rem .5rem;color:var(--color-nav-text);text-decoration:none;border-radius:4px;font-size:.875rem}
-nav a:hover{color:var(--color-nav-hover)}
-nav a.active,nav a[aria-current="true"]{color:var(--color-accent);font-weight:600}
-main{min-width:0}
-section{margin-bottom:2rem}
-h2{font-size:1.25rem;border-bottom:1px solid var(--color-border);padding-bottom:.35rem}
-h4{font-size:.95rem;margin:1.25rem 0 .35rem}
-blockquote{margin:0 0 1rem;padding:.5rem .9rem;border-left:3px solid var(--color-accent);background:var(--color-card-bg);border-radius:0 6px 6px 0}
-blockquote p{margin:0;font-size:.875rem}
-.check-item{list-style:none;margin-left:-1.2rem}
-.step-card{background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:box-shadow .15s ease,transform .15s ease;position:relative}
-.step-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.12);transform:translateY(-1px)}
-.step-card.completed .step-action{text-decoration:line-through;opacity:.6}
-.step-label{display:flex;align-items:flex-start;gap:.5rem;cursor:pointer}
-.step-checkbox{width:1.25rem;height:1.25rem;flex-shrink:0;cursor:pointer;margin-top:.2rem}
-.step-action{margin:0;font-size:1rem}
-.step-detail{font-size:.875rem;margin:.5rem 0 0}
-.step-detail p{margin:.4rem 0}
-.step-detail ul{margin:.4rem 0;padding-left:1.1rem}
-.step-why{color:var(--color-muted);font-size:.875rem;margin:.5rem 0 0}
-.step-verify{color:var(--color-accent);font-size:.875rem;margin:.25rem 0 0}
-.step-status{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-code{background:var(--color-code-bg);border-radius:3px;padding:.1em .35em;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.875em;overflow-wrap:anywhere}
-p,li,h2,h3,h4,.step-action,.step-detail,.step-why,.step-verify{overflow-wrap:break-word}
-pre{background:var(--color-code-bg);border:1px solid var(--color-border);border-radius:6px;padding:1rem;overflow-x:auto}
-pre code{background:none;padding:0;font-size:.85em}
-.section-diagram{max-width:1024px;margin:0 auto 1rem;padding:0 1.5rem;overflow-x:auto}
-.section-diagram figcaption{font-size:.75rem;color:var(--color-muted);text-align:center;margin-top:.25rem}
-.steps-list{list-style:none;padding-left:2rem;position:relative}
-.steps-list::before{content:"";position:absolute;left:.75rem;top:1.5rem;bottom:1.5rem;width:2px;background:var(--color-border)}
-.step-card::before{content:"";position:absolute;left:-1.6rem;top:1.25rem;width:.75rem;height:.75rem;border-radius:50%;background:var(--color-border);border:2px solid var(--color-card-bg);transition:background .2s ease}
-.step-card.completed::before{background:var(--color-accent);border-color:var(--color-accent)}
-.step-chip{display:inline-block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.15em .5em;border-radius:9999px;background:var(--color-border);color:var(--color-body-text);vertical-align:middle;margin-right:.5rem;user-select:none}
-.step-card.completed .step-chip{background:var(--color-accent);color:#fff}
-.scroll-rail{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--color-border);border-radius:2px;overflow:hidden}
-.scroll-rail::after{content:"";position:absolute;top:0;left:0;right:0;height:calc(var(--scroll-pct,0) * 1%);background:var(--color-accent);transition:height .1s linear}
-.save-pdf-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem 1rem;font-size:.8rem;font-weight:600;color:#fff;background:var(--color-accent);border:1px solid var(--color-accent);border-radius:4px;cursor:pointer;font-family:inherit;line-height:1.4;white-space:nowrap;transition:background .15s,box-shadow .15s}
-.save-pdf-btn:hover{filter:brightness(.85);box-shadow:0 2px 6px rgba(0,0,0,.2)}
-.save-pdf-btn:active{filter:brightness(.75)}
-.save-pdf-btn:focus-visible{outline:3px solid var(--color-accent);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.step-card,.step-card::before,.progress-fill,.scroll-rail::after,.save-pdf-btn{transition:none}.step-card:hover{transform:none}}
-@media (max-width:768px){.layout{grid-template-columns:1fr}nav{position:static}.scroll-rail{display:none}}
-@media print{header{background:#fff !important;color:#000 !important;box-shadow:none}
-.progress-bar,.scroll-rail,.step-chip,.save-pdf-btn,nav,.section-diagram,.skip-link{display:none}
-.layout{display:block}
-.step-card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
-a[href]::after{content:" (" attr(href) ")";font-size:.8em;color:#555}
-.status-badge{border:1px solid currentColor;background:none !important;color:inherit !important}}
+  /* ── Header — document cover ────────────────────────────────────── */
+  .plan-header {
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    padding: 0;
+  }
+  .plan-header::before {
+    content: "";
+    display: block;
+    height: 3px;
+    background: var(--accent);
+  }
+  .plan-header-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 1.75rem 1.5rem 1.5rem;
+  }
+  .plan-doc-type {
+    font-family: var(--mono);
+    font-size: .65rem;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: .6rem;
+  }
+  .plan-header-top {
+    display: block;
+  }
+  /* Sans, not mono. A 2.2rem monospaced headline read as a terminal dump
+     rather than a document title; the weight and the tight tracking carry
+     the emphasis instead. */
+  .plan-title {
+    font-size: clamp(1.7rem, 4vw, 2.35rem);
+    font-weight: 700;
+    letter-spacing: -.028em;
+    line-height: 1.12;
+    color: var(--ink);
+    max-width: 24ch;
+    text-wrap: balance;
+  }
+  /* State reads before controls. The markup order is fixed by the renderer
+     (buttons, then badges), so the visual order is set here rather than by
+     moving nodes the extractor and the gallery both walk. */
+  .plan-header-actions {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .plan-header-actions .status-badge { order: 1; }
+  .plan-header-actions .effort-badge { order: 2; }
+  .plan-header-actions .save-pdf-btn { order: 3; margin-left: auto; }
+  .plan-header-actions .theme-toggle { order: 4; }
+  @media (max-width: 560px) {
+    .plan-header-actions .save-pdf-btn { margin-left: 0; }
+  }
 
+  /* Status badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: .25rem .75rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-family: var(--mono);
+    color: var(--ink-3);
+    background: var(--sunk);
+    border: 1px solid var(--rule);
+  }
+  .status-badge::before {
+    content: "";
+    display: inline-block;
+    width: .45em;
+    height: .45em;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+  [data-status="in-progress"] .status-badge { color: var(--signal); background: var(--signal-soft); border-color: var(--signal-line); }
+  [data-status="completed"]   .status-badge { color: var(--moss);   background: var(--moss-soft);   border-color: var(--moss-line); }
+
+  /* Effort badge — color tracks the data-effort attribute, mirroring .status-badge */
+  .effort-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: .25rem .75rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-family: var(--mono);
+    color: var(--ink-3);
+    background: var(--sunk);
+    border: 1px solid var(--rule);
+  }
+  .effort-badge::before { content: "Effort "; opacity: .7; }
+  [data-effort="low"]    .effort-badge { color: var(--moss);   border-color: var(--moss-line); }
+  [data-effort="medium"] .effort-badge { color: var(--signal); border-color: var(--signal-line); }
+  [data-effort="high"]   .effort-badge { color: var(--red);    border-color: var(--red-border); }
+
+  @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+  [data-status="in-progress"] .status-badge::before {
+    animation: pulse-dot 1.4s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    [data-status="in-progress"] .status-badge::before { animation: none; }
+  }
+
+  /* Save as PDF button */
+  .save-pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .4rem 1rem;
+    font-size: .75rem;
+    font-weight: 600;
+    font-family: var(--mono);
+    color: var(--on-accent);
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 1.4;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: filter .15s, box-shadow .15s;
+  }
+  .save-pdf-btn:hover { filter: brightness(1.12); }
+  .save-pdf-btn:active { filter: brightness(.92); }
+  .save-pdf-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { .save-pdf-btn { transition: none; } }
+
+  /* Theme toggle — same shape as Save as PDF, quieter fill. */
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    min-width: 44px;
+    min-height: 44px;
+    padding: .4rem .9rem;
+    font-family: var(--mono);
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .theme-toggle:hover { color: var(--accent); border-color: var(--accent-line); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* Meta row */
+  .plan-meta {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: .7rem;
+    color: var(--ink-2);
+  }
+  .plan-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+  }
+  .plan-meta .icon { opacity: .55; }
+
+  /* ── Layout ────────────────────────────────────────────────────── */
+  .layout {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 3.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+    align-items: start;
+  }
+  /* 900, not 720: the sidebar now carries a step rail and is 15rem wide, so
+     between those two widths the main column was narrow enough to break a
+     copyable path across four lines. Collapse to one column sooner. */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; padding: 1.5rem .75rem 4rem; gap: 0; }
+  }
+
+  /* ── Sidebar — table of contents ───────────────────────────────── */
+  .plan-nav {
+    position: sticky;
+    top: 1.5rem;
+    align-self: start;
+    overflow: hidden;
+  }
+  @media (max-width: 900px) {
+    .plan-nav {
+      position: static;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+  }
+  .nav-heading {
+    font-family: var(--mono);
+    font-size: .625rem;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 0 1rem .6rem;
+    margin-bottom: .25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .scroll-rail {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--rule);
+    border-radius: 1px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .scroll-rail::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: calc(var(--scroll-pct, 0) * 1%);
+    background: var(--accent);
+    transition: height .1s linear;
+  }
+  @media (prefers-reduced-motion: reduce) { .scroll-rail::after { transition: none; } }
+  .plan-nav ul { list-style: none; padding: 0; margin: 0; }
+  .plan-nav > ul > li > a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: .125rem 1rem .125rem 1.25rem;
+    font-size: .825rem;
+    color: var(--ink-2);
+    text-decoration: none;
+    gap: .5rem;
+    border-left: 2px solid transparent;
+    transition: color .12s, border-color .12s;
+  }
+  .plan-nav a:hover { color: var(--ink); border-left-color: var(--accent-line); }
+  .plan-nav a.active { color: var(--accent); font-weight: 600; border-left-color: var(--accent); }
+  .plan-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .plan-nav .icon { opacity: .65; }
+  .plan-nav a.active .icon,
+  .plan-nav a:hover .icon { opacity: 1; }
+
+  /* ── Step rail — one link per step, the plan's real structure ───── */
+  .rail-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+    padding-top: .5rem;
+    margin-top: .75rem;
+  }
+  .rail-heading {
+    font-family: var(--mono);
+    font-size: .625rem;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 0 1rem .45rem 1.25rem;
+  }
+  a.rail-step {
+    display: grid;
+    grid-template-columns: 1.6rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: .35rem;
+    min-height: 30px;
+    padding: .3rem 1rem .3rem 1.25rem;
+    font-size: .78rem;
+    line-height: 1.35;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-left: 2px solid var(--rule-soft);
+    transition: color .12s, border-color .12s;
+  }
+  @media (prefers-reduced-motion: reduce) { a.rail-step { transition: none; } }
+  a.rail-step .rail-no {
+    font-family: var(--mono);
+    font-size: .7rem;
+    color: var(--ink-3);
+  }
+  a.rail-step .rail-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  a.rail-step.done .rail-no { color: var(--moss); }
+  a.rail-step.done .rail-text { color: var(--ink-3); }
+  a.rail-step.active {
+    color: var(--ink);
+    font-weight: 600;
+    border-left-color: var(--accent);
+    background: linear-gradient(90deg, var(--accent-soft), transparent 75%);
+  }
+  a.rail-step.active .rail-no { color: var(--accent); }
+  /* Visually-hidden step state — the tick glyph alone tells a screen reader
+     nothing, so every rail link carries "step N of M[, done]" in text. */
+  .rail-state {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* Once the sidebar stops being a sidebar the step list collapses into a
+     disclosure rather than disappearing — a phone reader keeps every jump
+     target. The element ships OPEN and the inline script closes it below the
+     breakpoint: a closed-by-default <details> would hide the whole rail on
+     desktop when scripting is off, and no-JS-on-mobile only costs some
+     scrolling. */
+  .rail-disclosure { margin-top: .75rem; }
+  .rail-disclosure > summary {
+    display: none;
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    cursor: pointer;
+    list-style: none;
+    align-items: center;
+    gap: .4rem;
+    min-height: 44px;
+    padding: 0 1rem 0 1.25rem;
+  }
+  .rail-disclosure > summary::-webkit-details-marker { display: none; }
+  .rail-disclosure > summary::before { content: "▶"; font-size: .55em; }
+  .rail-disclosure[open] > summary::before { content: "▼"; }
+  @media (max-width: 900px) {
+    .rail-disclosure > summary { display: flex; }
+  }
+
+  /* ── Objective card — executive summary ────────────────────────── */
+  /* A lead statement, not a slab. The filled panel put a saturated block of
+     colour directly above the green Implement row, so the page opened on two
+     competing fills before a word of content. One accent rule carries the
+     same "this is the point" signal at a fraction of the noise. */
+  .objective-card {
+    background: transparent;
+    border: 0;
+    border-left: 2px solid var(--accent);
+    border-radius: 0;
+    padding: .1rem 0 .1rem 1.25rem;
+    margin-bottom: 2rem;
+    color: var(--ink);
+  }
+  .objective-card > p {
+    font-size: 1.15rem;
+    line-height: 1.5;
+    letter-spacing: -.011em;
+    color: var(--ink);
+    max-width: 62ch;
+    text-wrap: pretty;
+  }
+  .objective-card .section-label,
+  .plan-glance-label {
+    font-family: var(--mono);
+    font-size: .625rem;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: .5rem;
+  }
+
+  /* ── At a glance — the plain-language register of the same goal, nested
+        inside #objective so the reader meets one summary, not two. ────── */
+  .plan-glance {
+    margin-top: 1rem;
+    padding-top: .85rem;
+    border-top: 1px solid var(--rule);
+    max-width: 66ch;
+  }
+  .plan-glance p { margin: 0; color: var(--ink-2); font-size: .92rem; line-height: 1.65; }
+
+  /* ── Progress bar ──────────────────────────────────────────────── */
+  .progress-wrap {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: .6rem;
+    font-family: var(--mono);
+    font-size: .65rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: .16em;
+  }
+  .progress-bar-bg { height: 4px; background: var(--rule); border-radius: 999px; overflow: hidden; }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--accent);
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .progress-bar-fill { transition: none; }
+  }
+
+  /* ── Document sections ─────────────────────────────────────────── */
+  .section-card {
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 2rem 0 1.25rem;
+    margin-bottom: 0;
+    box-shadow: none;
+  }
+  .section-card:first-of-type { border-top: none; }
+  .section-card h2 {
+    font-size: 1.05rem;
+    font-weight: 650;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+  }
+  .section-card h2::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+  .section-card h2 .icon { opacity: .75; }
+  .section-card .section-intro {
+    font-size: .85rem;
+    color: var(--ink-2);
+    margin: -1rem 0 1.25rem;
+  }
+  .section-card p {
+    margin-bottom: .75rem;
+    /* Reading text sits in the primary ink. It was --ink-2, which set every
+       paragraph of the document one step back from the labels around it. */
+    color: var(--ink);
+    font-size: .975rem;
+    line-height: 1.68;
+    max-width: 68ch;
+  }
+  .section-card p.section-intro { font-family: var(--ui); font-size: .85rem; }
+  .section-card p strong.md { color: var(--ink); }
+  .section-card p:last-child { margin-bottom: 0; }
+  .section-card ul, .section-card ol {
+    padding-left: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+  }
+
+  /* ── Steps ──────────────────────────────────────────────────────── */
+  .steps-list { display: flex; flex-direction: column; }
+
+  /* Records, not cards: a rule between steps, no box and no dotted
+     timeline. The sidebar rail is the page's one progress device now. */
+  .step-card {
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--rule-soft);
+    border-radius: 0;
+    padding: 1.05rem 0;
+    box-shadow: none;
+    position: relative;
+    scroll-margin-top: 1.5rem;
+  }
+  .step-card:first-child { border-top: 0; }
+
+  .step-card-header { display: flex; align-items: flex-start; gap: .75rem; }
+  .step-number {
+    flex-shrink: 0;
+    width: 2rem;
+    font-family: var(--mono);
+    color: var(--ink-3);
+    font-size: .8rem;
+    font-weight: 600;
+    padding-top: .12rem;
+  }
+  .step-card.completed .step-number { color: var(--moss); }
+  .step-body { flex: 1; min-width: 0; }
+  /* Emphasised body, not a heading. At 600 across a full-width line the
+     action out-shouted the section headings above it, and a plan of twelve
+     steps read as twelve headlines. */
+  .step-action {
+    /* 500, not 550: the system stack has no variable axis here, so 550 snaps
+       to semibold and the step reads as a heading again. */
+    font-weight: 500;
+    font-size: .95rem;
+    line-height: 1.6;
+    margin-bottom: .35rem;
+    display: flex;
+    align-items: baseline;
+    gap: .45rem;
+    flex-wrap: wrap;
+    color: var(--ink);
+  }
+  .step-chip {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: .58rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    padding: .12em .5em;
+    border-radius: 3px;
+    background: var(--sunk);
+    color: var(--ink-3);
+    border: 1px solid var(--rule);
+    vertical-align: middle;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .step-card.completed .step-chip {
+    background: var(--moss-soft);
+    color: var(--moss);
+    border-color: var(--moss-line);
+  }
+  .step-chip-text { flex: 1; }
+
+  /* Why and Verify are both always visible. Verify is the line a reader
+     needs WHILE executing the step — putting it behind a disclosure was the
+     single worst call in the previous shell. */
+  .step-note {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: .1rem .75rem;
+    margin-top: .5rem;
+    font-size: .85rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .step-note > .step-note-label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-top: .25rem;
+  }
+  .step-verify > .step-note-label { color: var(--accent); }
+  @media (max-width: 560px) {
+    .step-note { grid-template-columns: 1fr; gap: .1rem; }
+  }
+
+  /* ── Acceptance criteria ───────────────────────────────────────── */
+  .criteria-list {
+    list-style: none; padding: 0;
+    display: flex; flex-direction: column; gap: .6rem;
+  }
+  .criteria-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    padding: .6rem .75rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--panel);
+    transition: background .12s;
+  }
+  .criteria-list li:has(input:checked) { background: var(--sunk); }
+  .criteria-list input[type="checkbox"] {
+    flex-shrink: 0;
+    width: 1rem; height: 1rem;
+    margin-top: .2rem;
+    accent-color: var(--moss);
+    cursor: pointer;
+  }
+  .criteria-list label { cursor: pointer; font-size: .9rem; }
+  .criteria-list input:checked + label { text-decoration: line-through; color: var(--ink-2); }
+
+  /* ── Completion checklist ────────────────────────────────────── */
+  .completion-checklist {
+    background: var(--panel);
+    border: 2px solid var(--signal);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-top: 1rem;
+  }
+  .completion-checklist.all-complete { border-color: var(--moss); }
+  .completion-header {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 1rem;
+  }
+  .completion-badge {
+    font-size: .6rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: .15rem .6rem;
+    border-radius: 999px;
+    background: var(--signal-soft);
+    color: var(--signal);
+    border: 1px solid var(--signal-line);
+  }
+  .completion-checklist.all-complete .completion-badge {
+    background: var(--moss-soft);
+    color: var(--moss);
+    border-color: var(--moss-line);
+  }
+  .completion-list {
+    list-style: none; padding: 0;
+    display: flex; flex-direction: column; gap: .6rem;
+  }
+  .completion-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    padding: .6rem .75rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--panel);
+    transition: background .12s;
+  }
+  .completion-list li:has(input:checked) { background: var(--sunk); }
+  .completion-list input[type="checkbox"] {
+    flex-shrink: 0;
+    width: 1rem; height: 1rem;
+    margin-top: .2rem;
+    accent-color: var(--moss);
+  }
+  .completion-list label { font-size: .9rem; }
+  .completion-list input:checked + label { text-decoration: line-through; color: var(--ink-2); }
+  @media (prefers-reduced-motion: reduce) {
+    .completion-list li { transition: none; }
+  }
+
+  /* ── Completion report ─────────────────────────────────────── */
+  .completion-report {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+  }
+  .report-heading {
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin-bottom: .75rem;
+  }
+  .report-empty {
+    font-style: italic;
+    color: var(--ink-3);
+    font-size: .875rem;
+  }
+  .report-list { margin: 0; padding: 0; }
+  .report-list dt {
+    font-weight: 600;
+    color: var(--ink);
+    font-size: .875rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: .75rem;
+  }
+  .report-list dt:first-child { margin-top: 0; }
+  .report-list dt::before {
+    content: "";
+    display: inline-block;
+    width: .5rem; height: .5rem;
+    border-radius: 50%;
+    background: var(--red);
+    flex-shrink: 0;
+  }
+  .report-list dd {
+    color: var(--ink-2);
+    font-size: .85rem;
+    margin-left: .9rem;
+    margin-top: .2rem;
+    margin-bottom: 0;
+  }
+
+  /* ── Next steps ────────────────────────────────────────────────── */
+  .next-steps-list { padding: 0; display: flex; flex-direction: column; gap: .75rem; }
+  .next-step-item {
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--panel);
+  }
+  .next-step-item summary {
+    font-weight: 600;
+    font-size: .9rem;
+    padding: .75rem 1rem;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    background: var(--panel);
+    user-select: none;
+    min-height: 44px;
+  }
+  .next-step-item summary::before { content: "▶"; font-size: .55em; color: var(--ink-3); transition: transform .2s; }
+  .next-step-item[open] summary::before { transform: rotate(90deg); }
+  .next-step-prompt { padding: .75rem 1rem 1rem; background: var(--sunk); border-top: 1px solid var(--rule); }
+  .next-step-prompt p { font-size: .8rem; color: var(--ink-2); margin-bottom: .5rem; }
+  .next-step-prompt pre { margin: 0; }
+  @media (prefers-reduced-motion: reduce) { .next-step-item summary::before { transition: none; } }
+
+  /* ── Copy prompt button ─────────────────────────────────────── */
+  .copy-prompt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: .6rem;
+    padding: .3rem .75rem;
+    font-size: .775rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s;
+    font-family: inherit;
+    line-height: 1.4;
+  }
+  .copy-prompt-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .copy-prompt-btn:active { background: var(--accent-line); }
+  .copy-prompt-btn.copied { color: var(--moss); background: var(--moss-soft); border-color: var(--moss-line); }
+  .copy-prompt-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media print { .copy-prompt-btn { display: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .copy-prompt-btn { transition: none; } }
+  /* Shared clipboard-failure state for every copy button */
+  .copy-failed { color: var(--red) !important; background: var(--red-bg) !important; border-color: var(--red-border) !important; white-space: normal; }
+
+  /* Wish list variant */
+  .wish-list-header {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin: 1.5rem 0 .75rem;
+  }
+  .wish-list-header::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--wish-border);
+    opacity: .5;
+  }
+  .wish-item { border: 1px dashed var(--wish-border) !important; background: var(--wish-bg) !important; }
+  .wish-item summary { background: var(--wish-bg) !important; color: var(--purple); }
+  .wish-badge {
+    font-size: .6rem;
+    background: var(--purple-bg);
+    color: var(--purple);
+    padding: .1rem .5rem;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-left: auto;
+    border: 1px solid var(--purple-border);
+  }
+
+  /* ── Collapsible optional sections ─────────────────────────────── */
+  .optional-section {
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    margin-top: 1.5rem;
+    overflow: hidden;
+    background: var(--panel);
+  }
+  .optional-section > summary {
+    padding: .875rem 1.25rem;
+    font-weight: 600;
+    font-size: .9rem;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    user-select: none;
+    min-height: 44px;
+  }
+  .optional-section > summary::before,
+  .plan-more-ways > summary::before { content: "▶"; font-size: .55em; color: var(--ink-3); transition: transform .2s; }
+  .optional-section[open] > summary::before,
+  .plan-more-ways[open] > summary::before { transform: rotate(90deg); }
+  .optional-body { padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--rule); padding-top: 1rem; }
+  .unresolved-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1rem; }
+  .unresolved-item summary { font-weight: 600; padding: .35rem 0; cursor: pointer; list-style: none; user-select: none; font-size: .9rem; }
+  .unresolved-prompt { margin-top: .5rem; }
+  @media (prefers-reduced-motion: reduce) { .optional-section > summary::before, .plan-more-ways > summary::before { transition: none; } }
+
+  /* ── More-ways drawer (goal / workflow / plan-source rows) ─────── */
+  .plan-more-ways {
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--panel);
+    margin: -.5rem 0 1.5rem;
+    font-size: .8rem;
+    overflow: hidden;
+  }
+  .plan-more-ways > summary {
+    padding: .55rem 1rem;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    user-select: none;
+    min-height: 44px;
+  }
+  .plan-more-ways > summary:hover { color: var(--accent); }
+  .more-ways-hint { font-weight: 400; color: var(--ink-2); }
+  .plan-more-ways-body {
+    padding: .75rem 1rem 1rem;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+  }
+  @media print { .plan-more-ways { display: none !important; } }
+
+  /* ── Implement prompt ─────────────────────────────────────────── */
+  .plan-implement {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    margin-bottom: 1.5rem;
+    padding: .55rem .8rem;
+    /* Not moss: moss means "done" everywhere else on the page, so a green
+       call-to-action on an unstarted plan said the opposite of what it meant.
+       Not a tinted slab either — this prompt runs to eight wrapped lines of
+       monospace, and any fill that large outshouted the objective above it.
+       Neutral surface, accent only on the label. */
+    background: var(--sunk);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    font-size: .8rem;
+  }
+  .plan-implement-label {
+    font-family: var(--mono);
+    font-size: .62rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: .2rem;
+  }
+  .plan-implement code {
+    font-family: var(--mono);
+    font-size: .82rem;
+    color: var(--ink);
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
+  .copy-cmd-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .2rem .6rem;
+    font-size: .72rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s;
+    font-family: inherit;
+    line-height: 1.4;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .copy-cmd-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+  .copy-cmd-btn.copied { color: var(--moss); background: var(--moss-soft); border-color: var(--moss-line); }
+  .copy-cmd-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  [data-status="completed"] .copy-cmd-btn { display: none; }
+  @media print { .plan-implement { display: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .copy-cmd-btn { transition: none; } }
+
+  /* ── Plan source (file name + relative path — lives in the drawer) ── */
+  /* Borderless like its sibling drawer rows — the drawer body supplies the frame */
+  .plan-source {
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+    margin: 0;
+    padding: .55rem .75rem;
+    font-size: .8rem;
+  }
+  .plan-source-row { display: flex; align-items: center; gap: .6rem; }
+  .plan-source-label {
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    flex-shrink: 0;
+    width: 2.4rem;
+  }
+  .plan-source code {
+    font-family: var(--mono);
+    font-size: .82rem;
+    color: var(--ink);
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
+  .copy-src-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .2rem .6rem;
+    font-size: .72rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s;
+    font-family: inherit;
+    line-height: 1.4;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .copy-src-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+  .copy-src-btn.copied { color: var(--moss); background: var(--moss-soft); border-color: var(--moss-line); }
+  .copy-src-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media print { .copy-src-btn { display: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .copy-src-btn { transition: none; } }
+
+  /* ── Workflow prompt row (conditional — remove row when empty; lives in the drawer) ── */
+  .plan-workflow {
+    margin: 0;
+    font-size: .8rem;
+  }
+  .plan-workflow-label {
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--accent);
+    padding: .1rem 0;
+  }
+  .plan-workflow-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    margin-top: .4rem;
+    padding: .45rem .75rem;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius);
+  }
+  .plan-workflow code {
+    font-family: var(--mono);
+    font-size: .82rem;
+    color: var(--ink);
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
+  .copy-workflow-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .2rem .6rem;
+    font-size: .72rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s;
+    font-family: inherit;
+    line-height: 1.4;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .copy-workflow-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+  .copy-workflow-btn.copied { color: var(--moss); background: var(--moss-soft); border-color: var(--moss-line); }
+  .copy-workflow-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  [data-status="completed"] .plan-workflow { display: none; }
+  /* Redundant under .plan-more-ways' print hide; kept to mirror the test-pinned .plan-goal print rule */
+  @media print { .plan-workflow { display: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .copy-workflow-btn { transition: none; } }
+
+  /* ── Goal prompt row (outcome-driven — always present; lives in the drawer) ── */
+  .plan-goal {
+    margin: 0;
+    font-size: .8rem;
+  }
+  .plan-goal-label {
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--purple);
+    padding: .1rem 0;
+  }
+  .plan-goal-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    margin-top: .4rem;
+    padding: .45rem .75rem;
+    background: var(--purple-bg);
+    border: 1px solid var(--purple-border);
+    border-radius: var(--radius);
+  }
+  .plan-goal code {
+    font-family: var(--mono);
+    font-size: .82rem;
+    color: var(--ink);
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
+  .copy-goal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .2rem .6rem;
+    font-size: .72rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s;
+    font-family: inherit;
+    line-height: 1.4;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .copy-goal-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+  .copy-goal-btn.copied { color: var(--moss); background: var(--moss-soft); border-color: var(--moss-line); }
+  .copy-goal-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  [data-status="completed"] .plan-goal { display: none; }
+  /* Redundant under .plan-more-ways' print hide, but pinned byte-for-byte by test-goal-prompt.sh check 4 */
+  @media print { .plan-goal { display: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .copy-goal-btn { transition: none; } }
+
+  /* ── Tests section ──────────────────────────────────────────────── */
+  .test-list {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+  }
+  .test-card {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow);
+  }
+  .test-card-header {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: .5rem;
+    flex-wrap: wrap;
+  }
+  .test-badge {
+    display: inline-block;
+    font-size: .6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: .15em .55em;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .test-badge-unit        { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-line); }
+  .test-badge-integration { background: var(--signal-soft);  color: var(--signal);  border: 1px solid var(--signal-line); }
+  .test-badge-e2e         { background: var(--purple-bg);  color: var(--purple);  border: 1px solid var(--purple-border); }
+  .test-badge-objective   { background: var(--moss-soft);  color: var(--moss);  border: 1px solid var(--moss-line); }
+  .test-card-title {
+    font-weight: 600;
+    font-size: .95rem;
+    color: var(--ink);
+    flex: 1;
+  }
+  .test-card-body { font-size: .875rem; color: var(--ink-2); }
+  .test-card-body p { margin-bottom: .4rem; }
+  .test-card-body p:last-child { margin-bottom: 0; }
+  .test-card-body code { font-size: .85em; }
+  .test-card-body strong { color: var(--ink); font-weight: 600; }
+  .test-tier-label {
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin-bottom: .75rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .test-tier-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  .objective-test-card {
+    background: var(--moss-soft);
+    border: 1px solid var(--moss-line);
+    border-left: 4px solid var(--moss);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+  }
+  .objective-test-card .test-card-header { margin-bottom: .6rem; }
+  .objective-test-card .test-card-title { color: var(--moss); }
+  .objective-test-card .test-card-body { color: var(--moss); }
+  .objective-test-card .test-card-body strong { color: var(--moss); }
+  /* ── Footer ────────────────────────────────────────────────────── */
+  .plan-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    font-size: .75rem;
+    color: var(--ink-3);
+    margin-top: 3rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+  }
+  .plan-footer .icon { opacity: .35; }
+
+  /* ── Focus styles ───────────────────────────────────────────────── */
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ── Print styles ───────────────────────────────────────────────── */
+  @media print {
+    .plan-nav, .scroll-rail, .progress-wrap, .save-pdf-btn, .theme-toggle { display: none !important; }
+    .layout { display: block !important; }
+    .step-card, .section-card { box-shadow: none !important; break-inside: avoid; }
+    .step-chip { display: none !important; }
+    a[href]::after { content: " (" attr(href) ")"; font-size: .8em; }
+  }
+
+  /* ═════════════════════════════════════════════════════════════════
+     OPT-IN VISUAL COMPONENTS
+     Pure-CSS / token-driven — no CDN, no external script. These rules
+     are always present (harmless when unused); the matching <body>
+     section blocks are kept only when a plan needs them and deleted
+     otherwise. See SKILL.md → "Visual Components".
+     ═════════════════════════════════════════════════════════════════ */
+
+  /* ── Files file-tree ────────────────────────────────────────────── */
+  .file-tree { font-family: var(--mono); font-size: .85rem; }
+  .file-tree-root { font-weight: 700; color: var(--ink); margin-bottom: .5rem; display: flex; align-items: center; gap: .35rem; }
+  .file-list, .file-list ul { list-style: none; padding-left: 1.25rem; margin: 0; border-left: 1px dashed var(--rule); }
+  .file-list li { padding: .2rem 0; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; color: var(--ink-2); }
+  .file-list li.file-dir { color: var(--ink); font-weight: 600; }
+  /* The nested list is a CHILD of the bold directory row, so without this it
+     inherits the 600 and every file under a subdirectory renders bold. */
+  .file-list li.file-dir > ul { flex-basis: 100%; font-weight: 400; color: var(--ink-2); }
+  .file-badge { font-size: .6rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: .1em .45em; border-radius: 999px; }
+  .file-badge-new       { background: var(--moss-soft); color: var(--moss); border: 1px solid var(--moss-line); }
+  .file-badge-modified  { background: var(--signal-soft); color: var(--signal); border: 1px solid var(--signal-line); }
+  .file-badge-deleted   { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-border); }
+  .file-badge-generated { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-line); }
+  .file-note { font-size: .75rem; font-weight: 400; color: var(--ink-3); font-style: italic; font-family: var(--ui); }
+
+  /* ── Flow / pipeline diagram ────────────────────────────────────── */
+  .pipeline { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 0 auto; max-width: 580px; }
+  .pipeline-node { width: 100%; border: 1px solid var(--rule); border-radius: var(--radius); padding: .7rem 1.25rem; background: var(--panel); text-align: center; box-shadow: var(--shadow); }
+  .pipeline-label { font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .2rem; color: var(--accent); }
+  .pipeline-node code { font-size: .82rem; font-weight: 600; display: block; color: var(--ink); }
+  .pipeline-sub { font-size: .74rem; color: var(--ink-2); margin-top: .2rem; }
+  .pipeline-arrow { font-size: .85rem; color: var(--ink-3); padding: .25rem 0; }
+
+  /* ── Comparison grid (2–3 way) ──────────────────────────────────── */
+  .compare-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+  @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-header { font-size: .66rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .35rem .75rem; border-radius: var(--radius) var(--radius) 0 0; text-align: center; }
+  .compare-col-add     .compare-header { background: var(--moss-soft);  color: var(--moss);  border: 1px solid var(--moss-line); }
+  .compare-col-neutral .compare-header { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-line); }
+  .compare-col-remove  .compare-header { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+  .compare-list { list-style: none; padding: .5rem .75rem; margin: 0; border: 1px solid var(--rule); border-top: none; border-radius: 0 0 var(--radius) var(--radius); background: var(--panel); }
+  .compare-list li { font-family: var(--mono); font-size: .78rem; color: var(--ink-2); padding: .15rem 0; }
+
+  /* ── Bar chart (value via inline --val) ─────────────────────────── */
+  .bar-chart { display: flex; flex-direction: column; gap: .55rem; }
+  .bar-row { display: grid; grid-template-columns: 9.5rem 1fr 3rem; align-items: center; gap: .75rem; }
+  @media (max-width: 520px) { .bar-row { grid-template-columns: 1fr; gap: .15rem; } }
+  .bar-label { font-size: .82rem; color: var(--ink); }
+  .bar-track { background: var(--rule); border-radius: 999px; height: .7rem; overflow: hidden; }
+  .bar-fill { height: 100%; width: var(--val, 0%); background: var(--accent); border-radius: 999px; }
+  .bar-fill.full { background: var(--moss); }
+  .bar-fill.zero { background: var(--ink-3); }
+  .bar-value { font-size: .78rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; text-align: right; }
+
+  /* ── Data table ─────────────────────────────────────────────────── */
+  .plan-table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-top: .5rem; }
+  .plan-table caption { text-align: left; font-size: .78rem; color: var(--ink-3); font-style: italic; margin-bottom: .5rem; }
+  .plan-table th, .plan-table td { text-align: left; padding: .5rem .75rem; border: 1px solid var(--rule); vertical-align: top; }
+  .plan-table thead th { background: var(--sunk); font-weight: 700; color: var(--ink-2); text-transform: uppercase; font-size: .66rem; letter-spacing: .05em; }
+  .plan-table tbody tr:nth-child(even) { background: var(--sunk); }
+  .plan-table code { font-size: .8em; }
+
+  /* Shared sub-heading used inside visual sections */
+  .diagram-subheading { font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); margin: 1.75rem 0 .75rem; }
+
+  /* ── Resources (images, screenshots & reference links) ──────────── */
+  .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .resource-figure { margin: 0; border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; background: var(--panel); box-shadow: var(--shadow); }
+  .resource-figure > a { display: block; line-height: 0; }
+  .resource-figure img { display: block; width: 100%; height: auto; background: var(--sunk); }
+  .resource-figure figcaption { font-size: .74rem; line-height: 1.5; color: var(--ink-2); padding: .5rem .75rem; border-top: 1px solid var(--rule); }
+  .resource-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .1rem; }
+  .resource-links li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; padding: .4rem 0; border-bottom: 1px solid var(--rule); }
+  .resource-links li:last-child { border-bottom: none; }
+  .resource-links a { font-weight: 600; word-break: break-word; }
+  .resource-note { font-size: .78rem; color: var(--ink-3); font-style: italic; }
+
+  .plan-back-nav { margin-bottom: .5rem; }
+  .plan-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .3125rem;
+    font-size: .8125rem;
+    color: var(--ink-2);
+    text-decoration: none;
+    transition: color .15s;
+  }
+  .plan-back-link:hover { color: var(--accent); }
+  .plan-back-link svg { width: 14px; height: 14px; flex-shrink: 0; }
+</style>
+<style id="plan-responsive-fix" data-version="1">
+/* plan-responsive-fix v1 — injected by scripts/retrofit-responsive-plans.mjs */
+body { overflow-wrap: anywhere; }
+main, nav, aside { min-width: 0; }
+.layout > *, .wrap > *, .compare-grid > * { min-width: 0; }
+pre { white-space: pre-wrap; max-width: 100%; }
+table { max-width: 100%; }
+img, video { max-width: 100%; height: auto; }
+@media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
-<body class="theme-default">
-<a href="#main-content" class="skip-link">Skip to main content</a>
-<header>
-<div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100" aria-label="Plan progress">
-<div class="progress-fill" style="width:5%"></div>
-</div>
-<h1>Build vendor-neutral UI component skills</h1>
-<button class="save-pdf-btn" type="button" onclick="savePDF()" aria-label="Save this plan as PDF">Save as PDF</button>
-<span class="status-badge status-todo">todo</span>
-<div class="metadata-row">created: 2026-09-02 &middot; modified: 2026-09-02 &middot; type: feature &middot; theme: default</div>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="ic-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/>
+  </symbol>
+  <symbol id="ic-chart-bar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
+  </symbol>
+  <symbol id="ic-document-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+  </symbol>
+  <symbol id="ic-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
+  </symbol>
+  <symbol id="ic-list-bullet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
+  </symbol>
+  <symbol id="ic-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+  </symbol>
+  <symbol id="ic-magnifying-glass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+  </symbol>
+  <symbol id="ic-arrow-right-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m12.75 15 3-3m0 0-3-3m3 3h-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+  </symbol>
+  <symbol id="ic-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+  </symbol>
+  <symbol id="ic-code-bracket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5"/>
+  </symbol>
+  <symbol id="ic-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/>
+    <path d="M6 6h.008v.008H6V6Z"/>
+  </symbol>
+  <symbol id="ic-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/>
+  </symbol>
+  <symbol id="ic-question-mark-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/>
+  </symbol>
+  <symbol id="ic-clipboard-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15a2.25 2.25 0 0 1 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75"/>
+  </symbol>
+  <symbol id="ic-beaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
+  </symbol>
+  <symbol id="ic-photo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
+  </symbol>
+</svg>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header class="plan-header">
+  <div class="plan-header-inner">
+    <div class="plan-back-nav">
+      <a href="./index.html" class="plan-back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
+        Plans
+      </a>
+    </div>
+    <div class="plan-doc-type">Implementation Plan</div>
+    <div class="plan-header-top">
+      <h1 class="plan-title">Build vendor-neutral UI component skills</h1>
+      <div class="plan-header-actions">
+        <button class="save-pdf-btn" type="button" onclick="savePDF()"
+                aria-label="Save this plan as PDF">Save as PDF</button>
+        <button class="theme-toggle" type="button" id="theme-toggle" onclick="toggleTheme(this)"
+                aria-pressed="false" aria-label="Use dark theme">Dark</button>
+        <span class="effort-badge" aria-label="Effort level">High</span>
+        <span class="status-badge">todo</span>
+      </div>
+    </div>
+    <div class="plan-meta">
+      <span><svg class="icon" aria-hidden="true"><use href="#ic-calendar"/></svg> 2026-09-02</span>
+      <span><svg class="icon" aria-hidden="true"><use href="#ic-code-bracket"/></svg> agent-ui-kit</span>
+      <span><svg class="icon" aria-hidden="true"><use href="#ic-tag"/></svg> feature</span>
+      <span><svg class="icon" aria-hidden="true"><use href="#ic-bolt"/></svg> High effort</span>
+    </div>
+  </div>
 </header>
-<figure class="section-diagram" aria-labelledby="diagram-title"><svg role="img" aria-labelledby="diagram-title" viewBox="0 0 1023 80" width="100%" height="80"><title id="diagram-title">Plan sections: Context, Objective, Steps, Tests, Acceptance Criteria, Verification, Next Steps, Unresolved Questions</title><line x1="120" y1="40" x2="129" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="249" y1="40" x2="258" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="378" y1="40" x2="387" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="507" y1="40" x2="516" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="636" y1="40" x2="645" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="765" y1="40" x2="774" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="894" y1="40" x2="903" y2="40" stroke="var(--color-border)" stroke-width="2"/><g class="svg-node" data-section="context" style="cursor:pointer"><rect x="0" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="60" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Context</text></g><g class="svg-node" data-section="objective" style="cursor:pointer"><rect x="129" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="189" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Objective</text></g><g class="svg-node" data-section="steps" style="cursor:pointer"><rect x="258" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="318" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Steps</text></g><g class="svg-node" data-section="tests" style="cursor:pointer"><rect x="387" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="447" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Tests</text></g><g class="svg-node" data-section="acceptance-criteria" style="cursor:pointer"><rect x="516" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="576" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Acceptance Cr…</text></g><g class="svg-node" data-section="verification" style="cursor:pointer"><rect x="645" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="705" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Verification</text></g><g class="svg-node" data-section="next-steps" style="cursor:pointer"><rect x="774" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="834" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Next Steps</text></g><g class="svg-node" data-section="unresolved-questions" style="cursor:pointer"><rect x="903" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="963" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Unresolved Qu…</text></g></svg><figcaption>8 sections</figcaption></figure>
+
 <div class="layout">
-<nav aria-label="Document sections">
-<div class="scroll-rail" aria-hidden="true"></div>
-<ul><li><a href="#context">Context</a></li><li><a href="#objective">Objective</a></li><li><a href="#steps">Steps</a></li><li><a href="#tests">Tests</a></li><li><a href="#acceptance-criteria">Acceptance Criteria</a></li><li><a href="#verification">Verification</a></li><li><a href="#next-steps">Next Steps</a></li><li><a href="#unresolved-questions">Unresolved Questions</a></li></ul>
-</nav>
-<main id="main-content">
-<section id="context" aria-labelledby="context-heading">
-<h2 id="context-heading">Context</h2>
-<p><code>agent-ui-kit</code> (github.com/shawn-sandy/agent-ui-kit) exists as structure only. The scaffold commit <code>336b67a</code> created both plugin manifests, a marketplace manifest, an empty <code>skills/</code> tree, and a README. No components, no format specification, no tooling, no tests.</p>
-<p><strong>What this project is.</strong> A library of Agent Skills where each skill describes one UI component and ships a complete, copyable reference: semantic HTML with a real accessibility contract, plain CSS driven by custom properties, and dependency-free JavaScript. An agent reads the reference and builds the component into the user's project, in the user's stack. Nothing is installed into the consuming app.</p>
-<p><strong>Why it is separate from <code>acss-plugins</code>.</strong> <code>~/devbox/acss-plugins/plugins/acss-kit</code> already has 15 <code>component-*</code> skills, but they generate React TSX plus SCSS modules bound to <code>@fpkit/acss@6.5.0</code>. <code>agent-ui-kit</code> is bound to nothing. The decision was extract-and-generalize, not greenfield, so this plan lifts specific assets:</p>
-<ul><li><code>acss-plugins/plugins/style-agent/docs/component-md/spec.md</code> — a 178-line alpha framework-neutral COMPONENT.md spec. Its core insight is correct and reusable: HTML structure, CSS, and the a11y contract are framework-agnostic; only template syntax and reactivity binding are framework-specific.</li><li><code>acss-plugins/plugins/acss-kit/skills/component-*/reference.md</code> — 15 references, 161-615 lines each. <strong>Only the accessibility contracts, prop models, and data-attribute variant strategy transfer. The TSX and SCSS templates do not.</strong></li></ul>
-<h4>Verified constraints from the Agent Skills spec</h4>
-<p>From agentskills.io/specification:</p>
-<ul><li><code>name</code>: max 64 chars, lowercase/digits/hyphens, no leading or trailing hyphen, no consecutive hyphens, <strong>must match the parent directory name</strong>.</li><li><code>description</code>: max 1024 chars, must state what the skill does <em>and</em> when to use it. This is the only text loaded at startup, so it is the entire discovery mechanism.</li><li>Optional: <code>license</code>, <code>compatibility</code> (max 500), <code>metadata</code> (string→string map — <code>version</code> and <code>author</code> live here, not as top-level fields), <code>allowed-tools</code>.</li><li><code>SKILL.md</code> body under 500 lines. File references one level deep from <code>SKILL.md</code>.</li></ul>
-<p>From platform.claude.com skill authoring best practices:</p>
-<ul><li><strong>Evaluations come before documentation.</strong> Establish a baseline without the skill, then write the minimum needed to pass. At least three evaluations per skill.</li><li><strong>Test across Haiku, Sonnet, and Opus.</strong> What reads as sufficient to Opus can be too thin for Haiku.</li><li>Descriptions in third person. Never &quot;I can help you…&quot; or &quot;You can use this to…&quot;.</li><li>Reference files over 100 lines need a table of contents, because a partial read is a real failure mode.</li></ul>
-<h4>Tooling reality</h4>
-<p><code>skills-ref</code>, the reference validator at <code>github.com/agentskills/agentskills</code>, is a Python package <strong>explicitly labelled &quot;for demonstration purposes only. It is not meant to be used in production.&quot;</strong> It has no PyPI release and installs via <code>pip install -e .</code> from a clone. <strong>It must not be a hard gate in CI.</strong> This repo owns its own frontmatter validator in the Vitest suite; <code>skills-ref</code> is an optional manual cross-check only.</p>
-<h4>Portability hazards found in <code>acss-kit</code> that must not be repeated</h4>
-<ol><li><code>${CLAUDE_PLUGIN_ROOT}</code> is a Claude Code variable. Codex does not expand it. All paths must be relative to the skill root.</li><li><code>disable-model-invocation</code> and <code>hint</code> are Claude Code frontmatter, absent from the Agent Skills spec. A strict validator rejects them. Anything similar goes under <code>metadata:</code>.</li><li><code>acss-kit</code> shells out to Python helper scripts. A cross-vendor skill cannot assume a Python runtime exists. Keep skills pure-markdown, or declare it in <code>compatibility:</code>.</li></ol>
-<h4>Prerequisites</h4>
-<p>Before step 1, the executing machine needs: Node 20+ with npm, the <code>claude</code> CLI on <code>PATH</code> (already present — <code>claude plugin validate</code> ran during scaffolding), and <code>gh</code> authenticated (confirmed). Python 3 and <code>uv</code> are needed only for the optional <code>skills-ref</code> cross-check in step 10.</p>
-<h4>Decisions already made, recorded so no future session re-litigates them</h4>
-<ul><li><strong>One skill per component.</strong> Discovery quality beats startup token cost; ~100 tokens of description per skill is the accepted price.</li><li><strong>Literal CSS, not token references.</strong> Every themeable value ships as <code>var(--auk-&lt;name&gt;, &lt;fallback&gt;)</code>. The fallback makes a component work standalone; the variable makes it theme cleanly. The COMPONENT.md spec's <code>{colors.primary}</code> token refs become an <strong>optional</strong> mapping block, not a requirement, so no DESIGN.md file is needed for a component to function.</li><li><strong>WCAG claims must come from a tool run.</strong> Every reference states the criteria it satisfies, and those statements are asserted by axe-core plus explicit keyboard tests. An unverified claim is a defect.</li><li><strong>v1 is four components</strong> chosen to stress different parts of the format, not to be a useful kit: <code>button</code> (no JS), <code>alert</code> (ARIA live region), <code>dialog</code> (focus management and heavy JS), <code>tabs</code> (roving tabindex; deliberately absent from <code>acss-kit</code>, so it tests the greenfield path rather than the extraction path).</li></ul>
-<p><strong>Known environment note.</strong> GitHub Actions is frequently billing-blocked on this account. Every check must be runnable locally via a single script. CI mirrors that script and is never the only place a check exists.</p>
-</section>
-<section id="objective" aria-labelledby="objective-heading">
-<h2 id="objective-heading">Objective</h2>
-<p>Ship a working, tested, vendor-neutral component-skill format proven by four components that reliably trigger across models and load correctly in both Claude Code and ChatGPT/Codex.</p>
-</section>
-<section id="steps" aria-labelledby="steps-heading">
-<h2 id="steps-heading">Steps</h2>
-<ol class="steps-list">
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-0">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-0" aria-describedby="step-why-0">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Set up Node tooling.</h3>
-</label>
-<div class="step-detail"><p>Create <code>package.json</code> (private, type module) and install <code>vitest</code>, <code>@playwright/test</code>, <code>@axe-core/playwright</code>, and <code>gray-matter</code>. Add <code>.gitignore</code> entries for <code>node_modules/</code>, <code>test-results/</code>, <code>playwright-report/</code>. Add scripts: <code>test</code>, <code>test:e2e</code>, <code>check</code>.</p></div>
-<p class="step-why" id="step-why-0">Steps 3 onward all depend on a runner. The previous draft of this plan assumed <code>npm ci</code> would work in a repo with no <code>package.json</code>, which was wrong.</p>
-<p class="step-verify">&#10003; <code>rm -rf node_modules &amp;&amp; npm ci &amp;&amp; npx vitest run --passWithNoTests</code> exits zero, and <code>npx playwright install chromium</code> completes.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-1">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-1" aria-describedby="step-why-1">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Write <code>docs/component-spec.md</code></h3>
-</label>
-<div class="step-detail"><p>the authoring contract, extracted from <code>acss-plugins/plugins/style-agent/docs/component-md/spec.md</code> and decoupled from DESIGN.md. It must define <strong>both</strong> halves, because the split between them is the core authoring decision and is currently undefined:</p>
-<ul><li><strong><code>SKILL.md</code></strong> — frontmatter fields permitted (spec-defined keys only, third-person <code>description</code> stating what and when), and a body under 60 lines that orients and points at the reference. It must not contain the component code.</li><li><strong><code>references/&lt;name&gt;.component.md</code></strong> — the frontmatter contract (<code>element</code>, <code>role</code>, <code>props</code> with <code>maps-to</code> and <code>a11y</code> notes, <code>slots</code>, <code>variants</code>, <code>behavior</code>, <code>a11y</code> as WCAG criteria, optional <code>tokens</code>) plus five required body sections: Structure (HTML), Styles (CSS), Behavior (JS), Accessibility, Demo. Reference files over 100 lines carry a table of contents.</li><li><strong>Conventions:</strong> the <code>--auk-</code> custom property prefix, the <code>var(--auk-x, fallback)</code> rule, <code>references/demo.html</code> as a standalone runnable page.</li></ul></div>
-<p class="step-why" id="step-why-1">Every later step writes against this. Drafting components first bakes in an accidental format.</p>
-<p class="step-verify">&#10003; Hand the spec plus zero other context to a fresh Claude instance and ask it to write the <code>button</code> reference. If it asks a clarifying question about structure, the spec is incomplete — fix it before step 3.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-2">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-2" aria-describedby="step-why-2">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Write the evaluations and establish a baseline, before any skill exists.</h3>
-</label>
-<div class="step-detail"><p>Create <code>evals/&lt;skill&gt;.json</code> for all four components, three scenarios each, in the shape Anthropic documents: <code>{skills, query, expected_behavior[]}</code>. Queries must be phrased the way a real user would ask, not using the skill's own vocabulary. Add <code>scripts/eval.sh</code> to print a scenario formatted for a run. Run all twelve against a session with no skills installed and record what Claude produces in <code>docs/evaluations.md</code> under a Baseline heading.</p></div>
-<p class="step-why" id="step-why-2">Anthropic's best-practices doc is explicit that evaluations precede documentation, so skills solve observed gaps rather than imagined ones. Without a baseline there is no evidence any skill improved anything.</p>
-<p class="step-verify">&#10003; <code>docs/evaluations.md</code> contains twelve baseline results with concrete failures named — missing focus restoration, wrong <code>aria-live</code>, and so on. If a baseline scenario already passes without a skill, that component's scenario is too easy; rewrite it before continuing.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-3">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-3" aria-describedby="step-why-3">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Build the verification harness.</h3>
-</label>
-<div class="step-detail"><p>Create <code>scripts/check.sh</code> running four gates in order: (a) the Vitest unit suite including this repo's own frontmatter validator, (b) a portability lint grepping every <code>skills/**</code> file for <code>${CLAUDE_PLUGIN_ROOT}</code>, <code>disable-model-invocation</code>, <code>hint:</code>, and backslash paths, (c) <code>claude plugin validate . --strict</code>, (d) the Playwright E2E suite. <code>skills-ref</code> is <strong>not</strong> a gate.</p></div>
-<p class="step-why" id="step-why-3">Named before the work, per the verification rule. A harness written after components gets shaped to pass them.</p>
-<p class="step-verify">&#10003; Add a broken fixture at <code>tests/fixtures/bad-skill/</code> with a name/directory mismatch and a <code>${CLAUDE_PLUGIN_ROOT}</code> reference. Point the unit suite at <code>tests/fixtures/</code> and confirm it exits non-zero naming both faults separately. Confirm the portability lint scans only <code>skills/**</code>, so the fixture never trips the real gate.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-4">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-4" aria-describedby="step-why-4">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Write <code>skills/button/</code></h3>
-</label>
-<div class="step-detail"><p><code>SKILL.md</code>, <code>references/button.component.md</code>, <code>references/demo.html</code>. No JavaScript. Lift the accessibility contract from <code>acss-kit/skills/component-button/reference.md</code>, specifically the <code>aria-disabled</code> over native <code>disabled</code> decision that keeps the element in the tab order (WCAG 2.1.1). Discard the TSX and SCSS entirely.</p></div>
-<p class="step-why" id="step-why-4">The simplest possible component proves the format end to end before behavior complexity is added.</p>
-<p class="step-verify">&#10003; <code>scripts/check.sh</code> passes. <code>tests/e2e/button.spec.ts</code> confirms axe reports zero violations and that a disabled button is still reachable by Tab but does not activate on Enter. All three <code>evals/button.json</code> scenarios now pass.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-5">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-5" aria-describedby="step-why-5">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Write <code>skills/alert/</code></h3>
-</label>
-<div class="step-detail"><p>ARIA live region, still no JavaScript.</p></div>
-<p class="step-why" id="step-why-5">Proves the a11y-claim machinery on a component whose entire value is the accessibility contract, where a wrong <code>aria-live</code> value is invisible to the eye.</p>
-<p class="step-verify">&#10003; <code>tests/e2e/alert.spec.ts</code> asserts axe is clean and that content injected after load is announced — <code>role=&quot;alert&quot;</code> present, <code>aria-live</code> resolving to <code>assertive</code>, and the region present in the DOM before content arrives. All three <code>evals/alert.json</code> scenarios pass.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-6">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-6" aria-describedby="step-why-6">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Write <code>skills/dialog/</code></h3>
-</label>
-<div class="step-detail"><p>native <code>&lt;dialog&gt;</code> plus a vanilla ES module for focus management. Lift the contract from <code>acss-kit/skills/component-dialog/reference.md</code>.</p></div>
-<p class="step-why" id="step-why-6">The hardest accessibility case in the v1 set. If the format cannot express focus trapping, <code>inert</code>, Escape handling, and focus restoration, that must surface now, not at component twenty.</p>
-<p class="step-verify">&#10003; <code>tests/e2e/dialog.spec.ts</code> asserts axe is clean, focus moves into the dialog on open, Tab cycles only within it, Escape closes it, and focus returns to the exact element that opened it. All three <code>evals/dialog.json</code> scenarios pass.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-7">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-7" aria-describedby="step-why-7">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Write <code>skills/tabs/</code></h3>
-</label>
-<div class="step-detail"><p>roving tabindex, no <code>acss-kit</code> source to extract from.</p></div>
-<p class="step-why" id="step-why-7">Every other v1 component is an extraction. This one tests whether the spec from step 2 stands on its own when there is nothing to lift.</p>
-<p class="step-verify">&#10003; <code>tests/e2e/tabs.spec.ts</code> asserts axe is clean, exactly one tab is in the tab order at a time, Arrow keys move selection, Home/End jump to first and last, and each panel is associated via <code>aria-controls</code> and <code>aria-labelledby</code>. All three <code>evals/tabs.json</code> scenarios pass.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-8">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-8" aria-describedby="step-why-8">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Run all twelve evaluations against Haiku, Sonnet, and Opus.</h3>
-</label>
-<div class="step-detail"><p>Record every result in <code>docs/evaluations.md</code> beside the baseline, so the before/after is one table.</p></div>
-<p class="step-why" id="step-why-8">Best practices call for testing across models — a description sufficient for Opus can fail to trigger on Haiku, and triggering is the entire discovery mechanism. Skipping this ships descriptions tuned to one model.</p>
-<p class="step-verify">&#10003; Every scenario triggers its intended skill on all three models. Any miss is fixed by rewriting the <code>description</code> — not by adding body text, which loads too late to affect triggering — and then re-run. A miss that survives two rewrites gets documented as a known limitation rather than hidden.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-9">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-9" aria-describedby="step-why-9">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Prove cross-vendor installation manually, once, and write down what happened.</h3>
-</label>
-<div class="step-detail"><p>Install into Claude Code from the local directory and confirm all four skills load and are invocable. Place the same <code>skills/</code> tree at <code>.agents/skills/</code> and confirm Codex discovers it. Optionally cross-check with <code>skills-ref validate</code> from a throwaway clone.</p></div>
-<p class="step-why" id="step-why-9">Every other check tests the files. This is the only step that tests the README's actual claim, that one tree serves two vendors.</p>
-<p class="step-verify">&#10003; Record the result in <code>docs/vendor-support.md</code>, including anything that did not work. If Codex discovery fails, that is a finding to document, not a step to quietly skip.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-10">
-<label class="step-label">
-<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-10" aria-describedby="step-why-10">
-<span class="step-chip" aria-hidden="true">todo</span>
-<h3 class="step-action">Update <code>README.md</code>, bump both manifests to <code>0.2.0</code>, add <code>.github/workflows/check.yml</code> running <code>scripts/check.sh</code>.</h3>
-</label>
-<p class="step-why" id="step-why-10">The README currently states components do not exist. Version bumps are how Claude Code decides whether to hand users an update.</p>
-<p class="step-verify">&#10003; <code>scripts/check.sh</code> passes from a clean clone in a temp directory. If the Actions run fails, read <code>gh run view --log-failed</code> first — a billing block fails every job in seconds with no test output and is not a code defect.</p>
-<span class="step-status" aria-live="polite" aria-atomic="true"></span>
-</li>
-</ol>
-</section>
-<section id="tests" aria-labelledby="tests-heading">
-<h2 id="tests-heading">Tests</h2>
-<blockquote><p>Tier: 1 (code-touching — creates reference implementations, a JS module, and test files)</p></blockquote>
-<h4>Objective-Verification Test</h4>
-<ul><li><strong>File:</strong> <code>tests/objective.spec.ts</code></li><li><strong>Type:</strong> smoke test, data-driven over <code>skills/*/</code></li><li><strong>Asserts:</strong> For every skill directory present, all three halves of the objective hold simultaneously: (1) its <code>SKILL.md</code> frontmatter conforms to the Agent Skills spec, (2) it contains no vendor-specific token (<code>${CLAUDE_PLUGIN_ROOT}</code>, <code>disable-model-invocation</code>, <code>hint:</code>, backslash paths), and (3) its <code>references/demo.html</code> returns zero axe-core violations. Iterates the directory rather than a hardcoded list, so every component added later is covered without editing the test.</li><li><strong>Run:</strong> <code>npx vitest run tests/objective.spec.ts</code></li></ul>
-<h4>Skill Discovery Evaluations</h4>
-<ul><li><strong>Files:</strong> <code>evals/button.json</code>, <code>alert.json</code>, <code>dialog.json</code>, <code>tabs.json</code></li><li><strong>Type:</strong> triggering evaluations, three scenarios per skill, run semi-manually via <code>scripts/eval.sh</code>. Anthropic documents the format but ships no runner, so results are recorded by hand in <code>docs/evaluations.md</code>.</li><li><strong>Targets:</strong> the <code>description</code> field — whether a realistically-phrased user request activates the right skill.</li><li><strong>Key cases:</strong> per skill, one obvious request, one oblique request that avoids the skill's own vocabulary, and one adjacent request that must <em>not</em> trigger it. Run against Haiku, Sonnet, and Opus. Baseline results without any skill installed are recorded first, so improvement is measured rather than assumed.</li></ul>
-<h4>Unit Tests</h4>
-<ul><li><strong>File:</strong> <code>tests/unit/frontmatter.spec.ts</code></li><li><strong>Targets:</strong> this repo's own SKILL.md frontmatter validator, which replaces <code>skills-ref</code> as the enforcing gate.</li><li><strong>Key cases:</strong> <code>name</code> matches the parent directory name; <code>name</code> satisfies the spec regex including no-consecutive-hyphens and no-edge-hyphen; <code>description</code> is non-empty and ≤1024 chars; <code>description</code> is third person, rejecting a leading &quot;I &quot; or &quot;You &quot;; <code>description</code> contains a &quot;use when&quot; trigger phrase; only spec-defined keys appear at the top level. Each case is asserted against a fixture under <code>tests/fixtures/</code> that violates exactly that rule, so a passing test proves the rule can fail.</li></ul>
-<h4>Integration Tests</h4>
-<ul><li><strong>File:</strong> <code>tests/integration/manifests.spec.ts</code></li><li><strong>Targets:</strong> <code>.claude-plugin/plugin.json</code>, <code>.claude-plugin/marketplace.json</code>, and <code>.codex-plugin/plugin.json</code> read together.</li><li><strong>Key cases:</strong> both plugin manifests declare the same <code>name</code> and the same <code>version</code>; the marketplace entry's <code>source: &quot;./&quot;</code> and <code>skills: [&quot;./skills/&quot;]</code> resolve to real directories; the Codex <code>skills</code> path resolves to the same directory Claude Code scans by default; every directory under <code>skills/</code> is reachable from both manifests.</li></ul>
-<h4>E2E Tests</h4>
-<ul><li><strong>Files:</strong> <code>tests/e2e/button.spec.ts</code>, <code>alert.spec.ts</code>, <code>dialog.spec.ts</code>, <code>tabs.spec.ts</code></li><li><strong>Targets:</strong> each component's <code>references/demo.html</code> driven in a real browser via Playwright, loaded from <code>file://</code> with no server and no build step.</li><li><strong>Key cases:</strong> per-component keyboard and focus behavior as listed in steps 5-8. Every WCAG criterion a reference claims in its <code>a11y:</code> frontmatter has a corresponding assertion here — a claim with no assertion fails the objective test.</li></ul>
-</section>
-<section id="acceptance-criteria" aria-labelledby="acceptance-criteria-heading">
-<h2 id="acceptance-criteria-heading">Acceptance Criteria</h2>
-<ul><li class="check-item">&#9744; <code>npm ci</code> succeeds from a clean clone and <code>scripts/check.sh</code> exits zero.</li><li class="check-item">&#9744; <code>docs/component-spec.md</code> defines both the <code>SKILL.md</code> contract and the reference format, and a fresh agent can write a conforming component from it without asking a clarifying question.</li><li class="check-item">&#9744; Four skills exist: <code>button</code>, <code>alert</code>, <code>dialog</code>, <code>tabs</code>.</li><li class="check-item">&#9744; Every skill's frontmatter passes this repo's validator; the validator itself is proven by fixtures that fail each rule.</li><li class="check-item">&#9744; No skill contains <code>${CLAUDE_PLUGIN_ROOT}</code>, <code>disable-model-invocation</code>, <code>hint:</code>, or a backslash path.</li><li class="check-item">&#9744; No component's CSS, HTML, or JS references a framework, a preprocessor, or an external package.</li><li class="check-item">&#9744; Every themeable CSS value is a <code>var(--auk-*, fallback)</code> and every component renders correctly with no custom properties defined at all.</li><li class="check-item">&#9744; Every WCAG criterion claimed in a reference's <code>a11y:</code> frontmatter has a passing assertion in <code>tests/e2e/</code>.</li><li class="check-item">&#9744; Each skill has at least three evaluations, with baseline results recorded before the skill existed.</li><li class="check-item">&#9744; All twelve evaluations trigger the correct skill on Haiku, Sonnet, and Opus, or the miss is documented in <code>docs/evaluations.md</code> as a known limitation.</li><li class="check-item">&#9744; The four skills load and are invocable in Claude Code.</li><li class="check-item">&#9744; Codex discovery result is recorded in <code>docs/vendor-support.md</code>, whether it worked or not.</li></ul>
-</section>
-<section id="verification" aria-labelledby="verification-heading">
-<h2 id="verification-heading">Verification</h2>
-<p>From a clean clone in a temporary directory:</p>
-<ol><li><code>npm ci &amp;&amp; npx playwright install chromium</code></li><li><code>bash scripts/check.sh</code> — exits zero, having run the unit suite, the portability lint, <code>claude plugin validate . --strict</code>, and the Playwright suite.</li><li><code>claude --plugin-dir .</code> — starts, and <code>/help</code> lists all four skills under the <code>agent-ui-kit</code> namespace.</li><li>Read <code>docs/evaluations.md</code> — baseline and post-skill results are both present for all twelve scenarios across three models, and the delta is visible.</li><li>Open each <code>skills/*/references/demo.html</code> directly in a browser with no build step and no stylesheet beyond the reference's own CSS. Each component renders correctly and is fully keyboard operable.</li></ol>
-<p>Step 5 is the one that matters most. The whole premise is that these references work with nothing else present. If a demo needs anything the reference did not ship, the component is not vendor-neutral regardless of what the tests say.</p>
-</section>
-<section id="next-steps" aria-labelledby="next-steps-heading">
-<h2 id="next-steps-heading">Next Steps</h2>
-<ul><li>Extend v1 into a genuinely useful kit:</li></ul>
-<pre><code class="lang-text">  In ~/devbox/agent-ui-kit, the component skill format is proven by button, alert,
-  dialog, and tabs. Read docs/component-spec.md and the four existing skills under
-  skills/, then add: combobox (ARIA 1.2 pattern with filtering), disclosure, tooltip,
-  and checkbox. Follow the same structure exactly, including a references/demo.html,
-  three evaluations in evals/, and matching E2E assertions for every WCAG criterion
-  claimed. Run scripts/check.sh before you finish and report the result.</code></pre>
-<ul><li>Automate the evaluation runner:</li></ul>
-<pre><code class="lang-text">  ~/devbox/agent-ui-kit has evals/*.json holding skill-triggering scenarios in
-  Anthropic's documented format, currently run by hand via scripts/eval.sh with results
-  pasted into docs/evaluations.md. Investigate whether `claude -p` with --model can run
-  these non-interactively and whether skill activation is reliably detectable from its
-  output. If it is, build the runner and have it write docs/evaluations.md directly. If
-  it is not, say so plainly and leave the manual protocol alone.</code></pre>
-<ul><li>Make <code>acss-kit</code> depend on <code>agent-ui-kit</code> instead of duplicating it:</li></ul>
-<pre><code class="lang-text">  ~/devbox/acss-plugins/plugins/acss-kit has 15 component-* skills whose references
-  contain fpkit-bound TSX and SCSS templates plus framework-neutral accessibility
-  contracts. ~/devbox/agent-ui-kit now owns the neutral contracts. Propose (do not
-  implement) how acss-kit could consume agent-ui-kit's references as the neutral source
-  of truth and keep only the fpkit projection layer. Identify what would break for
-  existing acss-kit users and whether Claude Code plugin dependencies can express this
-  relationship.</code></pre>
-<ul><li>Add an optional DESIGN.md token bridge:</li></ul>
-<pre><code class="lang-text">  In ~/devbox/agent-ui-kit, components ship literal CSS using var(--auk-*, fallback).
-  Design and document an optional mapping layer that lets a project with a DESIGN.md
-  token file bind its tokens to the --auk-* custom properties, so components pick up a
-  project's theme automatically. This must stay optional — every component must keep
-  working with no DESIGN.md present. Write the design to docs/ as a proposal first.</code></pre>
-</section>
-<section id="unresolved-questions" aria-labelledby="unresolved-questions-heading">
-<h2 id="unresolved-questions-heading">Unresolved Questions</h2>
-<ul><li>Plugin and marketplace share the name <code>agent-ui-kit</code>:</li></ul>
-<pre><code class="lang-text">  The agent-ui-kit repository is both a Claude Code plugin and its own marketplace, so
-  installation reads /plugin install agent-ui-kit@agent-ui-kit and skills invoke as
-  /agent-ui-kit:button. Investigate whether renaming the plugin (not the repo) to
-  something shorter like &quot;ui&quot; improves this, what the tradeoffs are for discovery and
-  namespace collisions with other plugins, and whether renaming after publication
-  breaks existing installs. Recommend one option.</code></pre>
-<ul><li>Whether v1 should be submitted to the public marketplaces:</li></ul>
-<pre><code class="lang-text">  agent-ui-kit is a public repo that is both a Claude Code plugin and its own
-  marketplace. Investigate what submitting to anthropics/claude-plugins-community
-  requires, what the ChatGPT/Codex universal plugin directory requires, and whether a
-  four-component v1 with an alpha reference format is ready for either. Consider that
-  approved Claude Code plugins are pinned to a commit SHA with CI auto-bumping the pin.
-  Recommend whether to submit now or wait, and say what would need to be true first.</code></pre>
-</section>
-</main>
-</div>
+
+  <nav class="plan-nav" aria-label="Plan sections">
+    <div class="scroll-rail" aria-hidden="true"></div>
+    <div class="nav-heading">On this page</div>
+    <ul>
+      <li><a href="#objective"><svg class="icon" aria-hidden="true"><use href="#ic-bolt"/></svg> Objective</a></li>
+      <li><a href="#progress"><svg class="icon" aria-hidden="true"><use href="#ic-chart-bar"/></svg> Progress</a></li>
+      <li><a href="#context"><svg class="icon" aria-hidden="true"><use href="#ic-document-text"/></svg> Context</a></li>
+      <li><a href="#decisions"><svg class="icon" aria-hidden="true"><use href="#ic-sparkles"/></svg> Decisions</a></li>
+      <li><a href="#files"><svg class="icon" aria-hidden="true"><use href="#ic-folder"/></svg> Files that change</a></li>
+      <li><a href="#steps"><svg class="icon" aria-hidden="true"><use href="#ic-list-bullet"/></svg> Steps</a></li>
+      <li><a href="#tests"><svg class="icon" aria-hidden="true"><use href="#ic-beaker"/></svg> Tests</a></li>
+      <li><a href="#criteria"><svg class="icon" aria-hidden="true"><use href="#ic-check-circle"/></svg> Definition of done</a></li>
+      <li><a href="#verification"><svg class="icon" aria-hidden="true"><use href="#ic-magnifying-glass"/></svg> Final check</a></li>
+      <li><a href="#completion"><svg class="icon" aria-hidden="true"><use href="#ic-clipboard-check"/></svg> Wrapping up</a></li>
+      <li><a href="#next-steps"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-right-circle"/></svg> Next steps</a></li>
+    </ul>
+    <details class="rail-disclosure" open>
+      <summary>11 steps</summary>
+      <div class="rail-heading">Steps</div>
+      <ul class="rail-steps">
+        <li><a class="rail-step" href="#step-1"><span class="rail-no">1</span><span class="rail-text">Create package.json and install vitest, @playwright/test, @axe-core/playwright and gray-matter.</span><span class="rail-state">step 1 of 11</span></a></li>
+        <li><a class="rail-step" href="#step-2"><span class="rail-no">2</span><span class="rail-text">Write docs/component-spec.md defining both halves of the authoring contract — what belongs in SKILL.md (standard frontmatter keys only, a third-person description, a body under 60 lines, no component code) and what belongs in the reference (element, role, props, slots, variants, behaviour, WCAG criteria, plus the five body sections Structure, Styles, Behaviour, Accessibility and Demo).</span><span class="rail-state">step 2 of 11</span></a></li>
+        <li><a class="rail-step" href="#step-3"><span class="rail-no">3</span><span class="rail-text">Write three evaluation scenarios per component in evals/ and record a baseline run, with no skills installed, in docs/evaluations.md.</span><span class="rail-state">step 3 of 11</span></a></li>
+        <li><a class="rail-step" href="#step-4"><span class="rail-no">4</span><span class="rail-text">Build scripts/check.sh running four gates in order — the Vitest unit suite, a portability lint over every file under skills/, <code class="md">claude plugin validate . --strict</code>, and the Playwright browser suite.</span><span class="rail-state">step 4 of 11</span></a></li>
+        <li><a class="rail-step" href="#step-5"><span class="rail-no">5</span><span class="rail-text">Write skills/button/ with no JavaScript, lifting from acss-kit the decision to use <code class="md">aria-disabled</code> instead of the native disabled attribute so a disabled button stays in the keyboard tab order.</span><span class="rail-state">step 5 of 11</span></a></li>
+        <li><a class="rail-step" href="#step-6"><span class="rail-no">6</span><span class="rail-text">Write skills/alert/ as an ARIA live region (the mechanism that makes a screen reader announce content appearing after page load), still with no JavaScript.</span><span class="rail-state">step 6 of 11</span></a></li>
+        <li><a class="rail-step" href="#step-7"><span class="rail-no">7</span><span class="rail-text">Write skills/dialog/ using the native dialog element plus a dependency-free ES module for focus management.</span><span class="rail-state">step 7 of 11</span></a></li>
+        <li><a class="rail-step" href="#step-8"><span class="rail-no">8</span><span class="rail-text">Write skills/tabs/ using roving tabindex (keeping exactly one tab in the keyboard tab order and moving it with the arrow keys), with no acss-kit source to lift from.</span><span class="rail-state">step 8 of 11</span></a></li>
+        <li><a class="rail-step" href="#step-9"><span class="rail-no">9</span><span class="rail-text">Run all twelve evaluations against Haiku, Sonnet and Opus and record every result beside the baseline in docs/evaluations.md.</span><span class="rail-state">step 9 of 11</span></a></li>
+        <li><a class="rail-step" href="#step-10"><span class="rail-no">10</span><span class="rail-text">Install the plugin into Claude Code from the local directory, place the same skills tree where Codex looks for it, and write down what happened in docs/vendor-support.md.</span><span class="rail-state">step 10 of 11</span></a></li>
+        <li><a class="rail-step" href="#step-11"><span class="rail-no">11</span><span class="rail-text">Update README.md, bump both plugin manifests to 0.2.0, and add .github/workflows/check.yml running scripts/check.sh.</span><span class="rail-state">step 11 of 11</span></a></li>
+      </ul>
+    </details>
+  </nav>
+
+  <main id="main">
+
+    <div class="objective-card" id="objective">
+      <div class="section-label">Objective</div>
+      <p>Ship a vendor-neutral component-skill format, proven by four components that reliably trigger across models and load correctly in both Claude Code and ChatGPT/Codex.</p>
+      <section class="plan-glance" aria-labelledby="plan-glance-label">
+        <div class="plan-glance-label" id="plan-glance-label">At a glance</div>
+        <p>Agents keep rebuilding the same accessible components badly, and every existing kit ties you to one framework. This proves a component format that carries real working code and no vendor lock-in, and we will know it worked when four components load in both Claude Code and ChatGPT with their accessibility claims backed by a test run rather than a promise.</p>
+      </section>
+    </div>
+
+    <div class="plan-implement">
+      <span class="plan-implement-label">Implement</span>
+      <code id="implement-cmd" aria-label="Implement prompt">Read and implement all steps in the plan at docs/plans/build-ui-component-skills.md — Build vendor-neutral UI component skills. Verify against the plan&#39;s Tests, Verification, and Acceptance Criteria before reporting done. If everything passed, mark completion in docs/plans/build-ui-component-skills.md — tick each step&#39;s [x] marker and each criterion&#39;s - [x], set status: completed — and re-render the HTML from the spec. If any check failed, leave status: in-progress and say which. This plan is published at https://claude.ai/code/artifact/aabf412c-2636-4254-9a21-615215b8c4ce — after re-rendering, republish it to that same URL so the shared page matches the spec.</code>
+      <button class="copy-cmd-btn" type="button"
+              onclick="copyCmd(this)" aria-label="Copy implement prompt to clipboard">Copy</button>
+    </div>
+
+    <details class="plan-more-ways">
+      <summary>More ways to run this plan <span class="more-ways-hint">— goal &amp; workflow prompts, file path</span></summary>
+      <div class="plan-more-ways-body">
+
+        <div class="plan-goal">
+          <div class="plan-goal-label">Pursue as goal — optimize for the outcome</div>
+          <div class="plan-goal-inner">
+            <code id="goal-cmd" aria-label="Goal prompt">Achieve this goal: Build vendor-neutral UI component skills. The plan at docs/plans/build-ui-component-skills.md describes one approach — use it as reference, but optimize for the outcome. Verify against the plan&#39;s Tests, Verification, and Acceptance Criteria before reporting done. If everything passed, mark completion in docs/plans/build-ui-component-skills.md — tick each step&#39;s [x] marker and each criterion&#39;s - [x], set status: completed — and re-render the HTML from the spec. If any check failed, leave status: in-progress and say which. This plan is published at https://claude.ai/code/artifact/aabf412c-2636-4254-9a21-615215b8c4ce — after re-rendering, republish it to that same URL so the shared page matches the spec.</code>
+            <button class="copy-goal-btn" type="button"
+                    onclick="copyGoal(this)" aria-label="Copy goal prompt to clipboard">Copy</button>
+          </div>
+        </div>
+
+        <div class="plan-source">
+          <div class="plan-source-row">
+            <span class="plan-source-label">File</span>
+            <code id="plan-file" aria-label="Plan file name">build-ui-component-skills.html</code>
+            <button class="copy-src-btn" type="button"
+                    onclick="copyPath(this, 'plan-file')" aria-label="Copy plan file name to clipboard">Copy</button>
+          </div>
+          <div class="plan-source-row">
+            <span class="plan-source-label">Path</span>
+            <code id="plan-path" aria-label="Plan relative path">docs/plans/build-ui-component-skills.html</code>
+            <button class="copy-src-btn" type="button"
+                    onclick="copyPath(this, 'plan-path')" aria-label="Copy plan relative path to clipboard">Copy</button>
+          </div>
+          <div class="plan-source-row">
+            <span class="plan-source-label">Spec</span>
+            <code id="plan-md" aria-label="Plan spec markdown path">docs/plans/build-ui-component-skills.md</code>
+            <button class="copy-src-btn" type="button"
+                    onclick="copyPath(this, 'plan-md')" aria-label="Copy plan spec path to clipboard">Copy</button>
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <div class="progress-wrap" id="progress">
+      <div class="progress-header">
+        <span>Definition of done</span>
+        <span id="progress-label">0 / 12 done</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"
+             role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+             aria-label="Plan progress" style="width:0%"></div>
+      </div>
+    </div>
+
+    <section class="section-card card-context" id="context" aria-labelledby="h-context">
+      <h2 id="h-context">
+        <svg class="icon" aria-hidden="true"><use href="#ic-document-text"/></svg>
+        Context
+      </h2>
+      <p class="section-intro">The story behind this plan — what prompted the work and why it matters now.</p>
+      <p><code class="md">agent-ui-kit</code> exists as structure only. The scaffold created both plugin manifests, a marketplace manifest, an empty <code class="md">skills/</code> tree and a README. There are no components, no format specification, no tooling and no tests.</p>
+      <p>The project packages each UI component as an Agent Skill (a folder with a <code class="md">SKILL.md</code> that agents load on demand). Each skill ships a complete, copyable reference: semantic HTML with a real accessibility contract, plain CSS driven by custom properties, and JavaScript with no dependencies. An agent reads the reference and builds the component into the user&#39;s project, in the user&#39;s stack. Nothing is installed into the consuming app.</p>
+      <p>It is deliberately seeded from <code class="md">~/devbox/acss-plugins</code> rather than written from nothing. That repo&#39;s <code class="md">style-agent</code> plugin holds an alpha framework-neutral component specification whose core insight is reusable: HTML structure, CSS and the accessibility contract are framework-agnostic, and only template syntax and reactivity binding are framework-specific. Its <code class="md">acss-kit</code> plugin holds fifteen component references. Only the accessibility contracts, prop models and data-attribute variant strategy transfer from those — the TSX and SCSS templates are bound to <code class="md">@fpkit/acss</code> and do not.</p>
+      <p>Three portability hazards found in <code class="md">acss-kit</code> must not be repeated here. It uses <code class="md">${CLAUDE_PLUGIN_ROOT}</code>, a Claude Code variable that Codex does not expand. It uses <code class="md">disable-model-invocation</code> and <code class="md">hint</code> frontmatter, which are Claude Code extensions absent from the Agent Skills open standard and rejected by a strict validator. It shells out to Python helper scripts, which a cross-vendor skill cannot assume exist.</p>
+      <p>One tooling constraint shapes the harness. <code class="md">skills-ref</code>, the reference validator published alongside the Agent Skills standard, is labelled by its own authors as being for demonstration purposes only and not meant for production. It has no package release and installs from a git clone. It must not gate CI, so this repo owns its own frontmatter validator and treats <code class="md">skills-ref</code> as an optional manual cross-check.</p>
+      <p>GitHub Actions is frequently billing-blocked on this account, so every check must run locally from one script. Continuous integration mirrors that script and is never the only place a check lives.</p>
+    </section>
+
+    <section class="section-card card-decisions" id="decisions" aria-labelledby="h-decisions">
+      <h2 id="h-decisions">
+        <svg class="icon" aria-hidden="true"><use href="#ic-sparkles"/></svg>
+        Decisions
+      </h2>
+      <p class="section-intro">Choices already settled — read these before re-opening any of them.</p>
+      <ul class="decisions-list" style="padding-left:1.15rem;">
+        <li style="margin-bottom:.5rem;">One skill per component, not one skill per family — discovery quality beats startup token cost, and roughly 100 tokens of description per skill is an acceptable price for an agent picking the right component first time.</li>
+        <li style="margin-bottom:.5rem;">References ship literal CSS where every themeable value is <code class="md">var(--auk-name, fallback)</code>, not token references into a separate design file — the fallback lets a component work standalone, and the variable lets it theme cleanly.</li>
+        <li style="margin-bottom:.5rem;">The upstream specification&#39;s <code class="md">{colors.primary}</code> token references become an optional mapping layer rather than a requirement, so no design-token file needs to exist for a component to function.</li>
+        <li style="margin-bottom:.5rem;"><code class="md">SKILL.md</code> orients and points; the reference carries the code. The skill body stays under 60 lines and never contains the component itself, because the body loads whenever the skill triggers while the reference loads only when actually needed.</li>
+        <li style="margin-bottom:.5rem;">Accessibility claims are asserted by axe-core and explicit keyboard tests, never stated bare — a criterion claimed in a reference with no matching assertion is a defect, not documentation.</li>
+        <li style="margin-bottom:.5rem;">Version one is four components chosen to stress different parts of the format rather than to be a useful kit: no JavaScript, a live region, heavy focus management, and keyboard navigation.</li>
+        <li style="margin-bottom:.5rem;"><code class="md">tabs</code> is deliberately absent from <code class="md">acss-kit</code> so one component tests the greenfield path instead of the extraction path.</li>
+      </ul>
+    </section>
+
+    <section class="section-card card-files" id="files" aria-labelledby="h-files">
+      <h2 id="h-files">
+        <svg class="icon" aria-hidden="true"><use href="#ic-folder"/></svg>
+        Files that change
+      </h2>
+      <p class="section-intro">Every file this plan touches, and what happens to each one.</p>
+      <div class="file-tree">
+        <div class="file-tree-root"><svg class="icon" aria-hidden="true"><use href="#ic-folder"/></svg> agent-ui-kit/</div>
+        <ul class="file-list">
+          <li><code>package.json</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">test runner and browser automation dependencies</span></li>
+          <li class="file-dir"><svg class="icon" aria-hidden="true"><use href="#ic-folder"/></svg> docs/
+            <ul class="file-list">
+            <li><code>component-spec.md</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">the authoring contract for both SKILL.md and the reference</span></li>
+            <li><code>evaluations.md</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">baseline and per-model skill-triggering results</span></li>
+            <li><code>vendor-support.md</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">what actually happened when each vendor loaded the tree</span></li>
+            </ul>
+          </li>
+          <li class="file-dir"><svg class="icon" aria-hidden="true"><use href="#ic-folder"/></svg> scripts/
+            <ul class="file-list">
+            <li><code>check.sh</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">the single local gate: unit tests, portability lint, plugin validation, browser tests</span></li>
+            <li><code>eval.sh</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">prints one evaluation scenario formatted for a manual run</span></li>
+            </ul>
+          </li>
+          <li><code>evals/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">twelve triggering scenarios, three per component</span></li>
+          <li><code>skills/button/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference and standalone demo page</span></li>
+          <li><code>skills/alert/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference and standalone demo page</span></li>
+          <li><code>skills/dialog/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference, focus-management module and demo page</span></li>
+          <li><code>skills/tabs/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference, roving-tabindex module and demo page</span></li>
+          <li><code>tests/objective.spec.ts</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">the whole-kit smoke test, data-driven over skills/</span></li>
+          <li><code>tests/unit/frontmatter.spec.ts</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">this repo&#39;s own Agent Skills frontmatter validator</span></li>
+          <li><code>tests/integration/manifests.spec.ts</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">both plugin manifests read together</span></li>
+          <li><code>tests/e2e/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">one browser spec per component</span></li>
+          <li><code>tests/fixtures/bad-skill/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">deliberately broken skill proving the harness fails</span></li>
+          <li><code>README.md</code> <span class="file-badge file-badge-modified">modified</span> <span class="file-note">replace the &quot;components do not exist yet&quot; status</span></li>
+          <li><code>.claude-plugin/plugin.json</code> <span class="file-badge file-badge-modified">modified</span> <span class="file-note">version bump to 0.2.0</span></li>
+          <li><code>.codex-plugin/plugin.json</code> <span class="file-badge file-badge-modified">modified</span> <span class="file-note">version bump to 0.2.0</span></li>
+          <li><code>.github/workflows/check.yml</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">mirrors scripts/check.sh</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card card-steps" id="steps" aria-labelledby="h-steps">
+      <h2 id="h-steps">
+        <svg class="icon" aria-hidden="true"><use href="#ic-list-bullet"/></svg>
+        Steps
+      </h2>
+      <p class="section-intro">The step-by-step work, in order — each step says what to do, why it matters, and how to check it worked.</p>
+      <div class="steps-list">
+
+        <div class="phase-group" data-phase="Foundation" style="margin-top:1.5rem;">
+          <h3 class="phase-name" style="font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:0 0 .75rem;">Foundation</h3>
+        <div class="step-card" id="step-1">
+          <div class="step-card-header">
+            <div class="step-number">1</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Create package.json and install vitest, @playwright/test, @axe-core/playwright and gray-matter.</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">every later step needs a test runner, and an earlier draft of this plan called <code class="md">npm ci</code> in a repo that had no package.json at all.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body"><code class="md">npm ci &amp;&amp; npx vitest run --passWithNoTests</code> exits zero and <code class="md">npx playwright install chromium</code> completes.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card" id="step-2">
+          <div class="step-card-header">
+            <div class="step-number">2</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Write docs/component-spec.md defining both halves of the authoring contract — what belongs in SKILL.md (standard frontmatter keys only, a third-person description, a body under 60 lines, no component code) and what belongs in the reference (element, role, props, slots, variants, behaviour, WCAG criteria, plus the five body sections Structure, Styles, Behaviour, Accessibility and Demo).</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">every later step writes against this contract, and the split between the two files is currently undefined, so drafting a component first would bake in an accidental format.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body">hand the spec and nothing else to a fresh Claude and ask it to write the button reference — a clarifying question about structure means the spec is incomplete and gets fixed before step 3.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card" id="step-3">
+          <div class="step-card-header">
+            <div class="step-number">3</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Write three evaluation scenarios per component in evals/ and record a baseline run, with no skills installed, in docs/evaluations.md.</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">Anthropic&#39;s authoring guidance puts evaluations before documentation so a skill closes an observed gap rather than an imagined one, and without a baseline nothing proves the skill improved anything.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body">docs/evaluations.md holds twelve baseline results naming concrete failures such as missing focus restoration or a wrong live-region setting; a scenario that already passes with no skill is too easy and gets rewritten.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card" id="step-4">
+          <div class="step-card-header">
+            <div class="step-number">4</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Build scripts/check.sh running four gates in order — the Vitest unit suite, a portability lint over every file under skills/, <code class="md">claude plugin validate . --strict</code>, and the Playwright browser suite.</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">naming the check before the work stops the harness being quietly shaped to pass whatever the components happen to do.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body">a deliberately broken fixture at tests/fixtures/bad-skill/ makes the run exit non-zero naming both faults separately, and the portability lint scans only skills/ so the fixture never trips the real gate.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <div class="phase-group" data-phase="Components" style="margin-top:1.5rem;">
+          <h3 class="phase-name" style="font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:0 0 .75rem;">Components</h3>
+        <div class="step-card" id="step-5">
+          <div class="step-card-header">
+            <div class="step-number">5</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Write skills/button/ with no JavaScript, lifting from acss-kit the decision to use <code class="md">aria-disabled</code> instead of the native disabled attribute so a disabled button stays in the keyboard tab order.</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">the simplest possible component proves the format end to end before any behaviour complexity arrives.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body">check.sh passes, and tests/e2e/button.spec.ts confirms zero axe violations plus a disabled button that is reachable by Tab but does not fire on Enter, with all three button evaluations passing.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card" id="step-6">
+          <div class="step-card-header">
+            <div class="step-number">6</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Write skills/alert/ as an ARIA live region (the mechanism that makes a screen reader announce content appearing after page load), still with no JavaScript.</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">its entire value is the accessibility contract, so a wrong live-region setting is invisible to the eye and only a test catches it.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body">tests/e2e/alert.spec.ts confirms zero axe violations, the alert role present, the live-region setting resolving to assertive, and the region already in the page before any content arrives.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card" id="step-7">
+          <div class="step-card-header">
+            <div class="step-number">7</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Write skills/dialog/ using the native dialog element plus a dependency-free ES module for focus management.</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">this is the hardest accessibility case in the set, so if the format cannot express focus trapping, inertness, Escape handling and focus restoration, that has to surface now rather than at component twenty.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body">tests/e2e/dialog.spec.ts confirms focus moves inside on open, Tab cycles only within the dialog, Escape closes it, and focus returns to the exact element that opened it.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card" id="step-8">
+          <div class="step-card-header">
+            <div class="step-number">8</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Write skills/tabs/ using roving tabindex (keeping exactly one tab in the keyboard tab order and moving it with the arrow keys), with no acss-kit source to lift from.</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">every other component is an extraction, so this one tests whether the specification from step 2 stands on its own with nothing to copy.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body">tests/e2e/tabs.spec.ts confirms one tab in the tab order at a time, arrow keys moving selection, Home and End jumping to the ends, and each tab paired to its panel by aria-controls and aria-labelledby.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <div class="phase-group" data-phase="Proof" style="margin-top:1.5rem;">
+          <h3 class="phase-name" style="font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:0 0 .75rem;">Proof</h3>
+        <div class="step-card" id="step-9">
+          <div class="step-card-header">
+            <div class="step-number">9</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Run all twelve evaluations against Haiku, Sonnet and Opus and record every result beside the baseline in docs/evaluations.md.</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">a description that triggers reliably on Opus can fail to trigger on Haiku, and triggering is the entire discovery mechanism, so skipping this ships descriptions tuned to one model.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body">every scenario fires its intended skill on all three models, or the miss is named as a known limitation after two description rewrites — fixes go in the description, never the body, which loads too late to affect triggering.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card" id="step-10">
+          <div class="step-card-header">
+            <div class="step-number">10</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Install the plugin into Claude Code from the local directory, place the same skills tree where Codex looks for it, and write down what happened in docs/vendor-support.md.</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">every other check tests the files, and this is the only step that tests the README&#39;s actual claim that one tree serves two vendors.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body">docs/vendor-support.md records both results including anything that failed, because a Codex discovery failure is a finding to document rather than a step to quietly skip.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card" id="step-11">
+          <div class="step-card-header">
+            <div class="step-number">11</div>
+            <div class="step-body">
+              <div class="step-action">
+                <span class="step-chip">todo</span>
+                <span class="step-chip-text">Update README.md, bump both plugin manifests to 0.2.0, and add .github/workflows/check.yml running scripts/check.sh.</span>
+              </div>
+              <div class="step-note step-why-note">
+                <span class="step-note-label">Why</span>
+                <div class="step-why">the README still says components do not exist, and Claude Code only offers users an update when the manifest version changes.</div>
+              </div>
+              <div class="step-note step-verify">
+                <span class="step-note-label">Verify</span>
+                <div class="verify-body">check.sh exits zero from a clean clone in a temporary directory; a failing Actions run is read with <code class="md">gh run view --log-failed</code> first, because a billing block fails every job in seconds with no test output and is not a code defect.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section-card card-tests" id="tests" aria-labelledby="h-tests">
+      <h2 id="h-tests">
+        <svg class="icon" aria-hidden="true"><use href="#ic-beaker"/></svg>
+        Tests
+      </h2>
+      <p class="section-intro">The tests that prove the change does what it promises.</p>
+      <div class="test-tier-label">Tier 1 — This plan changes application code</div>
+      <div class="objective-test-card">Objective: every skill in the kit is portable and its demo is accessible. File: tests/objective.spec.ts; Type: smoke; Asserts: for every directory under skills/, the frontmatter conforms to the Agent Skills standard, the files contain no vendor-specific token, and the demo page returns zero axe-core violations — iterating the directory so later components are covered without editing the test; Run: npx vitest run tests/objective.spec.ts</div>
+      <div class="test-list">
+        <div class="test-card">Unit: the repo&#39;s own frontmatter validator, which replaces skills-ref as the enforcing gate. File: tests/unit/frontmatter.spec.ts; Targets: the SKILL.md frontmatter parser; Key cases: name matches its parent directory, name satisfies the standard&#39;s pattern including no consecutive or edge hyphens, description is non-empty and within 1024 characters, description is third person, only standard keys appear — each asserted against a fixture violating exactly that rule so a passing test proves the rule can fail</div>
+        <div class="test-card">Integration: both plugin manifests read together. File: tests/integration/manifests.spec.ts; Targets: the Claude Code manifest, the marketplace manifest and the Codex manifest; Key cases: both declare the same name and version, the marketplace source and skills paths resolve to real directories, and the Codex skills path resolves to the same directory Claude Code scans by default</div>
+        <div class="test-card">E2E: per-component keyboard and focus behaviour in a real browser. File: tests/e2e/button.spec.ts, alert.spec.ts, dialog.spec.ts, tabs.spec.ts; Targets: each component&#39;s demo page loaded from disk with no server and no build step; Key cases: the behaviours named in steps 5 to 8, with every WCAG criterion a reference claims carrying a matching assertion here</div>
+        <div class="test-card">Evaluations: whether a realistically-phrased request activates the right skill. File: evals/button.json, alert.json, dialog.json, tabs.json; Targets: the description field, run semi-manually since the format is documented but no runner ships; Key cases: per skill one obvious request, one oblique request avoiding the skill&#39;s own vocabulary, and one adjacent request that must not trigger it</div>
+      </div>
+    </section>
+
+    <section class="section-card card-criteria" id="criteria" aria-labelledby="h-criteria">
+      <h2 id="h-criteria">
+        <svg class="icon" aria-hidden="true"><use href="#ic-check-circle"/></svg>
+        Definition of done
+      </h2>
+      <p class="section-intro">The plan counts as done when every statement below is true — check each one off as you verify it.</p>
+      <ul class="criteria-list" id="criteria-list">
+        <li>
+          <input type="checkbox" id="ac1">
+          <label for="ac1"><code class="md">npm ci</code> succeeds from a clean clone and <code class="md">scripts/check.sh</code> exits zero</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac2">
+          <label for="ac2">docs/component-spec.md defines both the SKILL.md contract and the reference format, and a fresh agent writes a conforming component from it without asking a clarifying question</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac3">
+          <label for="ac3">Four skills exist: button, alert, dialog and tabs</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac4">
+          <label for="ac4">Every skill&#39;s frontmatter passes this repo&#39;s validator, and the validator is itself proven by fixtures that fail each rule</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac5">
+          <label for="ac5">No skill contains <code class="md">${CLAUDE_PLUGIN_ROOT}</code>, <code class="md">disable-model-invocation</code>, <code class="md">hint:</code> or a backslash path</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac6">
+          <label for="ac6">No component&#39;s HTML, CSS or JavaScript references a framework, a preprocessor or an external package</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac7">
+          <label for="ac7">Every themeable CSS value is a <code class="md">var(--auk-*, fallback)</code> and every component renders correctly with no custom properties defined at all</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac8">
+          <label for="ac8">Every WCAG criterion claimed in a reference has a passing assertion in tests/e2e/</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac9">
+          <label for="ac9">Each skill has at least three evaluations, with baseline results recorded from before the skill existed</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac10">
+          <label for="ac10">All twelve evaluations trigger the correct skill on Haiku, Sonnet and Opus, or the miss is documented as a known limitation</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac11">
+          <label for="ac11">The four skills load and are invocable in Claude Code</label>
+        </li>
+        <li>
+          <input type="checkbox" id="ac12">
+          <label for="ac12">The Codex discovery result is recorded in docs/vendor-support.md whether it worked or not</label>
+        </li>
+      </ul>
+      <span id="criteria-status" aria-live="polite" aria-atomic="true"
+            style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"></span>
+    </section>
+
+    <section class="section-card card-verification" id="verification" aria-labelledby="h-verification">
+      <h2 id="h-verification">
+        <svg class="icon" aria-hidden="true"><use href="#ic-magnifying-glass"/></svg>
+        Final check
+      </h2>
+      <p class="section-intro">One last pass to confirm the whole change works end to end.</p>
+      <p>From a clean clone in a temporary directory, run <code class="md">npm ci &amp;&amp; npx playwright install chromium</code>, then <code class="md">bash scripts/check.sh</code>. It must exit zero, having run the unit suite, the portability lint, <code class="md">claude plugin validate . --strict</code> and the browser suite. Then run <code class="md">claude --plugin-dir .</code> and confirm <code class="md">/help</code> lists all four skills under the <code class="md">agent-ui-kit</code> namespace.</p>
+      <p>Read docs/evaluations.md and confirm both baseline and post-skill results are present for all twelve scenarios across three models, so the improvement is visible rather than assumed.</p>
+      <p>Finally, open each component&#39;s demo page directly in a browser with no build step and no stylesheet beyond the reference&#39;s own CSS. Each component must render correctly and be fully keyboard operable. This last check matters most: the entire premise is that these references work with nothing else present, so if a demo needs anything the reference did not ship, the component is not vendor-neutral regardless of what the tests report.</p>
+    </section>
+
+    <section class="section-card card-completion" id="completion" aria-labelledby="h-completion">
+      <h2 id="h-completion">
+        <svg class="icon" aria-hidden="true"><use href="#ic-clipboard-check"/></svg>
+        Wrapping up
+      </h2>
+      <p class="section-intro">Three gates that must all pass before this plan is marked completed.</p>
+      <div class="completion-checklist" id="completion-checklist">
+        <div class="completion-header">
+          <span class="completion-badge" id="completion-badge">Required</span>
+        </div>
+        <ul class="completion-list" id="completion-list">
+          <li>
+            <input type="checkbox" id="cc1" disabled>
+            <label for="cc1">All step TODOs marked as done</label>
+          </li>
+          <li>
+            <input type="checkbox" id="cc2" disabled>
+            <label for="cc2">All acceptance criteria verified and checked off</label>
+          </li>
+          <li>
+            <input type="checkbox" id="cc3" disabled>
+            <label for="cc3">Plan status updated to completed</label>
+          </li>
+        </ul>
+        <div class="completion-report" id="completion-report">
+          <h3 class="report-heading">Completion Report</h3>
+          <p class="report-empty">No items to report — all requirements met.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card card-next-steps" id="next-steps" aria-labelledby="h-next-steps">
+      <h2 id="h-next-steps">
+        <svg class="icon" aria-hidden="true"><use href="#ic-arrow-right-circle"/></svg>
+        Next steps
+      </h2>
+      <p class="section-intro">Follow-up ideas that came up along the way — none of them are required to finish this plan.</p>
+      <div class="next-steps-list">
+        <details class="next-step-item">
+          <summary>Extend version one into a genuinely useful kit</summary>
+          <div class="next-step-prompt">
+            <p>Adds the components a real project reaches for, once the format is proven.</p>
+            <p>Paste this prompt into Claude to execute this follow-up:</p>
+            <pre>In ~/devbox/agent-ui-kit the component skill format is proven by button, alert, dialog and tabs. Read docs/component-spec.md and the four existing skills under skills/, then add combobox (the ARIA 1.2 pattern with filtering), disclosure, tooltip and checkbox. Follow the same structure exactly, including a standalone demo page, three evaluations in evals/, and matching end-to-end assertions for every WCAG criterion claimed. Run scripts/check.sh before finishing and report the result.</pre>
+            <button class="copy-prompt-btn" type="button"
+                    onclick="copyPrompt(this)" aria-label="Copy prompt to clipboard">Copy prompt</button>
+          </div>
+        </details>
+
+        <details class="next-step-item">
+          <summary>Automate the evaluation runner</summary>
+          <div class="next-step-prompt">
+            <p>Removes the manual step from the only check that measures skill triggering.</p>
+            <p>Paste this prompt into Claude to execute this follow-up:</p>
+            <pre>~/devbox/agent-ui-kit has evals/*.json holding skill-triggering scenarios, currently run by hand via scripts/eval.sh with results pasted into docs/evaluations.md. Investigate whether `claude -p` with --model can run these non-interactively and whether skill activation is reliably detectable from its output. If it is, build the runner and have it write docs/evaluations.md directly. If it is not, say so plainly and leave the manual protocol alone. Report which you found.</pre>
+            <button class="copy-prompt-btn" type="button"
+                    onclick="copyPrompt(this)" aria-label="Copy prompt to clipboard">Copy prompt</button>
+          </div>
+        </details>
+
+        <details class="next-step-item">
+          <summary>Make acss-kit depend on agent-ui-kit instead of duplicating it</summary>
+          <div class="next-step-prompt">
+            <p>Wish list — removes the duplication this project deliberately created.</p>
+            <p>Paste this prompt into Claude to execute this follow-up:</p>
+            <pre>~/devbox/acss-plugins/plugins/acss-kit has fifteen component-* skills whose references contain fpkit-bound TSX and SCSS templates alongside framework-neutral accessibility contracts. ~/devbox/agent-ui-kit now owns the neutral contracts. Propose, but do not implement, how acss-kit could consume agent-ui-kit&#39;s references as the neutral source of truth and keep only the fpkit projection layer. Identify what would break for existing acss-kit users and whether Claude Code plugin dependencies can express this relationship. Write the proposal to docs/ and report the path.</pre>
+            <button class="copy-prompt-btn" type="button"
+                    onclick="copyPrompt(this)" aria-label="Copy prompt to clipboard">Copy prompt</button>
+          </div>
+        </details>
+
+        <details class="next-step-item">
+          <summary>Add an optional design-token bridge</summary>
+          <div class="next-step-prompt">
+            <p>Wish list — lets components inherit a project&#39;s theme automatically.</p>
+            <p>Paste this prompt into Claude to execute this follow-up:</p>
+            <pre>In ~/devbox/agent-ui-kit, components ship literal CSS using var(--auk-*, fallback). Design and document an optional mapping layer that lets a project with a design-token file bind its tokens to the --auk-* custom properties so components pick up the project&#39;s theme automatically. This must stay optional: every component must keep working with no token file present. Write the design to docs/ as a proposal first and report the path.</pre>
+            <button class="copy-prompt-btn" type="button"
+                    onclick="copyPrompt(this)" aria-label="Copy prompt to clipboard">Copy prompt</button>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="plan-footer">
+      <svg class="icon" aria-hidden="true"><use href="#ic-sparkles"/></svg>
+      Generated by plan-agent · 2026-09-02 · agent-ui-kit
+    </footer>
+
+  </main>
+</div><!-- /.layout -->
+
 <script>
-/* markdown-to-html v2.1.0 — generated from reference/html-spec.md */
+/* ── Theme toggle ───────────────────────────────────────────── */
+/* The <head> script has already applied any stored choice. This only has to
+   resolve what is currently on screen, flip it, and remember the answer. */
+function resolvedTheme() {
+  var set = document.documentElement.getAttribute('data-theme');
+  if (set === 'dark' || set === 'light') return set;
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark' : 'light';
+}
+
+function syncThemeButton(btn) {
+  if (!btn) return;
+  var dark = resolvedTheme() === 'dark';
+  btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+  btn.setAttribute('aria-label', dark ? 'Use light theme' : 'Use dark theme');
+  btn.textContent = dark ? 'Light' : 'Dark';
+}
+
+function toggleTheme(btn) {
+  var next = resolvedTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('plan-theme', next); } catch (e) { /* not persisted */ }
+  syncThemeButton(btn || document.getElementById('theme-toggle'));
+}
+
+/* ── Save as PDF (native browser print dialog) ──────────────── */
 function savePDF() {
   window.print();
 }
 
-(function () {
-  'use strict';
-  var links = {};
-  document.querySelectorAll('nav a[href^="#"]').forEach(function (a) {
-    links[a.getAttribute('href').slice(1)] = a;
-  });
-  var rail = document.querySelector('.scroll-rail');
-  function updateRail() {
-    if (!rail) return;
-    var pct = (window.scrollY / Math.max(1,
-      document.documentElement.scrollHeight - window.innerHeight)) * 100;
-    rail.style.setProperty('--scroll-pct', Math.min(100, Math.round(pct)));
+/* ── Build rich implementation prompt from DOM ──────────────── */
+function buildImplementPrompt() {
+  var cmdEl = document.getElementById('implement-cmd');
+  var status = document.documentElement.getAttribute('data-status') || 'todo';
+  var stepCards = Array.prototype.slice.call(document.querySelectorAll('.step-card'));
+  var criteriaItems = Array.prototype.slice.call(document.querySelectorAll('#criteria-list li'));
+
+  var totalSteps = stepCards.length;
+  var doneSteps = stepCards.filter(function(c) { return c.classList.contains('completed'); }).length;
+  var totalCriteria = criteriaItems.length;
+  var checkedCriteria = criteriaItems.filter(function(li) {
+    var cb = li.querySelector('input[type="checkbox"]');
+    return cb && cb.checked;
+  }).length;
+
+  var planPathMeta = document.querySelector('meta[name="plan-path"]');
+  var planPath = (planPathMeta && planPathMeta.getAttribute('content')) || '<plan-file>';
+  var mdMeta = document.querySelector('meta[name="plan-md"]');
+  var specPath = (mdMeta && mdMeta.getAttribute('content')) || planPath.replace(/\.html$/, '.md');
+
+  var lines = [];
+  lines.push(cmdEl ? cmdEl.textContent.trim() : 'Implement the plan');
+  lines.push('');
+  lines.push('Status: ' + status + ' (' + doneSteps + '/' + totalSteps + ' steps done, ' + checkedCriteria + '/' + totalCriteria + ' criteria met)');
+  lines.push('');
+  lines.push('Instructions:');
+  lines.push('1. Read the plan spec at ' + specPath + ' (Markdown — the source of truth; the sibling HTML at ' + planPath + ' is a rendered view of it).');
+  lines.push('2. Implement every step still marked todo; after completing each step, mark it done by adding its [x] marker in the spec (e.g. "3. [x] ...").');
+  lines.push('3. When all steps are done, verify each acceptance criterion and flip its bullet to "- [x]" in the spec.');
+  lines.push('4. Run the objective test\'s Run command from the plan\'s Tests section, then walk the Verification section end-to-end and confirm the stated objective actually works — on failure, fix and re-verify before continuing; never mark the plan done on a failing check.');
+  lines.push('5. Set "status: completed" in the spec frontmatter only once every step is marked, every criterion is checked, and verification passes.');
+  lines.push('6. Re-render the sibling HTML from the spec so it shows every step and criterion complete (the plan-agent render hook does this on save; otherwise run the bundled build-plan-html.mjs renderer) — never edit the HTML by hand.');
+
+  return lines.join('\n');
+}
+
+/* ── Shared clipboard helper ────────────────────────────────── */
+/* All copy buttons delegate here. `restoreLabel` is the button's   */
+/* idle text. On failure (Clipboard API rejects AND execCommand     */
+/* fails) the button shows a visible error so the user knows to      */
+/* select manually — never a silent no-op.                          */
+function clipboardCopy(text, btn, restoreLabel) {
+  function show(labelText, cls, delay) {
+    if (btn._copyTimer) clearTimeout(btn._copyTimer);
+    btn.textContent = labelText;
+    btn.classList.remove('copied', 'copy-failed');
+    if (cls) btn.classList.add(cls);
+    btn._copyTimer = setTimeout(function () {
+      btn.textContent = restoreLabel;
+      btn.classList.remove('copied', 'copy-failed');
+      btn._copyTimer = null;
+    }, delay);
   }
-  var observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) {
-        Object.values(links).forEach(function (a) {
-          a.classList.remove('active');
-          a.removeAttribute('aria-current');
-        });
-        var link = links[entry.target.id];
-        if (link) {
-          link.classList.add('active');
-          link.setAttribute('aria-current', 'true');
-        }
-      }
-    });
-  }, { threshold: 0.3 });
-  document.querySelectorAll('main section').forEach(function (s) {
-    observer.observe(s);
-  });
-  document.querySelectorAll('.svg-node').forEach(function (node) {
-    node.addEventListener('click', function () {
-      var id = node.dataset.section;
-      var el = id && document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    });
-  });
-  window.addEventListener('scroll', updateRail, { passive: true });
-  updateRail();
-})();
+  function flash() { show('Copied ✓', 'copied', 2000); }
+  function fail()  { show('Copy failed — select manually', 'copy-failed', 4000); }
+  function fallback() {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    if (ok) flash(); else fail();
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(flash).catch(fallback);
+  } else {
+    fallback();
+  }
+}
+
+/* ── Copy implement prompt ──────────────────────────────────── */
+function copyCmd(btn) {
+  clipboardCopy(buildImplementPrompt(), btn, 'Copy');
+}
+
+/* ── Copy workflow prompt (element absent when plan has no workflow) ── */
+function copyWorkflow(btn) {
+  var code = document.getElementById('workflow-cmd');
+  if (!code) return;
+  clipboardCopy(code.textContent, btn, 'Copy');
+}
+
+/* ── Copy goal prompt ──────────────────────────────────────── */
+function copyGoal(btn) {
+  var code = document.getElementById('goal-cmd');
+  if (!code) return;
+  clipboardCopy(code.textContent, btn, 'Copy');
+}
+
+/* ── Copy plan file name / relative path ────────────────────── */
+function copyPath(btn, id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  clipboardCopy(el.textContent.trim(), btn, 'Copy');
+}
+
+/* ── Copy prompt button (global — required by inline onclick) ── */
+function copyPrompt(btn) {
+  var pre = btn.previousElementSibling;
+  if (!pre || pre.tagName !== 'PRE') {
+    pre = btn.parentElement && btn.parentElement.querySelector('pre');
+  }
+  if (!pre) return;
+  clipboardCopy(pre.textContent, btn, 'Copy prompt');
+}
 
 (function () {
   'use strict';
-  var STORE_KEY = 'plan-steps-' + encodeURIComponent(document.title);
-  var saved = {};
-  try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch (e) {}
+
+  /* ── Progress bar — state from HTML attributes ──────────────── */
+  /* State lives in the HTML itself: a criterion is done iff its       */
+  /* <input> carries the `checked` attribute, which the browser        */
+  /* renders natively on load. Toggling a box syncs the attribute so   */
+  /* the live DOM (and any saved copy of this file) stays the single   */
+  /* portable source of truth — no browser-only storage layer.         */
+  var bar        = document.getElementById('progress-bar');
+  var label      = document.getElementById('progress-label');
+  var liveRegion = document.getElementById('criteria-status');
+  var checkboxes = Array.prototype.slice.call(
+    document.querySelectorAll('#criteria-list input[type="checkbox"]')
+  );
+  var total = checkboxes.length;
 
   function updateProgress() {
-    var bar = document.querySelector('.progress-bar[role="progressbar"]');
-    var fill = document.querySelector('.progress-fill');
-    if (!fill) return;
-    var boxes = document.querySelectorAll('.step-checkbox');
-    if (!boxes.length) return;
-    var checked = Array.from(boxes).filter(function (b) { return b.checked; }).length;
-    var pct = Math.round((checked / boxes.length) * 100);
-    fill.style.width = pct + '%';
+    var done = checkboxes.filter(function (cb) { return cb.checked; }).length;
+    var pct  = total ? Math.round(done / total * 100) : 0;
     if (bar) {
-      bar.setAttribute('aria-valuenow', String(pct));
-      bar.setAttribute('aria-valuetext', pct + '% complete');
+      bar.style.width = pct + '%';
+      bar.setAttribute('aria-valuenow', pct);
+      if (pct > 0) bar.classList.add('has-progress');
+      else         bar.classList.remove('has-progress');
+    }
+    if (label) label.textContent = done + ' / ' + total + ' done';
+  }
+
+  checkboxes.forEach(function (cb, i) {
+    cb.addEventListener('change', function () {
+      cb.toggleAttribute('checked', cb.checked);
+      updateProgress();
+      if (liveRegion) {
+        liveRegion.textContent = 'Criterion ' + (i + 1) +
+          ' marked as ' + (cb.checked ? 'complete' : 'incomplete');
+      }
+    });
+  });
+
+  updateProgress();
+
+  /* ── Completion checklist auto-update ──────────────────────── */
+  var ccCheckboxes = Array.prototype.slice.call(
+    document.querySelectorAll('#completion-list input[type="checkbox"]')
+  );
+  var completionCard = document.getElementById('completion-checklist');
+
+  function updateCompletion() {
+    var stepCards = document.querySelectorAll('.step-card');
+    var allStepsDone = stepCards.length > 0 &&
+      Array.prototype.slice.call(stepCards).every(function(c) {
+        return c.classList.contains('completed');
+      });
+    if (ccCheckboxes[0]) ccCheckboxes[0].checked = allStepsDone;
+
+    var allCriteriaChecked = total > 0 &&
+      checkboxes.every(function(cb) { return cb.checked; });
+    if (ccCheckboxes[1]) ccCheckboxes[1].checked = allCriteriaChecked;
+
+    var metaStatus = document.querySelector('meta[name="plan-status"]');
+    var statusIsCompleted =
+      document.documentElement.getAttribute('data-status') === 'completed' &&
+      (!metaStatus || metaStatus.getAttribute('content') === 'completed');
+    if (ccCheckboxes[2]) ccCheckboxes[2].checked = statusIsCompleted;
+
+    var allComplete = allStepsDone && allCriteriaChecked && statusIsCompleted;
+    if (completionCard) {
+      if (allComplete) completionCard.classList.add('all-complete');
+      else completionCard.classList.remove('all-complete');
     }
   }
 
-  document.querySelectorAll('.step-card').forEach(function (card, idx) {
-    var id = card.dataset.stepId;
-    var cb = card.querySelector('.step-checkbox');
-    var chip = card.querySelector('.step-chip');
-    var status = card.querySelector('.step-status');
-    if (!cb || !id) return;
-    if (saved[id]) {
-      cb.checked = true;
-      card.classList.add('completed');
-      if (chip) chip.textContent = 'done';
-    }
-    cb.addEventListener('change', function () {
-      var done = cb.checked;
-      card.classList.toggle('completed', done);
-      if (chip) chip.textContent = done ? 'done' : 'todo';
-      if (status) {
-        status.textContent = 'Step ' + (idx + 1) + ' marked as ' +
-          (done ? 'complete' : 'incomplete');
-      }
-      saved[id] = done;
-      try { localStorage.setItem(STORE_KEY, JSON.stringify(saved)); } catch (e) {}
-      updateProgress();
-    });
-  });
-  updateProgress();
-})();
+  updateCompletion();
 
+  checkboxes.forEach(function(cb) {
+    cb.addEventListener('change', updateCompletion);
+  });
+
+  if ('MutationObserver' in window) {
+    new MutationObserver(updateCompletion).observe(
+      document.documentElement, { attributes: true, attributeFilter: ['data-status'] }
+    );
+  }
+
+  /* ── Scroll rail ─────────────────────────────────────────────── */
+  var rail = document.querySelector('.scroll-rail');
+  if (rail) {
+    function updateRail() {
+      var maxY = document.documentElement.scrollHeight - window.innerHeight;
+      var pct  = maxY > 0 ? (window.scrollY / maxY * 100).toFixed(1) : 0;
+      rail.style.setProperty('--scroll-pct', pct);
+    }
+    window.addEventListener('scroll', updateRail, { passive: true });
+    updateRail();
+  }
+
+  /* ── Step rail disclosure ────────────────────────────────────── */
+  /* Ships open so the rail is present with scripting off; below the layout
+     breakpoint it collapses, where an always-open list would push the plan
+     itself off the first screen. */
+  var railBox = document.querySelector('.rail-disclosure');
+  if (railBox && window.matchMedia) {
+    var narrow = window.matchMedia('(max-width: 900px)');
+    var syncRail = function (mq) { railBox.open = !mq.matches; };
+    syncRail(narrow);
+    if (narrow.addEventListener) narrow.addEventListener('change', syncRail);
+    else if (narrow.addListener) narrow.addListener(syncRail);
+  }
+
+  /* ── Theme button ────────────────────────────────────────────── */
+  syncThemeButton(document.getElementById('theme-toggle'));
+
+  /* ── Scroll spy ──────────────────────────────────────────────── */
+  /* Track which targets are on screen rather than reacting only to
+     entries that ARE intersecting: with one link per step, a stale
+     "you are here" marker left behind after scrolling past the last
+     target is worse than no marker at all. */
+  var navLinks = Array.prototype.slice.call(
+    document.querySelectorAll('.plan-nav a[href^="#"]')
+  );
+  if (navLinks.length && 'IntersectionObserver' in window) {
+    var targets = navLinks
+      .map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); })
+      .filter(Boolean);
+    var visible = [];
+    var setActive = function (id) {
+      navLinks.forEach(function (a) {
+        var isActive = id !== null && a.getAttribute('href') === '#' + id;
+        a.classList.toggle('active', isActive);
+        if (isActive) a.setAttribute('aria-current', 'true');
+        else          a.removeAttribute('aria-current');
+      });
+    };
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var at = visible.indexOf(entry.target);
+        if (entry.isIntersecting) { if (at === -1) visible.push(entry.target); }
+        else if (at !== -1) { visible.splice(at, 1); }
+      });
+      if (visible.length === 0) { setActive(null); return; }
+      /* Document order, not intersection order — the observer fires in
+         whatever order the entries arrive. */
+      var first = null;
+      targets.forEach(function (el) {
+        if (first === null && visible.indexOf(el) !== -1) first = el;
+      });
+      setActive(first ? first.id : null);
+    }, { threshold: 0, rootMargin: '-20% 0px -70% 0px' });
+    targets.forEach(function (el) { observer.observe(el); });
+  }
+})();
 </script>
 </body>
 </html>
