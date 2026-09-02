@@ -2,7 +2,7 @@
 # The single local gate. Continuous integration mirrors this script and is never the
 # only place a check lives, because GitHub Actions is not always available.
 #
-#   bash scripts/check.sh            run all four gates
+#   bash scripts/check.sh            run all five gates
 #   bash scripts/check.sh --prove    additionally prove the gate can fail, using the
 #                                    deliberately broken fixture in tests/fixtures/
 set -uo pipefail
@@ -21,8 +21,25 @@ gate() {
   fi
 }
 
+# A component that loads its CSS or JS from a sibling file passes the browser gate -
+# chrome-headless-shell runs module scripts straight from disk - and then fails the
+# manual check, where a real browser blocks them at a null origin. That would make the
+# automated gate more permissive than the one a person runs, so nothing under skills/
+# may reference an external resource. An <a href="#..."> is a link, not a resource
+# load, and stays allowed; so do data: URIs and SVG fragment references.
+no_external_refs() {
+  local dir="${1:-skills}"
+  local hits
+  hits=$(grep -rnE '<link[^>]+href=|[[:space:]]src=|@import|url\(' "$dir" 2>/dev/null \
+         | grep -vE 'src="data:|url\(data:|url\(#')
+  [ -z "$hits" ] && return 0
+  printf '%s\n' "$hits" | sed 's/^/   /'
+  return 1
+}
+
 gate "unit, objective and integration tests" npx vitest run
 gate "portability lint (skills/ only)" node scripts/lint-portability.mjs
+gate "no external resources under skills/" no_external_refs
 gate "plugin manifests" claude plugin validate . --strict
 gate "browser suite" npx playwright test
 
@@ -50,6 +67,14 @@ if [ "${1:-}" = "--prove" ]; then
   else
     printf '   FAILED: frontmatter validator did not reject the broken fixture\n'
     failed=1
+  fi
+
+  # A component split across sibling files must trip the resource guard.
+  if no_external_refs tests/fixtures >/dev/null 2>&1; then
+    printf '   FAILED: the split-component fixture did not trip the resource guard\n'
+    failed=1
+  else
+    printf '   ok: the resource guard catches a component split across files\n'
   fi
 
   # The real gate must stay clean: the fixture lives outside skills/ on purpose.

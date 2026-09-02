@@ -72,9 +72,10 @@ npm ci && npx playwright install chromium
 bash scripts/check.sh
 ```
 
-Four gates run in order: the unit, objective and integration suites; a portability
-lint over `skills/`; `claude plugin validate . --strict`; and the browser suite,
-which drives every demo with the keyboard and scans it with axe-core.
+Five gates run in order: the unit, objective and integration suites; a portability
+lint over `skills/`; a check that no file under `skills/` loads an external
+resource; `claude plugin validate . --strict`; and the browser suite, which drives
+every demo with the keyboard and scans it with axe-core.
 
 `bash scripts/check.sh --prove` additionally runs a deliberately broken fixture
 through the gate to show it can fail.

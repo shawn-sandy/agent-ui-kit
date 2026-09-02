@@ -22,6 +22,12 @@ function fencedBlock(markdown: string, lang: string): string | null {
   return match ? match[1].replace(/\n$/, '') : null;
 }
 
+/** The text inside the first <style> or <script> element of a demo page. */
+function htmlBlock(html: string, tag: 'style' | 'script'): string | null {
+  const match = html.match(new RegExp('<' + tag + '>\\n([\\s\\S]*?)\\n</' + tag + '>'));
+  return match ? match[1] : null;
+}
+
 const REQUIRED_SECTIONS = ['Structure', 'Styles', 'Behaviour', 'Accessibility', 'Demo'];
 const REQUIRED_CONTRACT_ROWS = ['Element', 'Role', 'Props', 'Slots', 'Variants', 'Behaviour', 'WCAG'];
 
@@ -103,15 +109,46 @@ describe.each(skills)('skills/%s', (name) => {
     expect(demo).not.toMatch(/--auk-[a-z0-9-]+\s*:/);
   });
 
-  it('demo carries the reference css verbatim', () => {
+  // The component's code exists twice: once in the reference, which is what a user
+  // copies, and once inlined in the demo, which is what the browser suite actually
+  // tests. Nothing regenerates one from the other, so the two can drift - and the
+  // dangerous direction is silent: patch the demo alone and an accessibility test
+  // goes green while the shipped reference still carries the bug.
+  //
+  // Containment would only catch drift one way. These pin position instead: the
+  // demo's stylesheet must END with the reference css, and its script must BEGIN
+  // with the reference module. Editing either copy breaks the match.
+
+  it('demo stylesheet ends with the reference css, byte for byte', () => {
     const css = fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!;
-    expect(readFileSync(demoPath, 'utf8')).toContain(css);
+    const style = htmlBlock(readFileSync(demoPath, 'utf8'), 'style');
+    expect(style, 'demo has no <style> block').not.toBeNull();
+    expect(style!.trimEnd().endsWith(css.trim()), 'demo css has drifted from the reference').toBe(true);
   });
 
-  it('demo carries the reference module verbatim, exports stripped', () => {
+  it('demo page chrome claims none of this component selectors', () => {
+    // The chrome is everything before the injected css. A rule for THIS component
+    // hiding up there would style it from a place the reference never ships, so the
+    // browser suite would be testing something the user does not get.
+    //
+    // Another component's selectors are allowed: a demo needs its buttons to look
+    // like buttons to stay self-contained, and the dialog demo says so in a comment.
+    // Those stand-ins are not what this test is guarding.
+    const css = fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!;
+    const style = htmlBlock(readFileSync(demoPath, 'utf8'), 'style')!.trimEnd();
+    const chrome = style.slice(0, style.length - css.trim().length);
+    expect(chrome, `demo chrome styles auk-${name} outside the reference css`).not.toMatch(
+      new RegExp(`auk-${name}\\b`),
+    );
+  });
+
+  it('demo script begins with the reference module, exports stripped', () => {
     const js = fencedBlock(readFileSync(referencePath, 'utf8'), 'js');
     if (js === null) return; // CSS-only component
-    expect(readFileSync(demoPath, 'utf8')).toContain(js.replace(/^export /gm, ''));
+    const script = htmlBlock(readFileSync(demoPath, 'utf8'), 'script');
+    expect(script, 'demo has no <script> block').not.toBeNull();
+    const stripped = js.replace(/^export /gm, '').trim();
+    expect(script!.trimStart().startsWith(stripped), 'demo module has drifted from the reference').toBe(true);
   });
 
   it('every WCAG criterion claimed has an assertion in the browser suite', () => {
