@@ -14,7 +14,7 @@ something stated here.
 A component's skill directory is exactly three files. Nothing else lives under
 `skills/<name>/`.
 
-```
+```text
 skills/<name>/
 ├── SKILL.md                    # trigger and orientation
 └── references/
@@ -59,14 +59,16 @@ Standard [Agent Skills](https://agentskills.io/specification) keys only.
 
 | Key | Required | Rule |
 |---|---|---|
-| `name` | yes | kebab-case; identical to the parent directory name; no leading, trailing or consecutive hyphens |
-| `description` | yes | third person; 1–1024 characters; written as a trigger (§2.2) |
-| `license` | no | SPDX identifier |
-| `allowed-tools` | no | comma-separated tool names |
+| `name` | yes | 1–64 characters; lowercase alphanumerics and hyphens only; identical to the parent directory name; no leading, trailing or consecutive hyphens |
+| `description` | yes | 1–1024 characters; written as a trigger (§2.2) |
+| `license` | no | licence name, or the name of a bundled licence file |
+| `compatibility` | no | 1–500 characters; environment requirements |
+| `metadata` | no | a map of string keys to string values |
+| `allowed-tools` | no | **space-separated** string of pre-approved tools (experimental) |
 
-No other key may appear. In particular `disable-model-invocation:` and `hint:` are
-Claude Code extensions absent from the standard, and this repository's validator
-rejects them.
+This is the standard's complete field set. No key outside it may appear — in
+particular `disable-model-invocation:` and `hint:` are Claude Code extensions absent
+from the standard, and this repository's validator rejects them.
 
 ### 2.2 Writing the `description`
 
@@ -77,7 +79,11 @@ Write it in the words a user would type **without knowing the component's name**
 Name the problem before the solution, and list the adjacent vocabulary a user is
 likely to reach for.
 
-```
+Write it in the third person — about the user and the component, never addressed to
+the reader as "you". The conventional `Use when …` opening satisfies this: its subject
+is the user, and it is the form the Agent Skills specification's own examples use.
+
+```text
 Weak:   Accessible dialog component with focus trap and aria-modal.
 Strong: Use when building a modal, popup, overlay, lightbox, or any panel that
         blocks the rest of the page until dismissed. Covers focus trapping,
@@ -121,7 +127,7 @@ This file carries the machine-readable contract. It lives here rather than in
 | `role` | no | explicit ARIA role; **omit when the element already implies it** |
 | `props` | no | abstract prop model, projected per framework by the consuming agent |
 | `slots` | no | named content slots; `children` is the default slot |
-| `variants` | no | named variant to the DOM expression that selects it (§3.1.1) |
+| `variants` | no | mapping of variant names to objects carrying `maps-to` and an optional `default` (§3.1.1) |
 | `a11y` | yes | WCAG 2.2 success criteria this component satisfies (§3.2) |
 
 A `props` entry may carry `values`, `type`, `required`, `default`, `maps-to` (how the
@@ -222,9 +228,11 @@ real browser at a null origin, with an inline module in the identical page as th
 passing control.
 
 The consequence is that the automated gate is more permissive than the manual one. A
-component split across files would pass `scripts/check.sh` and fail the manual
-verification of opening the demo in a browser. `scripts/check.sh` therefore greps for
-external references under `skills/` and fails the build when it finds one.
+component split across files would pass an automated browser suite and still fail the
+manual verification of opening the demo in a browser. The portability gate in
+`scripts/check.sh` must therefore reject any external reference under `skills/`. That
+gate is a requirement this specification places on the harness; it is not described
+here as already implemented.
 
 ### 4.2 CSS naming
 
@@ -241,7 +249,7 @@ says why. The worked example in §5 uses this exception once.
 Every themeable value is a custom property with a literal fallback, so the component
 renders correctly with no properties defined at all.
 
-```
+```text
 --auk-<component>-<property>
 --auk-<component>-<variant>-<property>    # only when a variant needs its own value
 ```
@@ -261,7 +269,7 @@ focus rings once rather than per component:
 They are used as a nested fallback, never directly:
 
 ```css
-outline: var(--auk-skip-link-focus-outline, var(--auk-focus-outline, 2px solid currentColor));
+outline: var(--auk-skip-link-focus-outline, var(--auk-focus-outline, 2px solid #1a1a1a));
 ```
 
 Fallback nesting is capped at two levels. Adding a name to the shared list requires a
@@ -275,15 +283,24 @@ to the white label colour and measures **1.00:1 against a white page** — an in
 focus indicator on the variant most likely to be a page's primary action. A dark
 literal reaches 17.40:1 there. Use a literal that contrasts with the page surface.
 
-The example above is safe only because a skip link's own background *is* the page
-surface, so `currentColor` contrasts with both.
+The same trap runs the other way on a dark page. The skip link paints its own
+background, so its `currentColor` stays dark — but the ring sits on the page, where a
+dark default measures **1.07:1 against a `#131312` surface** and **1.19:1 against
+`#1f2937`**, both far below the 3:1 that 1.4.11 requires of a non-text indicator.
+
+So `currentColor` is never a safe final fallback for a focus ring: it tracks the
+component's own text, while the ring lands on a surface the component does not
+control. Give the ring a literal that contrasts with the page, and state the page
+surface the value assumes in the reference's `## Styles` section so a consuming
+project knows what it must hold to. The worked example in §5 assumes a light page and
+says so.
 
 ### 4.3 JavaScript
 
 Dependency-free ES module in an inline `<script type="module">`. A stateful component
 exposes a single entry point taking a root element:
 
-```
+```js
 function init(root) { ... }
 ```
 
@@ -383,12 +400,18 @@ The link stays in the tab order at all times and is moved out of view with
 | `--auk-skip-link-bg` | `#ffffff` | background when visible |
 | `--auk-skip-link-color` | `#1a1a1a` | text colour when visible |
 | `--auk-skip-link-radius` | `0 0 0.25rem 0` | corner rounding |
-| `--auk-skip-link-focus-outline` | `--auk-focus-outline`, then `2px solid currentColor` | focus indicator |
+| `--auk-skip-link-focus-outline` | `--auk-focus-outline`, then `2px solid #1a1a1a` | focus indicator |
 | `--auk-skip-link-focus-offset` | `--auk-focus-offset`, then `2px` | focus indicator offset |
 
 The reveal transition is wrapped in `prefers-reduced-motion: no-preference`, so a
 user who has asked for reduced motion gets the link with no animation rather than no
 link.
+
+**Page surface assumed: light.** The focus ring's default is the literal `#1a1a1a`,
+which reaches 17.40:1 on a white page but only 1.07:1 on `#131312`. A project with a
+dark surface must set `--auk-skip-link-focus-outline` (or `--auk-focus-outline`) to a
+light value. `currentColor` is not used, per §4.2 — it tracks this component's own
+text while the ring lands on the page.
 
 The target container's own focus ring is suppressed. It is a programmatic focus
 target, not an operable control, so an outline around the whole content region carries
@@ -448,7 +471,7 @@ The complete file, self-contained per §4.1:
 
   .auk-skip-link:focus {
     transform: translateY(0);
-    outline: var(--auk-skip-link-focus-outline, var(--auk-focus-outline, 2px solid currentColor));
+    outline: var(--auk-skip-link-focus-outline, var(--auk-focus-outline, 2px solid #1a1a1a));
     outline-offset: var(--auk-skip-link-focus-offset, var(--auk-focus-offset, 2px));
   }
 
