@@ -1,0 +1,28 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "agent-ui-kit",
+  "description": "Vendor-neutral frontend UI component skills, conforming to the Agent Skills open standard.",
+  "owner": {
+    "name": "Shawn Sandy",
+    "url": "https://github.com/shawn-sandy"
+  },
+  "plugins": [
+    {
+      "name": "agent-ui-kit",
+      "source": "./",
+      "skills": ["./skills/"],
+      "description": "Vendor-neutral UI component skills. Each skill ships a complete reference - semantic HTML, plain CSS custom properties, and dependency-free JavaScript - that an agent builds into your project in your stack.",
+      "category": "development",
+      "tags": [
+        "ui",
+        "components",
+        "accessibility",
+        "wcag",
+        "html",
+        "css",
+        "vanilla-js",
+        "framework-agnostic"
+      ]
+    }
+  ]
+}
