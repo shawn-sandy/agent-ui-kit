@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build vendor-neutral UI component skills</title>
+<style>
+/* markdown-to-html v2.1.0 — generated from reference/html-spec.md */
+body.theme-default {
+  --color-header-bg: #1e293b;
+  --color-header-text: #f8fafc;
+  --color-nav-bg: #f1f5f9;
+  --color-nav-text: #334155;
+  --color-nav-hover: #2563eb;
+  --color-accent: #2563eb;
+  --color-body-bg: #ffffff;
+  --color-body-text: #1e293b;
+  --color-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-card-bg: #f8fafc;
+  --color-code-bg: #e2e8f0;
+}
+
+body.theme-developer {
+  --color-header-bg: #0d1117;
+  --color-header-text: #e6edf3;
+  --color-nav-bg: #161b22;
+  --color-nav-text: #8b949e;
+  --color-nav-hover: #3fb950;
+  --color-accent: #3fb950;
+  --color-body-bg: #0d1117;
+  --color-body-text: #e6edf3;
+  --color-muted: #8b949e;
+  --color-border: #30363d;
+  --color-card-bg: #161b22;
+  --color-code-bg: #21262d;
+}
+
+body.theme-document {
+  --color-header-bg: #4a3728;
+  --color-header-text: #fdf6ec;
+  --color-nav-bg: #fdf6ec;
+  --color-nav-text: #4a3728;
+  --color-nav-hover: #8b5e3c;
+  --color-accent: #8b5e3c;
+  --color-body-bg: #fdf6ec;
+  --color-body-text: #2c1a0e;
+  --color-muted: #6b4c38;
+  --color-border: #d4b896;
+  --color-card-bg: #f5eddf;
+  --color-code-bg: #ede0cc;
+}
+
+body.theme-minimal {
+  --color-header-bg: #000000;
+  --color-header-text: #ffffff;
+  --color-nav-bg: #ffffff;
+  --color-nav-text: #000000;
+  --color-nav-hover: #333333;
+  --color-accent: #000000;
+  --color-body-bg: #ffffff;
+  --color-body-text: #000000;
+  --color-muted: #555555;
+  --color-border: #dddddd;
+  --color-card-bg: #f9f9f9;
+  --color-code-bg: #eeeeee;
+}
+
+
+.skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+.skip-link:focus{position:static;width:auto;height:auto;padding:.5rem 1rem;background:var(--color-accent);color:#fff;z-index:100}
+:focus-visible{outline:3px solid var(--color-accent);outline-offset:2px}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--color-body-bg);color:var(--color-body-text)}
+header{background:var(--color-header-bg);color:var(--color-header-text);padding:1.5rem 2rem 1rem}
+header h1{margin:.5rem 0 .25rem;font-size:1.5rem;color:var(--color-header-text)}
+.metadata-row{font-size:.8rem;opacity:.75;margin-top:.5rem}
+.status-badge{display:inline-block;padding:.2em .7em;border-radius:9999px;font-size:.75rem;font-weight:600;color:#fff}
+.status-todo,.status-unknown{background:#6b7280}
+.status-in-progress{background:#d97706}
+.status-completed{background:#16a34a}
+.progress-bar{width:100%;height:4px;background:rgba(255,255,255,.2)}
+.progress-fill{height:100%;background:#6b7280;transition:width .3s ease}
+.layout{display:grid;grid-template-columns:220px 1fr;gap:2rem;max-width:1024px;margin:0 auto;padding:1.5rem}
+nav{position:sticky;top:1rem;align-self:start;background:var(--color-nav-bg);border-radius:8px;padding:.75rem 0}
+nav ul{list-style:none;padding:0 0 0 1rem;margin:0}
+nav a{display:flex;align-items:center;min-height:44px;padding:.35rem .5rem;color:var(--color-nav-text);text-decoration:none;border-radius:4px;font-size:.875rem}
+nav a:hover{color:var(--color-nav-hover)}
+nav a.active,nav a[aria-current="true"]{color:var(--color-accent);font-weight:600}
+main{min-width:0}
+section{margin-bottom:2rem}
+h2{font-size:1.25rem;border-bottom:1px solid var(--color-border);padding-bottom:.35rem}
+h4{font-size:.95rem;margin:1.25rem 0 .35rem}
+blockquote{margin:0 0 1rem;padding:.5rem .9rem;border-left:3px solid var(--color-accent);background:var(--color-card-bg);border-radius:0 6px 6px 0}
+blockquote p{margin:0;font-size:.875rem}
+.check-item{list-style:none;margin-left:-1.2rem}
+.step-card{background:var(--color-card-bg);border:1px solid var(--color-border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:box-shadow .15s ease,transform .15s ease;position:relative}
+.step-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.12);transform:translateY(-1px)}
+.step-card.completed .step-action{text-decoration:line-through;opacity:.6}
+.step-label{display:flex;align-items:flex-start;gap:.5rem;cursor:pointer}
+.step-checkbox{width:1.25rem;height:1.25rem;flex-shrink:0;cursor:pointer;margin-top:.2rem}
+.step-action{margin:0;font-size:1rem}
+.step-detail{font-size:.875rem;margin:.5rem 0 0}
+.step-detail p{margin:.4rem 0}
+.step-detail ul{margin:.4rem 0;padding-left:1.1rem}
+.step-why{color:var(--color-muted);font-size:.875rem;margin:.5rem 0 0}
+.step-verify{color:var(--color-accent);font-size:.875rem;margin:.25rem 0 0}
+.step-status{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+code{background:var(--color-code-bg);border-radius:3px;padding:.1em .35em;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.875em;overflow-wrap:anywhere}
+p,li,h2,h3,h4,.step-action,.step-detail,.step-why,.step-verify{overflow-wrap:break-word}
+pre{background:var(--color-code-bg);border:1px solid var(--color-border);border-radius:6px;padding:1rem;overflow-x:auto}
+pre code{background:none;padding:0;font-size:.85em}
+.section-diagram{max-width:1024px;margin:0 auto 1rem;padding:0 1.5rem;overflow-x:auto}
+.section-diagram figcaption{font-size:.75rem;color:var(--color-muted);text-align:center;margin-top:.25rem}
+.steps-list{list-style:none;padding-left:2rem;position:relative}
+.steps-list::before{content:"";position:absolute;left:.75rem;top:1.5rem;bottom:1.5rem;width:2px;background:var(--color-border)}
+.step-card::before{content:"";position:absolute;left:-1.6rem;top:1.25rem;width:.75rem;height:.75rem;border-radius:50%;background:var(--color-border);border:2px solid var(--color-card-bg);transition:background .2s ease}
+.step-card.completed::before{background:var(--color-accent);border-color:var(--color-accent)}
+.step-chip{display:inline-block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.15em .5em;border-radius:9999px;background:var(--color-border);color:var(--color-body-text);vertical-align:middle;margin-right:.5rem;user-select:none}
+.step-card.completed .step-chip{background:var(--color-accent);color:#fff}
+.scroll-rail{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--color-border);border-radius:2px;overflow:hidden}
+.scroll-rail::after{content:"";position:absolute;top:0;left:0;right:0;height:calc(var(--scroll-pct,0) * 1%);background:var(--color-accent);transition:height .1s linear}
+.save-pdf-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem 1rem;font-size:.8rem;font-weight:600;color:#fff;background:var(--color-accent);border:1px solid var(--color-accent);border-radius:4px;cursor:pointer;font-family:inherit;line-height:1.4;white-space:nowrap;transition:background .15s,box-shadow .15s}
+.save-pdf-btn:hover{filter:brightness(.85);box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.save-pdf-btn:active{filter:brightness(.75)}
+.save-pdf-btn:focus-visible{outline:3px solid var(--color-accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.step-card,.step-card::before,.progress-fill,.scroll-rail::after,.save-pdf-btn{transition:none}.step-card:hover{transform:none}}
+@media (max-width:768px){.layout{grid-template-columns:1fr}nav{position:static}.scroll-rail{display:none}}
+@media print{header{background:#fff !important;color:#000 !important;box-shadow:none}
+.progress-bar,.scroll-rail,.step-chip,.save-pdf-btn,nav,.section-diagram,.skip-link{display:none}
+.layout{display:block}
+.step-card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
+a[href]::after{content:" (" attr(href) ")";font-size:.8em;color:#555}
+.status-badge{border:1px solid currentColor;background:none !important;color:inherit !important}}
+
+</style>
+</head>
+<body class="theme-default">
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<header>
+<div class="progress-bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100" aria-label="Plan progress">
+<div class="progress-fill" style="width:5%"></div>
+</div>
+<h1>Build vendor-neutral UI component skills</h1>
+<button class="save-pdf-btn" type="button" onclick="savePDF()" aria-label="Save this plan as PDF">Save as PDF</button>
+<span class="status-badge status-todo">todo</span>
+<div class="metadata-row">created: 2026-09-02 &middot; modified: 2026-09-02 &middot; type: feature &middot; theme: default</div>
+</header>
+<figure class="section-diagram" aria-labelledby="diagram-title"><svg role="img" aria-labelledby="diagram-title" viewBox="0 0 1023 80" width="100%" height="80"><title id="diagram-title">Plan sections: Context, Objective, Steps, Tests, Acceptance Criteria, Verification, Next Steps, Unresolved Questions</title><line x1="120" y1="40" x2="129" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="249" y1="40" x2="258" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="378" y1="40" x2="387" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="507" y1="40" x2="516" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="636" y1="40" x2="645" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="765" y1="40" x2="774" y2="40" stroke="var(--color-border)" stroke-width="2"/><line x1="894" y1="40" x2="903" y2="40" stroke="var(--color-border)" stroke-width="2"/><g class="svg-node" data-section="context" style="cursor:pointer"><rect x="0" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="60" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Context</text></g><g class="svg-node" data-section="objective" style="cursor:pointer"><rect x="129" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="189" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Objective</text></g><g class="svg-node" data-section="steps" style="cursor:pointer"><rect x="258" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="318" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Steps</text></g><g class="svg-node" data-section="tests" style="cursor:pointer"><rect x="387" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="447" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Tests</text></g><g class="svg-node" data-section="acceptance-criteria" style="cursor:pointer"><rect x="516" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="576" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Acceptance Cr…</text></g><g class="svg-node" data-section="verification" style="cursor:pointer"><rect x="645" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="705" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Verification</text></g><g class="svg-node" data-section="next-steps" style="cursor:pointer"><rect x="774" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="834" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Next Steps</text></g><g class="svg-node" data-section="unresolved-questions" style="cursor:pointer"><rect x="903" y="22" width="120" height="36" rx="6" fill="var(--color-card-bg)" stroke="var(--color-border)"/><text x="963" y="44" text-anchor="middle" font-size="11" fill="var(--color-body-text)">Unresolved Qu…</text></g></svg><figcaption>8 sections</figcaption></figure>
+<div class="layout">
+<nav aria-label="Document sections">
+<div class="scroll-rail" aria-hidden="true"></div>
+<ul><li><a href="#context">Context</a></li><li><a href="#objective">Objective</a></li><li><a href="#steps">Steps</a></li><li><a href="#tests">Tests</a></li><li><a href="#acceptance-criteria">Acceptance Criteria</a></li><li><a href="#verification">Verification</a></li><li><a href="#next-steps">Next Steps</a></li><li><a href="#unresolved-questions">Unresolved Questions</a></li></ul>
+</nav>
+<main id="main-content">
+<section id="context" aria-labelledby="context-heading">
+<h2 id="context-heading">Context</h2>
+<p><code>agent-ui-kit</code> (github.com/shawn-sandy/agent-ui-kit) exists as structure only. The scaffold commit <code>336b67a</code> created both plugin manifests, a marketplace manifest, an empty <code>skills/</code> tree, and a README. No components, no format specification, no tooling, no tests.</p>
+<p><strong>What this project is.</strong> A library of Agent Skills where each skill describes one UI component and ships a complete, copyable reference: semantic HTML with a real accessibility contract, plain CSS driven by custom properties, and dependency-free JavaScript. An agent reads the reference and builds the component into the user's project, in the user's stack. Nothing is installed into the consuming app.</p>
+<p><strong>Why it is separate from <code>acss-plugins</code>.</strong> <code>~/devbox/acss-plugins/plugins/acss-kit</code> already has 15 <code>component-*</code> skills, but they generate React TSX plus SCSS modules bound to <code>@fpkit/acss@6.5.0</code>. <code>agent-ui-kit</code> is bound to nothing. The decision was extract-and-generalize, not greenfield, so this plan lifts specific assets:</p>
+<ul><li><code>acss-plugins/plugins/style-agent/docs/component-md/spec.md</code> — a 178-line alpha framework-neutral COMPONENT.md spec. Its core insight is correct and reusable: HTML structure, CSS, and the a11y contract are framework-agnostic; only template syntax and reactivity binding are framework-specific.</li><li><code>acss-plugins/plugins/acss-kit/skills/component-*/reference.md</code> — 15 references, 161-615 lines each. <strong>Only the accessibility contracts, prop models, and data-attribute variant strategy transfer. The TSX and SCSS templates do not.</strong></li></ul>
+<h4>Verified constraints from the Agent Skills spec</h4>
+<p>From agentskills.io/specification:</p>
+<ul><li><code>name</code>: max 64 chars, lowercase/digits/hyphens, no leading or trailing hyphen, no consecutive hyphens, <strong>must match the parent directory name</strong>.</li><li><code>description</code>: max 1024 chars, must state what the skill does <em>and</em> when to use it. This is the only text loaded at startup, so it is the entire discovery mechanism.</li><li>Optional: <code>license</code>, <code>compatibility</code> (max 500), <code>metadata</code> (string→string map — <code>version</code> and <code>author</code> live here, not as top-level fields), <code>allowed-tools</code>.</li><li><code>SKILL.md</code> body under 500 lines. File references one level deep from <code>SKILL.md</code>.</li></ul>
+<p>From platform.claude.com skill authoring best practices:</p>
+<ul><li><strong>Evaluations come before documentation.</strong> Establish a baseline without the skill, then write the minimum needed to pass. At least three evaluations per skill.</li><li><strong>Test across Haiku, Sonnet, and Opus.</strong> What reads as sufficient to Opus can be too thin for Haiku.</li><li>Descriptions in third person. Never &quot;I can help you…&quot; or &quot;You can use this to…&quot;.</li><li>Reference files over 100 lines need a table of contents, because a partial read is a real failure mode.</li></ul>
+<h4>Tooling reality</h4>
+<p><code>skills-ref</code>, the reference validator at <code>github.com/agentskills/agentskills</code>, is a Python package <strong>explicitly labelled &quot;for demonstration purposes only. It is not meant to be used in production.&quot;</strong> It has no PyPI release and installs via <code>pip install -e .</code> from a clone. <strong>It must not be a hard gate in CI.</strong> This repo owns its own frontmatter validator in the Vitest suite; <code>skills-ref</code> is an optional manual cross-check only.</p>
+<h4>Portability hazards found in <code>acss-kit</code> that must not be repeated</h4>
+<ol><li><code>${CLAUDE_PLUGIN_ROOT}</code> is a Claude Code variable. Codex does not expand it. All paths must be relative to the skill root.</li><li><code>disable-model-invocation</code> and <code>hint</code> are Claude Code frontmatter, absent from the Agent Skills spec. A strict validator rejects them. Anything similar goes under <code>metadata:</code>.</li><li><code>acss-kit</code> shells out to Python helper scripts. A cross-vendor skill cannot assume a Python runtime exists. Keep skills pure-markdown, or declare it in <code>compatibility:</code>.</li></ol>
+<h4>Prerequisites</h4>
+<p>Before step 1, the executing machine needs: Node 20+ with npm, the <code>claude</code> CLI on <code>PATH</code> (already present — <code>claude plugin validate</code> ran during scaffolding), and <code>gh</code> authenticated (confirmed). Python 3 and <code>uv</code> are needed only for the optional <code>skills-ref</code> cross-check in step 10.</p>
+<h4>Decisions already made, recorded so no future session re-litigates them</h4>
+<ul><li><strong>One skill per component.</strong> Discovery quality beats startup token cost; ~100 tokens of description per skill is the accepted price.</li><li><strong>Literal CSS, not token references.</strong> Every themeable value ships as <code>var(--auk-&lt;name&gt;, &lt;fallback&gt;)</code>. The fallback makes a component work standalone; the variable makes it theme cleanly. The COMPONENT.md spec's <code>{colors.primary}</code> token refs become an <strong>optional</strong> mapping block, not a requirement, so no DESIGN.md file is needed for a component to function.</li><li><strong>WCAG claims must come from a tool run.</strong> Every reference states the criteria it satisfies, and those statements are asserted by axe-core plus explicit keyboard tests. An unverified claim is a defect.</li><li><strong>v1 is four components</strong> chosen to stress different parts of the format, not to be a useful kit: <code>button</code> (no JS), <code>alert</code> (ARIA live region), <code>dialog</code> (focus management and heavy JS), <code>tabs</code> (roving tabindex; deliberately absent from <code>acss-kit</code>, so it tests the greenfield path rather than the extraction path).</li></ul>
+<p><strong>Known environment note.</strong> GitHub Actions is frequently billing-blocked on this account. Every check must be runnable locally via a single script. CI mirrors that script and is never the only place a check exists.</p>
+</section>
+<section id="objective" aria-labelledby="objective-heading">
+<h2 id="objective-heading">Objective</h2>
+<p>Ship a working, tested, vendor-neutral component-skill format proven by four components that reliably trigger across models and load correctly in both Claude Code and ChatGPT/Codex.</p>
+</section>
+<section id="steps" aria-labelledby="steps-heading">
+<h2 id="steps-heading">Steps</h2>
+<ol class="steps-list">
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-0">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-0" aria-describedby="step-why-0">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Set up Node tooling.</h3>
+</label>
+<div class="step-detail"><p>Create <code>package.json</code> (private, type module) and install <code>vitest</code>, <code>@playwright/test</code>, <code>@axe-core/playwright</code>, and <code>gray-matter</code>. Add <code>.gitignore</code> entries for <code>node_modules/</code>, <code>test-results/</code>, <code>playwright-report/</code>. Add scripts: <code>test</code>, <code>test:e2e</code>, <code>check</code>.</p></div>
+<p class="step-why" id="step-why-0">Steps 3 onward all depend on a runner. The previous draft of this plan assumed <code>npm ci</code> would work in a repo with no <code>package.json</code>, which was wrong.</p>
+<p class="step-verify">&#10003; <code>rm -rf node_modules &amp;&amp; npm ci &amp;&amp; npx vitest run --passWithNoTests</code> exits zero, and <code>npx playwright install chromium</code> completes.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-1">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-1" aria-describedby="step-why-1">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Write <code>docs/component-spec.md</code></h3>
+</label>
+<div class="step-detail"><p>the authoring contract, extracted from <code>acss-plugins/plugins/style-agent/docs/component-md/spec.md</code> and decoupled from DESIGN.md. It must define <strong>both</strong> halves, because the split between them is the core authoring decision and is currently undefined:</p>
+<ul><li><strong><code>SKILL.md</code></strong> — frontmatter fields permitted (spec-defined keys only, third-person <code>description</code> stating what and when), and a body under 60 lines that orients and points at the reference. It must not contain the component code.</li><li><strong><code>references/&lt;name&gt;.component.md</code></strong> — the frontmatter contract (<code>element</code>, <code>role</code>, <code>props</code> with <code>maps-to</code> and <code>a11y</code> notes, <code>slots</code>, <code>variants</code>, <code>behavior</code>, <code>a11y</code> as WCAG criteria, optional <code>tokens</code>) plus five required body sections: Structure (HTML), Styles (CSS), Behavior (JS), Accessibility, Demo. Reference files over 100 lines carry a table of contents.</li><li><strong>Conventions:</strong> the <code>--auk-</code> custom property prefix, the <code>var(--auk-x, fallback)</code> rule, <code>references/demo.html</code> as a standalone runnable page.</li></ul></div>
+<p class="step-why" id="step-why-1">Every later step writes against this. Drafting components first bakes in an accidental format.</p>
+<p class="step-verify">&#10003; Hand the spec plus zero other context to a fresh Claude instance and ask it to write the <code>button</code> reference. If it asks a clarifying question about structure, the spec is incomplete — fix it before step 3.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-2">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-2" aria-describedby="step-why-2">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Write the evaluations and establish a baseline, before any skill exists.</h3>
+</label>
+<div class="step-detail"><p>Create <code>evals/&lt;skill&gt;.json</code> for all four components, three scenarios each, in the shape Anthropic documents: <code>{skills, query, expected_behavior[]}</code>. Queries must be phrased the way a real user would ask, not using the skill's own vocabulary. Add <code>scripts/eval.sh</code> to print a scenario formatted for a run. Run all twelve against a session with no skills installed and record what Claude produces in <code>docs/evaluations.md</code> under a Baseline heading.</p></div>
+<p class="step-why" id="step-why-2">Anthropic's best-practices doc is explicit that evaluations precede documentation, so skills solve observed gaps rather than imagined ones. Without a baseline there is no evidence any skill improved anything.</p>
+<p class="step-verify">&#10003; <code>docs/evaluations.md</code> contains twelve baseline results with concrete failures named — missing focus restoration, wrong <code>aria-live</code>, and so on. If a baseline scenario already passes without a skill, that component's scenario is too easy; rewrite it before continuing.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-3">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-3" aria-describedby="step-why-3">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Build the verification harness.</h3>
+</label>
+<div class="step-detail"><p>Create <code>scripts/check.sh</code> running four gates in order: (a) the Vitest unit suite including this repo's own frontmatter validator, (b) a portability lint grepping every <code>skills/**</code> file for <code>${CLAUDE_PLUGIN_ROOT}</code>, <code>disable-model-invocation</code>, <code>hint:</code>, and backslash paths, (c) <code>claude plugin validate . --strict</code>, (d) the Playwright E2E suite. <code>skills-ref</code> is <strong>not</strong> a gate.</p></div>
+<p class="step-why" id="step-why-3">Named before the work, per the verification rule. A harness written after components gets shaped to pass them.</p>
+<p class="step-verify">&#10003; Add a broken fixture at <code>tests/fixtures/bad-skill/</code> with a name/directory mismatch and a <code>${CLAUDE_PLUGIN_ROOT}</code> reference. Point the unit suite at <code>tests/fixtures/</code> and confirm it exits non-zero naming both faults separately. Confirm the portability lint scans only <code>skills/**</code>, so the fixture never trips the real gate.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-4">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-4" aria-describedby="step-why-4">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Write <code>skills/button/</code></h3>
+</label>
+<div class="step-detail"><p><code>SKILL.md</code>, <code>references/button.component.md</code>, <code>references/demo.html</code>. No JavaScript. Lift the accessibility contract from <code>acss-kit/skills/component-button/reference.md</code>, specifically the <code>aria-disabled</code> over native <code>disabled</code> decision that keeps the element in the tab order (WCAG 2.1.1). Discard the TSX and SCSS entirely.</p></div>
+<p class="step-why" id="step-why-4">The simplest possible component proves the format end to end before behavior complexity is added.</p>
+<p class="step-verify">&#10003; <code>scripts/check.sh</code> passes. <code>tests/e2e/button.spec.ts</code> confirms axe reports zero violations and that a disabled button is still reachable by Tab but does not activate on Enter. All three <code>evals/button.json</code> scenarios now pass.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-5">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-5" aria-describedby="step-why-5">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Write <code>skills/alert/</code></h3>
+</label>
+<div class="step-detail"><p>ARIA live region, still no JavaScript.</p></div>
+<p class="step-why" id="step-why-5">Proves the a11y-claim machinery on a component whose entire value is the accessibility contract, where a wrong <code>aria-live</code> value is invisible to the eye.</p>
+<p class="step-verify">&#10003; <code>tests/e2e/alert.spec.ts</code> asserts axe is clean and that content injected after load is announced — <code>role=&quot;alert&quot;</code> present, <code>aria-live</code> resolving to <code>assertive</code>, and the region present in the DOM before content arrives. All three <code>evals/alert.json</code> scenarios pass.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-6">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-6" aria-describedby="step-why-6">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Write <code>skills/dialog/</code></h3>
+</label>
+<div class="step-detail"><p>native <code>&lt;dialog&gt;</code> plus a vanilla ES module for focus management. Lift the contract from <code>acss-kit/skills/component-dialog/reference.md</code>.</p></div>
+<p class="step-why" id="step-why-6">The hardest accessibility case in the v1 set. If the format cannot express focus trapping, <code>inert</code>, Escape handling, and focus restoration, that must surface now, not at component twenty.</p>
+<p class="step-verify">&#10003; <code>tests/e2e/dialog.spec.ts</code> asserts axe is clean, focus moves into the dialog on open, Tab cycles only within it, Escape closes it, and focus returns to the exact element that opened it. All three <code>evals/dialog.json</code> scenarios pass.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-7">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-7" aria-describedby="step-why-7">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Write <code>skills/tabs/</code></h3>
+</label>
+<div class="step-detail"><p>roving tabindex, no <code>acss-kit</code> source to extract from.</p></div>
+<p class="step-why" id="step-why-7">Every other v1 component is an extraction. This one tests whether the spec from step 2 stands on its own when there is nothing to lift.</p>
+<p class="step-verify">&#10003; <code>tests/e2e/tabs.spec.ts</code> asserts axe is clean, exactly one tab is in the tab order at a time, Arrow keys move selection, Home/End jump to first and last, and each panel is associated via <code>aria-controls</code> and <code>aria-labelledby</code>. All three <code>evals/tabs.json</code> scenarios pass.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-8">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-8" aria-describedby="step-why-8">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Run all twelve evaluations against Haiku, Sonnet, and Opus.</h3>
+</label>
+<div class="step-detail"><p>Record every result in <code>docs/evaluations.md</code> beside the baseline, so the before/after is one table.</p></div>
+<p class="step-why" id="step-why-8">Best practices call for testing across models — a description sufficient for Opus can fail to trigger on Haiku, and triggering is the entire discovery mechanism. Skipping this ships descriptions tuned to one model.</p>
+<p class="step-verify">&#10003; Every scenario triggers its intended skill on all three models. Any miss is fixed by rewriting the <code>description</code> — not by adding body text, which loads too late to affect triggering — and then re-run. A miss that survives two rewrites gets documented as a known limitation rather than hidden.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-9">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-9" aria-describedby="step-why-9">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Prove cross-vendor installation manually, once, and write down what happened.</h3>
+</label>
+<div class="step-detail"><p>Install into Claude Code from the local directory and confirm all four skills load and are invocable. Place the same <code>skills/</code> tree at <code>.agents/skills/</code> and confirm Codex discovers it. Optionally cross-check with <code>skills-ref validate</code> from a throwaway clone.</p></div>
+<p class="step-why" id="step-why-9">Every other check tests the files. This is the only step that tests the README's actual claim, that one tree serves two vendors.</p>
+<p class="step-verify">&#10003; Record the result in <code>docs/vendor-support.md</code>, including anything that did not work. If Codex discovery fails, that is a finding to document, not a step to quietly skip.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+<li class="step-card" data-step-id="build-vendor-neutral-ui-component-skills-10">
+<label class="step-label">
+<input type="checkbox" class="step-checkbox" id="step-build-vendor-neutral-ui-component-skills-10" aria-describedby="step-why-10">
+<span class="step-chip" aria-hidden="true">todo</span>
+<h3 class="step-action">Update <code>README.md</code>, bump both manifests to <code>0.2.0</code>, add <code>.github/workflows/check.yml</code> running <code>scripts/check.sh</code>.</h3>
+</label>
+<p class="step-why" id="step-why-10">The README currently states components do not exist. Version bumps are how Claude Code decides whether to hand users an update.</p>
+<p class="step-verify">&#10003; <code>scripts/check.sh</code> passes from a clean clone in a temp directory. If the Actions run fails, read <code>gh run view --log-failed</code> first — a billing block fails every job in seconds with no test output and is not a code defect.</p>
+<span class="step-status" aria-live="polite" aria-atomic="true"></span>
+</li>
+</ol>
+</section>
+<section id="tests" aria-labelledby="tests-heading">
+<h2 id="tests-heading">Tests</h2>
+<blockquote><p>Tier: 1 (code-touching — creates reference implementations, a JS module, and test files)</p></blockquote>
+<h4>Objective-Verification Test</h4>
+<ul><li><strong>File:</strong> <code>tests/objective.spec.ts</code></li><li><strong>Type:</strong> smoke test, data-driven over <code>skills/*/</code></li><li><strong>Asserts:</strong> For every skill directory present, all three halves of the objective hold simultaneously: (1) its <code>SKILL.md</code> frontmatter conforms to the Agent Skills spec, (2) it contains no vendor-specific token (<code>${CLAUDE_PLUGIN_ROOT}</code>, <code>disable-model-invocation</code>, <code>hint:</code>, backslash paths), and (3) its <code>references/demo.html</code> returns zero axe-core violations. Iterates the directory rather than a hardcoded list, so every component added later is covered without editing the test.</li><li><strong>Run:</strong> <code>npx vitest run tests/objective.spec.ts</code></li></ul>
+<h4>Skill Discovery Evaluations</h4>
+<ul><li><strong>Files:</strong> <code>evals/button.json</code>, <code>alert.json</code>, <code>dialog.json</code>, <code>tabs.json</code></li><li><strong>Type:</strong> triggering evaluations, three scenarios per skill, run semi-manually via <code>scripts/eval.sh</code>. Anthropic documents the format but ships no runner, so results are recorded by hand in <code>docs/evaluations.md</code>.</li><li><strong>Targets:</strong> the <code>description</code> field — whether a realistically-phrased user request activates the right skill.</li><li><strong>Key cases:</strong> per skill, one obvious request, one oblique request that avoids the skill's own vocabulary, and one adjacent request that must <em>not</em> trigger it. Run against Haiku, Sonnet, and Opus. Baseline results without any skill installed are recorded first, so improvement is measured rather than assumed.</li></ul>
+<h4>Unit Tests</h4>
+<ul><li><strong>File:</strong> <code>tests/unit/frontmatter.spec.ts</code></li><li><strong>Targets:</strong> this repo's own SKILL.md frontmatter validator, which replaces <code>skills-ref</code> as the enforcing gate.</li><li><strong>Key cases:</strong> <code>name</code> matches the parent directory name; <code>name</code> satisfies the spec regex including no-consecutive-hyphens and no-edge-hyphen; <code>description</code> is non-empty and ≤1024 chars; <code>description</code> is third person, rejecting a leading &quot;I &quot; or &quot;You &quot;; <code>description</code> contains a &quot;use when&quot; trigger phrase; only spec-defined keys appear at the top level. Each case is asserted against a fixture under <code>tests/fixtures/</code> that violates exactly that rule, so a passing test proves the rule can fail.</li></ul>
+<h4>Integration Tests</h4>
+<ul><li><strong>File:</strong> <code>tests/integration/manifests.spec.ts</code></li><li><strong>Targets:</strong> <code>.claude-plugin/plugin.json</code>, <code>.claude-plugin/marketplace.json</code>, and <code>.codex-plugin/plugin.json</code> read together.</li><li><strong>Key cases:</strong> both plugin manifests declare the same <code>name</code> and the same <code>version</code>; the marketplace entry's <code>source: &quot;./&quot;</code> and <code>skills: [&quot;./skills/&quot;]</code> resolve to real directories; the Codex <code>skills</code> path resolves to the same directory Claude Code scans by default; every directory under <code>skills/</code> is reachable from both manifests.</li></ul>
+<h4>E2E Tests</h4>
+<ul><li><strong>Files:</strong> <code>tests/e2e/button.spec.ts</code>, <code>alert.spec.ts</code>, <code>dialog.spec.ts</code>, <code>tabs.spec.ts</code></li><li><strong>Targets:</strong> each component's <code>references/demo.html</code> driven in a real browser via Playwright, loaded from <code>file://</code> with no server and no build step.</li><li><strong>Key cases:</strong> per-component keyboard and focus behavior as listed in steps 5-8. Every WCAG criterion a reference claims in its <code>a11y:</code> frontmatter has a corresponding assertion here — a claim with no assertion fails the objective test.</li></ul>
+</section>
+<section id="acceptance-criteria" aria-labelledby="acceptance-criteria-heading">
+<h2 id="acceptance-criteria-heading">Acceptance Criteria</h2>
+<ul><li class="check-item">&#9744; <code>npm ci</code> succeeds from a clean clone and <code>scripts/check.sh</code> exits zero.</li><li class="check-item">&#9744; <code>docs/component-spec.md</code> defines both the <code>SKILL.md</code> contract and the reference format, and a fresh agent can write a conforming component from it without asking a clarifying question.</li><li class="check-item">&#9744; Four skills exist: <code>button</code>, <code>alert</code>, <code>dialog</code>, <code>tabs</code>.</li><li class="check-item">&#9744; Every skill's frontmatter passes this repo's validator; the validator itself is proven by fixtures that fail each rule.</li><li class="check-item">&#9744; No skill contains <code>${CLAUDE_PLUGIN_ROOT}</code>, <code>disable-model-invocation</code>, <code>hint:</code>, or a backslash path.</li><li class="check-item">&#9744; No component's CSS, HTML, or JS references a framework, a preprocessor, or an external package.</li><li class="check-item">&#9744; Every themeable CSS value is a <code>var(--auk-*, fallback)</code> and every component renders correctly with no custom properties defined at all.</li><li class="check-item">&#9744; Every WCAG criterion claimed in a reference's <code>a11y:</code> frontmatter has a passing assertion in <code>tests/e2e/</code>.</li><li class="check-item">&#9744; Each skill has at least three evaluations, with baseline results recorded before the skill existed.</li><li class="check-item">&#9744; All twelve evaluations trigger the correct skill on Haiku, Sonnet, and Opus, or the miss is documented in <code>docs/evaluations.md</code> as a known limitation.</li><li class="check-item">&#9744; The four skills load and are invocable in Claude Code.</li><li class="check-item">&#9744; Codex discovery result is recorded in <code>docs/vendor-support.md</code>, whether it worked or not.</li></ul>
+</section>
+<section id="verification" aria-labelledby="verification-heading">
+<h2 id="verification-heading">Verification</h2>
+<p>From a clean clone in a temporary directory:</p>
+<ol><li><code>npm ci &amp;&amp; npx playwright install chromium</code></li><li><code>bash scripts/check.sh</code> — exits zero, having run the unit suite, the portability lint, <code>claude plugin validate . --strict</code>, and the Playwright suite.</li><li><code>claude --plugin-dir .</code> — starts, and <code>/help</code> lists all four skills under the <code>agent-ui-kit</code> namespace.</li><li>Read <code>docs/evaluations.md</code> — baseline and post-skill results are both present for all twelve scenarios across three models, and the delta is visible.</li><li>Open each <code>skills/*/references/demo.html</code> directly in a browser with no build step and no stylesheet beyond the reference's own CSS. Each component renders correctly and is fully keyboard operable.</li></ol>
+<p>Step 5 is the one that matters most. The whole premise is that these references work with nothing else present. If a demo needs anything the reference did not ship, the component is not vendor-neutral regardless of what the tests say.</p>
+</section>
+<section id="next-steps" aria-labelledby="next-steps-heading">
+<h2 id="next-steps-heading">Next Steps</h2>
+<ul><li>Extend v1 into a genuinely useful kit:</li></ul>
+<pre><code class="lang-text">  In ~/devbox/agent-ui-kit, the component skill format is proven by button, alert,
+  dialog, and tabs. Read docs/component-spec.md and the four existing skills under
+  skills/, then add: combobox (ARIA 1.2 pattern with filtering), disclosure, tooltip,
+  and checkbox. Follow the same structure exactly, including a references/demo.html,
+  three evaluations in evals/, and matching E2E assertions for every WCAG criterion
+  claimed. Run scripts/check.sh before you finish and report the result.</code></pre>
+<ul><li>Automate the evaluation runner:</li></ul>
+<pre><code class="lang-text">  ~/devbox/agent-ui-kit has evals/*.json holding skill-triggering scenarios in
+  Anthropic's documented format, currently run by hand via scripts/eval.sh with results
+  pasted into docs/evaluations.md. Investigate whether `claude -p` with --model can run
+  these non-interactively and whether skill activation is reliably detectable from its
+  output. If it is, build the runner and have it write docs/evaluations.md directly. If
+  it is not, say so plainly and leave the manual protocol alone.</code></pre>
+<ul><li>Make <code>acss-kit</code> depend on <code>agent-ui-kit</code> instead of duplicating it:</li></ul>
+<pre><code class="lang-text">  ~/devbox/acss-plugins/plugins/acss-kit has 15 component-* skills whose references
+  contain fpkit-bound TSX and SCSS templates plus framework-neutral accessibility
+  contracts. ~/devbox/agent-ui-kit now owns the neutral contracts. Propose (do not
+  implement) how acss-kit could consume agent-ui-kit's references as the neutral source
+  of truth and keep only the fpkit projection layer. Identify what would break for
+  existing acss-kit users and whether Claude Code plugin dependencies can express this
+  relationship.</code></pre>
+<ul><li>Add an optional DESIGN.md token bridge:</li></ul>
+<pre><code class="lang-text">  In ~/devbox/agent-ui-kit, components ship literal CSS using var(--auk-*, fallback).
+  Design and document an optional mapping layer that lets a project with a DESIGN.md
+  token file bind its tokens to the --auk-* custom properties, so components pick up a
+  project's theme automatically. This must stay optional — every component must keep
+  working with no DESIGN.md present. Write the design to docs/ as a proposal first.</code></pre>
+</section>
+<section id="unresolved-questions" aria-labelledby="unresolved-questions-heading">
+<h2 id="unresolved-questions-heading">Unresolved Questions</h2>
+<ul><li>Plugin and marketplace share the name <code>agent-ui-kit</code>:</li></ul>
+<pre><code class="lang-text">  The agent-ui-kit repository is both a Claude Code plugin and its own marketplace, so
+  installation reads /plugin install agent-ui-kit@agent-ui-kit and skills invoke as
+  /agent-ui-kit:button. Investigate whether renaming the plugin (not the repo) to
+  something shorter like &quot;ui&quot; improves this, what the tradeoffs are for discovery and
+  namespace collisions with other plugins, and whether renaming after publication
+  breaks existing installs. Recommend one option.</code></pre>
+<ul><li>Whether v1 should be submitted to the public marketplaces:</li></ul>
+<pre><code class="lang-text">  agent-ui-kit is a public repo that is both a Claude Code plugin and its own
+  marketplace. Investigate what submitting to anthropics/claude-plugins-community
+  requires, what the ChatGPT/Codex universal plugin directory requires, and whether a
+  four-component v1 with an alpha reference format is ready for either. Consider that
+  approved Claude Code plugins are pinned to a commit SHA with CI auto-bumping the pin.
+  Recommend whether to submit now or wait, and say what would need to be true first.</code></pre>
+</section>
+</main>
+</div>
+<script>
+/* markdown-to-html v2.1.0 — generated from reference/html-spec.md */
+function savePDF() {
+  window.print();
+}
+
+(function () {
+  'use strict';
+  var links = {};
+  document.querySelectorAll('nav a[href^="#"]').forEach(function (a) {
+    links[a.getAttribute('href').slice(1)] = a;
+  });
+  var rail = document.querySelector('.scroll-rail');
+  function updateRail() {
+    if (!rail) return;
+    var pct = (window.scrollY / Math.max(1,
+      document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    rail.style.setProperty('--scroll-pct', Math.min(100, Math.round(pct)));
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        Object.values(links).forEach(function (a) {
+          a.classList.remove('active');
+          a.removeAttribute('aria-current');
+        });
+        var link = links[entry.target.id];
+        if (link) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'true');
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('main section').forEach(function (s) {
+    observer.observe(s);
+  });
+  document.querySelectorAll('.svg-node').forEach(function (node) {
+    node.addEventListener('click', function () {
+      var id = node.dataset.section;
+      var el = id && document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+  window.addEventListener('scroll', updateRail, { passive: true });
+  updateRail();
+})();
+
+(function () {
+  'use strict';
+  var STORE_KEY = 'plan-steps-' + encodeURIComponent(document.title);
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch (e) {}
+
+  function updateProgress() {
+    var bar = document.querySelector('.progress-bar[role="progressbar"]');
+    var fill = document.querySelector('.progress-fill');
+    if (!fill) return;
+    var boxes = document.querySelectorAll('.step-checkbox');
+    if (!boxes.length) return;
+    var checked = Array.from(boxes).filter(function (b) { return b.checked; }).length;
+    var pct = Math.round((checked / boxes.length) * 100);
+    fill.style.width = pct + '%';
+    if (bar) {
+      bar.setAttribute('aria-valuenow', String(pct));
+      bar.setAttribute('aria-valuetext', pct + '% complete');
+    }
+  }
+
+  document.querySelectorAll('.step-card').forEach(function (card, idx) {
+    var id = card.dataset.stepId;
+    var cb = card.querySelector('.step-checkbox');
+    var chip = card.querySelector('.step-chip');
+    var status = card.querySelector('.step-status');
+    if (!cb || !id) return;
+    if (saved[id]) {
+      cb.checked = true;
+      card.classList.add('completed');
+      if (chip) chip.textContent = 'done';
+    }
+    cb.addEventListener('change', function () {
+      var done = cb.checked;
+      card.classList.toggle('completed', done);
+      if (chip) chip.textContent = done ? 'done' : 'todo';
+      if (status) {
+        status.textContent = 'Step ' + (idx + 1) + ' marked as ' +
+          (done ? 'complete' : 'incomplete');
+      }
+      saved[id] = done;
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(saved)); } catch (e) {}
+      updateProgress();
+    });
+  });
+  updateProgress();
+})();
+
+</script>
+</body>
+</html>

@@ -4,6 +4,7 @@ type: feature
 created: 2026-09-02
 modified: 2026-09-02
 repo-name: agent-ui-kit
+artifact-url: https://claude.ai/code/artifact/aabf412c-2636-4254-9a21-615215b8c4ce
 ---
 
 # Plan: Build vendor-neutral UI component skills
