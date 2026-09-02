@@ -18,16 +18,22 @@
  * Everything outside those regions - the markup, the page chrome, the wiring - is
  * hand-written and left untouched.
  *
- *   node scripts/build-demos.mjs           rewrite every demo
- *   node scripts/build-demos.mjs --check   report stale demos, write nothing, exit 1
+ *   node scripts/build-demos.mjs               rewrite every demo
+ *   node scripts/build-demos.mjs --check       report stale demos, write nothing, exit 1
+ *   node scripts/build-demos.mjs --check <dir>  the same against another tree, so the
+ *                                               gate can be proven against a fixture
  */
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const SKILLS_DIR = join(ROOT, 'skills');
 const CHECK = process.argv.includes('--check');
+// An explicit directory is only ever used to prove this gate can fail; the real run
+// takes the default. Mirrors scripts/lint-portability.mjs, which takes one for the
+// same reason.
+const target = process.argv.slice(2).find((arg) => !arg.startsWith('--'));
+const SKILLS_DIR = target ? resolve(ROOT, target) : join(ROOT, 'skills');
 
 /** The first fenced block of a given language, without its trailing newline. */
 function fencedBlock(markdown, lang) {

@@ -2,9 +2,9 @@
 # The single local gate. Continuous integration mirrors this script and is never the
 # only place a check lives, because GitHub Actions is not always available.
 #
-#   bash scripts/check.sh            run all five gates
+#   bash scripts/check.sh            run all six gates
 #   bash scripts/check.sh --prove    additionally prove the gate can fail, using the
-#                                    deliberately broken fixture in tests/fixtures/
+#                                    deliberately broken fixtures in tests/fixtures/
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
@@ -40,6 +40,7 @@ no_external_refs() {
 gate "unit, objective and integration tests" npx vitest run
 gate "portability lint (skills/ only)" node scripts/lint-portability.mjs
 gate "no external resources under skills/" no_external_refs
+gate "demos match their references" node scripts/build-demos.mjs --check
 gate "plugin manifests" claude plugin validate . --strict
 gate "browser suite" npx playwright test
 
@@ -75,6 +76,17 @@ if [ "${1:-}" = "--prove" ]; then
     failed=1
   else
     printf '   ok: the resource guard catches a component split across files\n'
+  fi
+
+  # A demo whose generated region disagrees with its reference must be reported,
+  # naming the component so the fix is obvious.
+  demo_out=$(node scripts/build-demos.mjs --check tests/fixtures/stale-demo 2>&1)
+  demo_status=$?
+  if [ "$demo_status" -ne 0 ] && printf '%s' "$demo_out" | grep -q 'widget'; then
+    printf '   ok: the demo gate reports a demo that drifted from its reference\n'
+  else
+    printf '   FAILED: the demo gate missed the stale fixture\n'
+    failed=1
   fi
 
   # The real gate must stay clean: the fixture lives outside skills/ on purpose.

@@ -74,10 +74,11 @@ npm ci && npx playwright install chromium
 bash scripts/check.sh
 ```
 
-Five gates run in order: the unit, objective and integration suites; a portability
+Six gates run in order: the unit, objective and integration suites; a portability
 lint over `skills/`; a check that no file under `skills/` loads an external
-resource; `claude plugin validate . --strict`; and the browser suite, which drives
-every demo with the keyboard and scans it with axe-core.
+resource; a check that every demo still matches its reference;
+`claude plugin validate . --strict`; and the browser suite, which drives every demo
+with the keyboard and scans it with axe-core.
 
 `bash scripts/check.sh --prove` additionally runs a deliberately broken fixture
 through the gate to show it can fail.
@@ -97,7 +98,8 @@ node scripts/build-demos.mjs           # rewrite every demo from its reference
 node scripts/build-demos.mjs --check   # report stale demos, write nothing
 ```
 
-Edit the reference and re-run it. The test suite fails if the two copies drift.
+Edit the reference and re-run it. `scripts/check.sh` runs `--check` as a gate, so a
+demo that drifts from its reference fails the build.
 
 ## Documentation
 
