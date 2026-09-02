@@ -58,7 +58,9 @@ agent-ui-kit/
 │           └── demo.html        # standalone, opens from disk
 ├── evals/                  # skill-triggering scenarios, three per component
 ├── tests/                  # frontmatter, manifests, and browser suites
-├── scripts/check.sh        # the single local gate
+├── scripts/
+│   ├── check.sh            # the single local gate
+│   └── build-demos.mjs     # rewrites each demo's component code from its reference
 └── docs/                   # specification, evaluations, vendor results
 ```
 
@@ -86,6 +88,16 @@ stylesheet beyond the reference's own CSS:
 ```
 open skills/dialog/references/demo.html
 ```
+
+A demo inlines its component's CSS and JavaScript so it stays self-contained, which
+means that code exists twice. The second copy is generated, not hand-kept:
+
+```
+node scripts/build-demos.mjs           # rewrite every demo from its reference
+node scripts/build-demos.mjs --check   # report stale demos, write nothing
+```
+
+Edit the reference and re-run it. The test suite fails if the two copies drift.
 
 ## Documentation
 
