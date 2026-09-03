@@ -81,7 +81,7 @@ unprefixed: the button skill still ships `auk-button`, `--auk-button-*`,
 ## Verifying it
 
 ```
-npm ci && npx playwright install chromium
+npm install && npx playwright install chromium
 bash scripts/check.sh
 ```
 

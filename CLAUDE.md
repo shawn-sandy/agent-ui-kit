@@ -15,7 +15,7 @@ consuming app. No framework, no build step, no runtime dependency - all delibera
 ## Commands
 
 ```
-npm ci && npx playwright install chromium   # first-time setup
+npm install && npx playwright install chromium   # first-time setup
 npm run check                               # the single local gate (six gates)
 bash scripts/check.sh --prove               # what CI runs; adds failure proofs for gates 1-4
 npm test                                    # vitest only - the fast inner loop
