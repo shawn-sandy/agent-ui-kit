@@ -1,0 +1,40 @@
+{
+  "skill": "ui-box",
+  "scenarios": [
+    {
+      "id": "ui-box-obvious",
+      "kind": "obvious",
+      "expect": "ui-box",
+      "prompt": "In index.html, wrap the pricing details in a padded container with rounded corners, and add a dark variant of the same container for the out-of-stock notice.",
+      "baselineFailure": "sets background-color on the dark variant without a paired color, so the text stays whatever the page inherited and disappears against the dark background; the light variant gets no border at all, so its edge vanishes the moment a reader forces their own palette",
+      "detect": {
+        "foreground declared": "(^|[^-\\w])color\\s*:",
+        "background declared": "background(-color)?\\s*:",
+        "border declared": "border\\s*:|border-width\\s*:|border-style\\s*:",
+        "pins a height": "(?<!min-|line-)\\b(?:height|block-size)\\s*:\\s*(?!auto\\b)[0-9]",
+        "border-box declared": "box-sizing\\s*:\\s*border-box"
+      }
+    },
+    {
+      "id": "ui-box-oblique",
+      "kind": "oblique",
+      "expect": "ui-box",
+      "prompt": "In index.html, the settings summary needs its own visual grouping, set apart from what surrounds it. Someone running Windows in high contrast has to still be able to see where it starts and ends.",
+      "baselineFailure": "relies on background-color alone to set the grouping apart, which a forced palette replaces, leaving no edge; no border is declared, so there is nothing for the forced palette to repaint",
+      "detect": {
+        "border declared": "border\\s*:|border-width\\s*:|border-style\\s*:",
+        "background only": "background(-color)?\\s*:",
+        "forced-colors or high-contrast handling": "forced-colors|-ms-high-contrast|CanvasText",
+        "foreground declared": "(^|[^-\\w])color\\s*:"
+      }
+    },
+    {
+      "id": "ui-box-adjacent",
+      "kind": "adjacent",
+      "expect": null,
+      "prompt": "In index.html, the three feature cards need even spacing between them and should sit side by side on a wide screen, stacking on a narrow one.",
+      "baselineFailure": "n/a - this scenario asserts the box skill stays quiet; the request is about arranging siblings, which this kit ships no component for",
+      "detect": {}
+    }
+  ]
+}
