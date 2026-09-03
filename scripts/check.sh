@@ -30,7 +30,7 @@ gate() {
 no_external_refs() {
   local dir="${1:-skills}"
   local hits
-  hits=$(grep -rnE '<link[^>]+href=|[[:space:]]srcset?=|@import|url\(' "$dir" 2>/dev/null \
+  hits=$(grep -rnE '<link[^>]+href=|[[:space:]]src(set)?=|@import|url\(' "$dir" 2>/dev/null \
          | grep -vE 'src="data:|url\(data:|url\(#')
   [ -z "$hits" ] && return 0
   printf '%s\n' "$hits" | sed 's/^/   /'
@@ -74,12 +74,21 @@ if [ "${1:-}" = "--prove" ]; then
     failed=1
   fi
 
-  # A component split across sibling files must trip the resource guard.
-  if no_external_refs tests/fixtures >/dev/null 2>&1; then
-    printf '   FAILED: the split-component fixture did not trip the resource guard\n'
-    failed=1
+  # A component split across sibling files must trip the resource guard, and each of
+  # the three ways it can happen has to be caught on its own - asserting only that the
+  # guard failed would stay green with one arm dead. The src= arm is the fragile one:
+  # written srcset?= it degrades to "srcse" plus an optional "t" and stops matching
+  # src= entirely, while <link> and srcset keep the fixture failing for the wrong
+  # reason.
+  refs_out=$(no_external_refs tests/fixtures 2>&1)
+  if [ -n "$refs_out" ] \
+     && printf '%s' "$refs_out" | grep -q 'href="\./split\.css"' \
+     && printf '%s' "$refs_out" | grep -q 'src="\./split\.js"' \
+     && printf '%s' "$refs_out" | grep -q 'srcset='; then
+    printf '   ok: the resource guard catches link href, src and srcset separately\n'
   else
-    printf '   ok: the resource guard catches a component split across files\n'
+    printf '   FAILED: the resource guard missed link href, src or srcset\n'
+    failed=1
   fi
 
   # A demo whose generated region disagrees with its reference must be reported,

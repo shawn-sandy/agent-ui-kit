@@ -72,11 +72,9 @@ resolve `skills/` from the repo root, so files under `.claude/` are out of scope
 - Package imports, and any `npm`/`yarn`/`pnpm` install instruction.
 
 Separately, the `no_external_refs` grep in `check.sh` rejects `<link ... href=`,
-`srcset=`, `@import` and `url(`. Only three exact spellings are exempt: `src="data:`,
-`url(data:` and `url(#` - so `href="data:...` and a quoted `url("#grad")` still fail.
-An `<a href="#...">` is fine. Note the grep's `srcset?=` never matches a plain `src=`,
-so a component split into a sibling file via `<script src>` passes the gate today and
-still breaks in a real browser at a `file://` null origin. Treat `src=` as banned.
+`src=`, `srcset=`, `@import` and `url(`. Only three exact spellings are exempt:
+`src="data:`, `url(data:` and `url(#` - so `href="data:...` and a quoted
+`url("#grad")` still fail. An `<a href="#...">` is fine.
 
 Put disambiguating phrases early in a `description`. Codex truncates descriptions
 under a context budget, so a trailing clause is lost.
