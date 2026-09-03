@@ -11,7 +11,7 @@ the two gaps that attribute leaves, both measured in a browser rather than assum
 | --- | --- |
 | Element | `<div>` |
 | Role | `group` |
-| Props | `id` — string — required, referenced by triggers; `popover` — `"auto"` or `"manual"` — `"auto"`; `aria-labelledby` — id reference — required, points at the popover heading; `autofocus` — boolean attribute on one descendant — absent; `popovertarget` — id reference — required, on any trigger element; `popovertargetaction` — `"show"` or `"hide"` or `"toggle"` — `"toggle"`, on a trigger; `aria-expanded` — `"true"` or `"false"` — `"false"`, on a trigger |
+| Props | `id` — string — required, referenced by triggers; `popover` — `"auto"` or `"manual"` — `"auto"`; `data-placement` — `"trigger"` or `"center"` or `"top"` or `"bottom"` or `"left"` or `"right"` — `"trigger"`; `aria-labelledby` — id reference — required, points at the popover heading; `autofocus` — boolean attribute on one descendant — absent; `popovertarget` — id reference — required, on any trigger element; `popovertargetaction` — `"show"` or `"hide"` or `"toggle"` — `"toggle"`, on a trigger; `aria-expanded` — `"true"` or `"false"` — `"false"`, on a trigger |
 | Slots | `data-part="header"`; `data-part="body"` |
 | Variants | `none` |
 | Behaviour | `initPopover(popover)` — mirrors the open state onto every trigger's `aria-expanded` and restores focus to the trigger when a `manual` popover closes with focus stranded inside it; returns a teardown |
@@ -35,8 +35,8 @@ popover; every other attribute here is written once by hand and never rewritten.
   Filters
 </button>
 
-<div class="auk-popover" id="filters-popover" popover="auto" role="group"
-     aria-labelledby="filters-popover-title">
+<div class="auk-popover" id="filters-popover" popover="auto" data-placement="trigger"
+     role="group" aria-labelledby="filters-popover-title">
   <div data-part="header">
     <h2 data-part="title" id="filters-popover-title">Filter results</h2>
   </div>
@@ -51,8 +51,8 @@ popover; every other attribute here is written once by hand and never rewritten.
   Release notes
 </button>
 
-<div class="auk-popover" id="notes-popover" popover="manual" role="group"
-     aria-labelledby="notes-popover-title">
+<div class="auk-popover" id="notes-popover" popover="manual" data-placement="center"
+     role="group" aria-labelledby="notes-popover-title">
   <div data-part="header">
     <h2 data-part="title" id="notes-popover-title">What changed</h2>
     <button data-part="close" type="button" popovertarget="notes-popover"
@@ -88,18 +88,24 @@ is open, so the closed state stays the browser's. There is deliberately no
 `::backdrop` rule: the page behind a popover is not inert, and a scrim over content
 that is still clickable tells the user the opposite of the truth.
 
-The `@supports` block moves the popover next to its trigger. A popover opened through
-`popovertarget` already has that trigger as its implicit anchor, so `position-area`
-places it with no `anchor-name` on the button and no script. `position-try-fallbacks`
-is what makes the placement dynamic: when the default position would overflow the
-viewport, the browser flips the popover above the trigger, to its other side, or
-both, and re-evaluates on every scroll and resize. The user agent's `inset: 0` and
+With no `data-placement`, or with `data-placement="trigger"`, the `@supports` block
+moves the popover next to its trigger. A popover opened through `popovertarget`
+already has that trigger as its implicit anchor, so `position-area` places it with
+no `anchor-name` on the button and no script. `position-try-fallbacks` is what makes
+the placement dynamic: when the default position would overflow the viewport, the
+browser flips the popover above the trigger, to its other side, or both, and
+re-evaluates on every scroll and resize. The user agent's `inset: 0` and
 `margin: auto` are reset inside the block so that neither competes with the anchor
 for the same axis. A browser without anchor positioning skips the block and keeps
 the browser's centred placement, so the component degrades to what it was rather
-than to something broken. Placement is themeable through
-`--auk-popover-position-area`; the gap between trigger and popover through
-`--auk-popover-offset`, which sits on the block axis and flips with it.
+than to something broken.
+
+The page placements are independent of anchor positioning. `data-placement="center"`
+keeps the centred top-layer placement, while `top`, `bottom`, `left` and `right`
+pin the popover to that viewport edge and centre it on the other axis. Trigger
+placement is themeable through `--auk-popover-position-area`; the fallback order
+through `--auk-popover-position-try-fallbacks`; the trigger gap through
+`--auk-popover-offset`; and the page edge gap through `--auk-popover-page-offset`.
 
 ```css
 .auk-popover {
@@ -119,12 +125,46 @@ than to something broken. Placement is themeable through
   flex-direction: column;
 }
 
+.auk-popover[data-placement="center"]:popover-open {
+  inset: 0;
+  margin: auto;
+}
+
+.auk-popover[data-placement="top"]:popover-open {
+  inset-block: var(--auk-popover-page-offset, 1rem) auto;
+  inset-inline: 0;
+  margin-block: 0 auto;
+  margin-inline: auto;
+}
+
+.auk-popover[data-placement="bottom"]:popover-open {
+  inset-block: auto var(--auk-popover-page-offset, 1rem);
+  inset-inline: 0;
+  margin-block: auto 0;
+  margin-inline: auto;
+}
+
+.auk-popover[data-placement="left"]:popover-open {
+  inset-block: 0;
+  inset-inline: var(--auk-popover-page-offset, 1rem) auto;
+  margin-block: auto;
+  margin-inline: 0 auto;
+}
+
+.auk-popover[data-placement="right"]:popover-open {
+  inset-block: 0;
+  inset-inline: auto var(--auk-popover-page-offset, 1rem);
+  margin-block: auto;
+  margin-inline: auto 0;
+}
+
 @supports (position-area: block-end) {
-  .auk-popover:popover-open {
+  .auk-popover:not([data-placement]):popover-open,
+  .auk-popover[data-placement="trigger"]:popover-open {
     inset: auto;
     margin: var(--auk-popover-offset, 0.25rem) 0 0;
     position-area: var(--auk-popover-position-area, block-end span-inline-end);
-    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    position-try-fallbacks: var(--auk-popover-position-try-fallbacks, flip-block, flip-inline, flip-block flip-inline);
   }
 }
 
@@ -304,12 +344,13 @@ export function initPopover(popover) {
 ## Demo
 
 `./demo.html` opens from disk with no server and no build step. It renders both
-modes plus page content behind them, which is how the non-modal behaviour becomes
-visible.
+modes, page placement controls, and page content behind them, which is how the
+non-modal behaviour becomes visible.
 
-Look for: each popover opening directly under its own trigger with their left edges
-aligned, and flipping above it once the window is short enough that there is no room
-below; the `auto` popover closing on Escape and on a click anywhere outside it; the
-`manual` popover ignoring both and closing only from its own button; a link behind
-an open popover still responding to a click; and each trigger's `aria-expanded`
-flipping to `true` while its own popover is open.
+Look for: the trigger placement opening directly under its trigger with their left
+edges aligned, and flipping above it once the window is short enough that there is
+no room below; `center`, `top`, `bottom`, `left` and `right` opening against the
+viewport instead of the trigger; the `auto` popover closing on Escape and on a click
+anywhere outside it; the `manual` popover ignoring both and closing only from its
+own button; a link behind an open popover still responding to a click; and each
+trigger's `aria-expanded` flipping to `true` while its own popover is open.

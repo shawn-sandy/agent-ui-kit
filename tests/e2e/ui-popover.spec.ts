@@ -14,6 +14,13 @@ const isOpen = (page: Page, id: string) =>
 const expanded = (page: Page, id: string) =>
   page.evaluate((triggerId) => document.getElementById(triggerId)!.getAttribute('aria-expanded'), id);
 
+const supportsAnchorPositioning = (page: Page) =>
+  page.evaluate(() => CSS.supports('position-area: block-end'));
+
+async function skipWithoutAnchorPositioning(page: Page) {
+  test.skip(!(await supportsAnchorPositioning(page)), 'CSS anchor positioning is not supported');
+}
+
 test('1.4.3 Contrast (Minimum): no axe violations with a popover open', async ({ page }) => {
   await page.locator('#filters-trigger').click();
   expect(await isOpen(page, 'filters-popover')).toBe(true);
@@ -218,14 +225,17 @@ const boxes = (page: Page, triggerId: string, popoverId: string) =>
     ([t, p]) => {
       const rect = (id: string) => {
         const b = document.getElementById(id)!.getBoundingClientRect();
-        return { x: b.x, y: b.y, right: b.right, bottom: b.bottom };
+        return { x: b.x, y: b.y, width: b.width, height: b.height, right: b.right, bottom: b.bottom };
       };
       return { trigger: rect(t), popover: rect(p) };
     },
     [triggerId, popoverId],
   );
 
-test('the popover opens adjacent to its trigger rather than centred', async ({ page }) => {
+test('the popover opens adjacent to its trigger when anchor positioning is supported', async ({
+  page,
+}) => {
+  await skipWithoutAnchorPositioning(page);
   await page.locator('#filters-trigger').click();
   expect(await isOpen(page, 'filters-popover')).toBe(true);
 
@@ -237,9 +247,10 @@ test('the popover opens adjacent to its trigger rather than centred', async ({ p
   expect(popover.y - trigger.bottom).toBeLessThan(16);
 });
 
-test('the popover flips above a trigger that sits near the bottom of the viewport', async ({
+test('the popover flips above a bottom trigger when anchor positioning is supported', async ({
   page,
 }) => {
+  await skipWithoutAnchorPositioning(page);
   await page.setViewportSize({ width: 1000, height: 700 });
   await page.evaluate(() => {
     document.getElementById('filters-trigger')!.style.cssText = 'position:fixed;left:32px;bottom:8px;';
@@ -253,4 +264,48 @@ test('the popover flips above a trigger that sits near the bottom of the viewpor
   expect(popover.bottom).toBeLessThanOrEqual(trigger.y);
   expect(popover.y).toBeGreaterThanOrEqual(0);
   expect(popover.x).toBeCloseTo(trigger.x, 0);
+});
+
+test('data-placement opens the popover at page positions', async ({ page }) => {
+  await page.setViewportSize({ width: 1000, height: 700 });
+  const placements = ['center', 'top', 'bottom', 'left', 'right'] as const;
+
+  for (const placement of placements) {
+    await page
+      .locator('#filters-popover')
+      .evaluate((el, value) => el.setAttribute('data-placement', value), placement);
+    await page.locator('#filters-trigger').click();
+    expect(await isOpen(page, 'filters-popover')).toBe(true);
+
+    const viewport = page.viewportSize();
+    if (!viewport) throw new Error('expected a viewport size');
+    const { popover } = await boxes(page, 'filters-trigger', 'filters-popover');
+    const centerX = popover.x + popover.width / 2;
+    const centerY = popover.y + popover.height / 2;
+    const edgeOffset = 16;
+
+    if (placement === 'center') {
+      expect(centerX).toBeCloseTo(viewport.width / 2, 0);
+      expect(centerY).toBeCloseTo(viewport.height / 2, 0);
+    }
+    if (placement === 'top') {
+      expect(popover.y).toBeCloseTo(edgeOffset, 0);
+      expect(centerX).toBeCloseTo(viewport.width / 2, 0);
+    }
+    if (placement === 'bottom') {
+      expect(popover.bottom).toBeCloseTo(viewport.height - edgeOffset, 0);
+      expect(centerX).toBeCloseTo(viewport.width / 2, 0);
+    }
+    if (placement === 'left') {
+      expect(popover.x).toBeCloseTo(edgeOffset, 0);
+      expect(centerY).toBeCloseTo(viewport.height / 2, 0);
+    }
+    if (placement === 'right') {
+      expect(popover.right).toBeCloseTo(viewport.width - edgeOffset, 0);
+      expect(centerY).toBeCloseTo(viewport.height / 2, 0);
+    }
+
+    await page.keyboard.press('Escape');
+    expect(await isOpen(page, 'filters-popover')).toBe(false);
+  }
 });

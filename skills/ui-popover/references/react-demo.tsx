@@ -9,6 +9,8 @@ import * as React from 'react';
  * module adds: an explicit `aria-expanded` on every trigger, and focus restoration
  * for `manual` popovers, which the browser does not restore at all.
  */
+export type AukPopoverPlacement = 'trigger' | 'center' | 'top' | 'bottom' | 'left' | 'right';
+
 export interface AukPopoverProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'id' | 'role' | 'title' | 'children'> {
   /** Referenced by every trigger's `popoverTarget`. Also seeds the heading id. */
@@ -17,6 +19,8 @@ export interface AukPopoverProps
   children: React.ReactNode;
   /** `auto` light-dismisses on Escape and outside clicks; `manual` does neither. */
   mode?: 'auto' | 'manual';
+  /** `trigger` follows the opener; the other values place the popover in the viewport. */
+  placement?: AukPopoverPlacement;
   /** Accessible name for the close button, which only a `manual` popover renders. */
   closeLabel?: string;
   onOpenChange?: (open: boolean) => void;
@@ -31,6 +35,7 @@ export function AukPopover({
   title,
   children,
   mode = 'auto',
+  placement = 'trigger',
   closeLabel = 'Close',
   onOpenChange,
   className,
@@ -77,6 +82,7 @@ export function AukPopover({
       className={cx('auk-popover', className)}
       id={id}
       popover={mode}
+      data-placement={placement}
       role="group"
       aria-labelledby={titleId}
     >
@@ -134,7 +140,13 @@ export function AukPopoverDemo() {
         </button>
       </AukPopover>
 
-      <AukPopover id="notes-popover" title="What changed" mode="manual" closeLabel="Close release notes">
+      <AukPopover
+        id="notes-popover"
+        title="What changed"
+        mode="manual"
+        placement="center"
+        closeLabel="Close release notes"
+      >
         <p>A manual popover ignores Escape and outside clicks. It closes only here.</p>
       </AukPopover>
     </div>

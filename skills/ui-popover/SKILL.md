@@ -1,6 +1,6 @@
 ---
 name: ui-popover
-description: Accessible non-modal popover on the native HTML popover attribute - a panel that opens above the page without blocking it. Use when adding a filter panel, a disclosure card, a settings flyout, an inline notice, a dropdown surface, or any layer that closes on Escape or an outside click while the page behind stays clickable and tabbable. Covers auto and manual modes, anchoring beside the trigger with automatic flipping to stay on screen, top-layer placement that no overflow or z-index can clip, and trigger state. Not a modal.
+description: Accessible non-modal popover on the native HTML popover attribute - a panel that opens above the page without blocking it. Use when adding a filter panel, a disclosure card, a settings flyout, an inline notice, a dropdown surface, or any layer that closes on Escape or an outside click while the page behind stays clickable and tabbable. Covers auto and manual modes, trigger-adjacent and viewport placements, top-layer placement that no overflow or z-index can clip, and trigger state. Not a modal.
 license: MIT
 ---
 
@@ -36,16 +36,16 @@ proceed and state any assumptions.
 
 ## Build it
 
-1. Read `references/ui-popover.md` for the markup, styles, module and accessibility
-   contract.
+1. Read `references/ui-popover.md` for the markup, styles, module and accessibility contract.
 2. Copy the Structure block. The root is a `<div>` with an `id`, a `popover`
    attribute and `role="group"`; triggers reference it with `popovertarget`.
 3. Choose the mode: `auto` for anything dismissible, `manual` only when the layer
    must survive Escape and outside clicks. A `manual` popover needs its own close
    control carrying `popovertargetaction="hide"`.
-4. Copy the Behaviour module and call `initPopover(popoverElement)` once per popover.
-5. Copy the Styles block as-is.
-6. Open `references/demo.html` and check the behaviours listed there.
+4. Choose placement: omit `data-placement` or use `trigger`, or set a viewport placement.
+5. Copy the Behaviour module and call `initPopover(popoverElement)` once per popover.
+6. Copy the Styles block as-is.
+7. Open `references/demo.html` and check the behaviours listed there.
 
 ## Non-negotiable
 

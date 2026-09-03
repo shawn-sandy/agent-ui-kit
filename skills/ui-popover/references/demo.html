@@ -37,12 +37,46 @@ a:focus-visible { outline: 3px solid #111827; outline-offset: 2px; }
   flex-direction: column;
 }
 
+.auk-popover[data-placement="center"]:popover-open {
+  inset: 0;
+  margin: auto;
+}
+
+.auk-popover[data-placement="top"]:popover-open {
+  inset-block: var(--auk-popover-page-offset, 1rem) auto;
+  inset-inline: 0;
+  margin-block: 0 auto;
+  margin-inline: auto;
+}
+
+.auk-popover[data-placement="bottom"]:popover-open {
+  inset-block: auto var(--auk-popover-page-offset, 1rem);
+  inset-inline: 0;
+  margin-block: auto 0;
+  margin-inline: auto;
+}
+
+.auk-popover[data-placement="left"]:popover-open {
+  inset-block: 0;
+  inset-inline: var(--auk-popover-page-offset, 1rem) auto;
+  margin-block: auto;
+  margin-inline: 0 auto;
+}
+
+.auk-popover[data-placement="right"]:popover-open {
+  inset-block: 0;
+  inset-inline: auto var(--auk-popover-page-offset, 1rem);
+  margin-block: auto;
+  margin-inline: auto 0;
+}
+
 @supports (position-area: block-end) {
-  .auk-popover:popover-open {
+  .auk-popover:not([data-placement]):popover-open,
+  .auk-popover[data-placement="trigger"]:popover-open {
     inset: auto;
     margin: var(--auk-popover-offset, 0.25rem) 0 0;
     position-area: var(--auk-popover-position-area, block-end span-inline-end);
-    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    position-try-fallbacks: var(--auk-popover-position-try-fallbacks, flip-block, flip-inline, flip-block flip-inline);
   }
 }
 
@@ -116,8 +150,33 @@ a:focus-visible { outline: 3px solid #111827; outline-offset: 2px; }
   tabbing on from inside an open popover has somewhere real to land.
 </p>
 
-<div class="auk-popover" id="filters-popover" popover="auto" role="group"
-     aria-labelledby="filters-popover-title">
+<h2 class="section">Page placement</h2>
+
+<div class="row">
+  <button class="auk-button" type="button" data-variant="secondary" id="placement-center-trigger"
+          popovertarget="placement-center-popover" aria-expanded="false">
+    Center
+  </button>
+  <button class="auk-button" type="button" data-variant="secondary" id="placement-top-trigger"
+          popovertarget="placement-top-popover" aria-expanded="false">
+    Top
+  </button>
+  <button class="auk-button" type="button" data-variant="secondary" id="placement-bottom-trigger"
+          popovertarget="placement-bottom-popover" aria-expanded="false">
+    Bottom
+  </button>
+  <button class="auk-button" type="button" data-variant="secondary" id="placement-left-trigger"
+          popovertarget="placement-left-popover" aria-expanded="false">
+    Left
+  </button>
+  <button class="auk-button" type="button" data-variant="secondary" id="placement-right-trigger"
+          popovertarget="placement-right-popover" aria-expanded="false">
+    Right
+  </button>
+</div>
+
+<div class="auk-popover" id="filters-popover" popover="auto" data-placement="trigger"
+     role="group" aria-labelledby="filters-popover-title">
   <div data-part="header">
     <h2 data-part="title" id="filters-popover-title">Filter results</h2>
   </div>
@@ -127,8 +186,8 @@ a:focus-visible { outline: 3px solid #111827; outline-offset: 2px; }
   </div>
 </div>
 
-<div class="auk-popover" id="notes-popover" popover="manual" role="group"
-     aria-labelledby="notes-popover-title">
+<div class="auk-popover" id="notes-popover" popover="manual" data-placement="center"
+     role="group" aria-labelledby="notes-popover-title">
   <div data-part="header">
     <h2 data-part="title" id="notes-popover-title">What changed</h2>
     <button data-part="close" type="button" id="notes-close" popovertarget="notes-popover"
@@ -138,6 +197,56 @@ a:focus-visible { outline: 3px solid #111827; outline-offset: 2px; }
   </div>
   <div data-part="body">
     <p>A manual popover ignores Escape and outside clicks. It closes only here.</p>
+  </div>
+</div>
+
+<div class="auk-popover" id="placement-center-popover" popover="auto" data-placement="center"
+     role="group" aria-labelledby="placement-center-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="placement-center-popover-title">Centered popover</h2>
+  </div>
+  <div data-part="body">
+    <p>This popover opens in the center of the viewport.</p>
+  </div>
+</div>
+
+<div class="auk-popover" id="placement-top-popover" popover="auto" data-placement="top"
+     role="group" aria-labelledby="placement-top-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="placement-top-popover-title">Top popover</h2>
+  </div>
+  <div data-part="body">
+    <p>This popover opens against the top edge of the viewport.</p>
+  </div>
+</div>
+
+<div class="auk-popover" id="placement-bottom-popover" popover="auto" data-placement="bottom"
+     role="group" aria-labelledby="placement-bottom-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="placement-bottom-popover-title">Bottom popover</h2>
+  </div>
+  <div data-part="body">
+    <p>This popover opens against the bottom edge of the viewport.</p>
+  </div>
+</div>
+
+<div class="auk-popover" id="placement-left-popover" popover="auto" data-placement="left"
+     role="group" aria-labelledby="placement-left-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="placement-left-popover-title">Left popover</h2>
+  </div>
+  <div data-part="body">
+    <p>This popover opens against the left edge of the viewport.</p>
+  </div>
+</div>
+
+<div class="auk-popover" id="placement-right-popover" popover="auto" data-placement="right"
+     role="group" aria-labelledby="placement-right-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="placement-right-popover-title">Right popover</h2>
+  </div>
+  <div data-part="body">
+    <p>This popover opens against the right edge of the viewport.</p>
   </div>
 </div>
 
@@ -190,8 +299,15 @@ function initPopover(popover) {
 }
 /* Generated from ui-popover.md by scripts/build-demos.mjs. Edit the reference, not this. */
 
-initPopover(document.getElementById('filters-popover'));
-initPopover(document.getElementById('notes-popover'));
+[
+  'filters-popover',
+  'notes-popover',
+  'placement-center-popover',
+  'placement-top-popover',
+  'placement-bottom-popover',
+  'placement-left-popover',
+  'placement-right-popover',
+].forEach((id) => initPopover(document.getElementById(id)));
 </script>
 </body>
 </html>
