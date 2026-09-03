@@ -1,12 +1,11 @@
 {
   "hooks": {
-    "PostToolUse": [
+    "Stop": [
       {
-        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | { read -r f; case \"$f\" in *skills/*/references/*) s=\"${CLAUDE_PROJECT_DIR:-.}/scripts/build-demos.mjs\"; [ -f \"$s\" ] || exit 0; out=$(node \"$s\" --check 2>&1) || { printf \"%s\\nRun: node scripts/build-demos.mjs\\n\" \"$out\" >&2; exit 2; };; esac; }",
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" 2>/dev/null || exit 0; [ -f scripts/build-demos.mjs ] || exit 0; node scripts/build-demos.mjs --check >/dev/null 2>&1 || printf \"%s\" \"{\\\"systemMessage\\\":\\\"Demo pages are stale or incomplete. Run: node scripts/build-demos.mjs\\\"}\"",
             "timeout": 30
           }
         ]
