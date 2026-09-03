@@ -74,7 +74,7 @@ is no build step and no duplicated content.
 ## Verifying it
 
 ```
-npm ci && npx playwright install chromium
+npm install && npx playwright install chromium
 bash scripts/check.sh
 ```
 
