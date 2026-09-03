@@ -3,3 +3,10 @@ node_modules/
 *.log
 .env
 .env.*
+
+# Playwright
+test-results/
+playwright-report/
+
+# Raw evaluation transcripts. docs/evaluations.md carries the reviewable record.
+evals/results/

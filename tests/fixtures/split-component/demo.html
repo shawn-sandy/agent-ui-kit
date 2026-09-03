@@ -1,0 +1,17 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Split component - deliberately broken fixture</title>
+<!--
+  This fixture exists to prove the external-resource guard can fail. It is the
+  mistake the guard is there to catch: a component whose CSS and behaviour live in
+  sibling files. Playwright's chrome-headless-shell runs this happily; a person
+  opening it from disk gets an unstyled page with no behaviour, because a module
+  script is blocked at a null origin.
+
+  It lives outside skills/ so the real gate never sees it.
+-->
+<link rel="stylesheet" href="./split.css">
+<div class="auk-split">Nothing here works from a file:// URL.</div>
+<script type="module" src="./split.js"></script>
+
+<img srcset="https://example.test/hero.png 1x, https://example.test/hero@2x.png 2x">

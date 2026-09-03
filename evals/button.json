@@ -1,0 +1,37 @@
+{
+  "skill": "button",
+  "scenarios": [
+    {
+      "id": "button-obvious",
+      "kind": "obvious",
+      "expect": "button",
+      "prompt": "In index.html, add a primary button that saves the form, plus a destructive variant for delete. It needs to be greyed out while the save is in flight.",
+      "baselineFailure": "reaches for the native disabled attribute for the in-flight state, which removes the control from the keyboard tab order so a keyboard user never learns the action exists",
+      "detect": {
+        "native disabled attribute": "<button[^>]*\\sdisabled\\b|\\.disabled\\s*=\\s*true",
+        "aria-disabled instead": "aria-disabled",
+        "handler guards on aria-disabled": "getAttribute\\(['\\\"]aria-disabled"
+      }
+    },
+    {
+      "id": "button-oblique",
+      "kind": "oblique",
+      "expect": "button",
+      "prompt": "In index.html I need a clickable control that runs an action in the current page. While the action is running, it should be visibly unavailable.",
+      "baselineFailure": "the unavailable state is expressed with the native disabled attribute, so the control silently leaves the tab order",
+      "detect": {
+        "native disabled attribute": "<button[^>]*\\sdisabled\\b|\\.disabled\\s*=\\s*true",
+        "aria-disabled instead": "aria-disabled",
+        "handler guards on aria-disabled": "getAttribute\\(['\\\"]aria-disabled"
+      }
+    },
+    {
+      "id": "button-adjacent",
+      "kind": "adjacent",
+      "expect": null,
+      "prompt": "In index.html, add a link to the pricing page, styled to look like a call to action.",
+      "baselineFailure": "n/a - this scenario asserts the button skill stays quiet",
+      "detect": {}
+    }
+  ]
+}

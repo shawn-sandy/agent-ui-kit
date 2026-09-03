@@ -12,7 +12,13 @@ package, no vendor.
 
 ## Status
 
-Pre-release. The repository structure is in place; components are not written yet.
+Version 0.2.0. Four components ship: **button**, **alert**, **dialog** and **tabs**.
+They were chosen to stress different parts of the format rather than to be a useful
+kit - no JavaScript, a live region, heavy focus management, and keyboard navigation.
+
+Both vendors load the tree and use it: see [docs/vendor-support.md](docs/vendor-support.md)
+for what actually happened, including what did not work.
+
 The reference format is still moving - pin a commit if you depend on it.
 
 ## Install
@@ -47,12 +53,62 @@ agent-ui-kit/
 ├── skills/                 # one directory per component
 │   └── <component>/
 │       ├── SKILL.md        # what it is, when to use it, how to build it
-│       └── references/     # the HTML, CSS, and JS
-└── docs/                   # format specification
+│       └── references/
+│           ├── <component>.md   # contract, HTML, CSS, JS, accessibility
+│           └── demo.html        # standalone, opens from disk
+├── evals/                  # skill-triggering scenarios, three per component
+├── tests/                  # frontmatter, manifests, and browser suites
+├── scripts/
+│   ├── check.sh            # the single local gate
+│   └── build-demos.mjs     # rewrites each demo's component code from its reference
+└── docs/                   # specification, evaluations, vendor results
 ```
 
 One `skills/` tree serves every vendor. The manifests are thin and additive; there
 is no build step and no duplicated content.
+
+## Verifying it
+
+```
+npm ci && npx playwright install chromium
+bash scripts/check.sh
+```
+
+Six gates run in order: the unit, objective and integration suites; a portability
+lint over `skills/`; a check that no file under `skills/` loads an external
+resource; a check that every demo still matches its reference;
+`claude plugin validate . --strict`; and the browser suite, which drives every demo
+with the keyboard and scans it with axe-core.
+
+`bash scripts/check.sh --prove` additionally runs a deliberately broken fixture
+through the gate to show it can fail.
+
+Every demo also opens directly from disk with no server, no build step and no
+stylesheet beyond the reference's own CSS:
+
+```
+open skills/dialog/references/demo.html
+```
+
+A demo inlines its component's CSS and JavaScript so it stays self-contained, which
+means that code exists twice. The second copy is generated, not hand-kept:
+
+```
+node scripts/build-demos.mjs           # rewrite every demo from its reference
+node scripts/build-demos.mjs --check   # report stale demos, write nothing
+```
+
+Edit the reference and re-run it. `scripts/check.sh` runs `--check` as a gate, so a
+demo that drifts from its reference fails the build.
+
+## Documentation
+
+- [docs/component-spec.md](docs/component-spec.md) - the authoring contract for
+  `SKILL.md` and the reference.
+- [docs/evaluations.md](docs/evaluations.md) - whether a realistic request actually
+  reaches the right skill, measured across three models.
+- [docs/vendor-support.md](docs/vendor-support.md) - what each vendor did with the
+  tree, including the failures.
 
 ## Principles
 
