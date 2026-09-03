@@ -60,6 +60,17 @@ describe.each(skills)('skills/%s', (name) => {
     expect(body).not.toMatch(/```(?:html|css|js|javascript)/);
   });
 
+  it('SKILL.md tells agents when to ask about missing descriptions, props, or requirements', () => {
+    const source = readFileSync(skillPath, 'utf8');
+    const body = source.replace(/^---\n[\s\S]*?\n---\n/, '');
+
+    expect(body).toMatch(/^## Clarify when needed$/m);
+    expect(body).toMatch(/\bdescriptions?\b/i);
+    expect(body).toMatch(/\bprops?\b/i);
+    expect(body).toMatch(/\brequirements?\b/i);
+    expect(body).toMatch(/\bask\b/i);
+  });
+
   it('contains no vendor-specific or framework-specific token', () => {
     for (const file of [skillPath, referencePath, demoPath]) {
       const text = readFileSync(file, 'utf8');

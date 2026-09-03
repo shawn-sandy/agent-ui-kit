@@ -21,6 +21,14 @@ A clickable control that performs an action in the current page.
 - Toggling a section open and closed. That needs `aria-expanded`, which is a
   disclosure, not this component.
 
+## Clarify when needed
+
+Use any component description the user provides to infer contract-backed props,
+slots, variant, handler guard and defaults. If the description, missing props or
+requirements leave multiple valid mappings that would change the element, ARIA or
+state model, ask targeted questions before building. If the request already maps
+cleanly to the contract, proceed and state any assumptions.
+
 ## Build it
 
 1. Read `references/button.md` for the markup, styles and accessibility contract.

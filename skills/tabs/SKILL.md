@@ -23,6 +23,14 @@ A row of controls that shows one panel at a time from a set.
 - Progressive steps in a sequence. That is a wizard, which has ordering rules tabs
   do not.
 
+## Clarify when needed
+
+Use any component description the user provides to infer contract-backed props,
+tabs, selected value, panel content and defaults. If the description, missing props
+or requirements leave multiple valid mappings that would change the controlled
+state, labelling or keyboard model, ask targeted questions before building. If the
+request already maps cleanly to the contract, proceed and state any assumptions.
+
 ## Build it
 
 1. Read `references/tabs.md` for the markup, styles, module and accessibility

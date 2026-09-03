@@ -167,6 +167,13 @@ One sentence: what it is.
 ## When not to use
 - ... (name the sibling component that is the right answer instead)
 
+## Clarify when needed
+- Accept a plain-language component description and use it to infer the closest
+  contract-backed props, slots, behaviour and defaults. Ask targeted questions when
+  the description, missing props or requirements would change the element, ARIA,
+  state model, slots, behaviour or defaults. Proceed with stated assumptions when
+  the request already maps cleanly to the contract.
+
 ## Build it
 1. Read `references/<component>.md`.
 2. Copy the Structure and Styles blocks; adapt only the template syntax to the stack.

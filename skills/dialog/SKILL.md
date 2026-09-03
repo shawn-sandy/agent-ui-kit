@@ -21,6 +21,14 @@ A modal overlay that blocks interaction with the rest of the page until it close
 - A menu, popover or tooltip anchored to a control. Those stay non-modal, and making
   them modal traps the user for no reason.
 
+## Clarify when needed
+
+Use any component description the user provides to infer contract-backed props,
+slots, open state, close triggers, focus targets and defaults. If the description,
+missing props or requirements leave multiple valid mappings that would change the
+labelled content or focus model, ask targeted questions before building. If the
+request already maps cleanly to the contract, proceed and state any assumptions.
+
 ## Build it
 
 1. Read `references/dialog.md` for the markup, styles, module and accessibility
