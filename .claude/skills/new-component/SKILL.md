@@ -2,6 +2,8 @@
 name: new-component
 description: Scaffolds and verifies a new ui-prefixed component skill in this repository, following docs/component-spec.md. Takes the unprefixed component slug as an argument.
 disable-model-invocation: true
+metadata:
+  internal: true
 ---
 
 # New component skill

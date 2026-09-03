@@ -23,7 +23,12 @@ export interface Violation {
   message: string;
 }
 
-function isPackagedSkill(skillPath: string): boolean {
+/**
+ * Whether a SKILL.md ships to installers: under a top-level `skills/` directory, not
+ * under a vendor directory such as `.claude/skills/`. This is the one boundary between
+ * the public catalog and maintainer tooling; every test that needs it reuses this.
+ */
+export function isPackagedSkill(skillPath: string): boolean {
   const normalized = skillPath.replace(/\\/g, '/');
   if (/(?:^|\/)\.(?:agents|claude|codex)\/skills\//.test(normalized)) return false;
   return /(?:^|\/)skills\/[^/]+\/SKILL\.md$/.test(normalized);
