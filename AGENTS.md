@@ -12,7 +12,7 @@ automation in `scripts/`, and tests in `tests/` (`unit`, `integration`, and
 
 ## Build, Test, and Development Commands
 
-- `npm ci` installs the locked Node dependencies.
+- `npm install` installs the Node dependencies.
 - `npx playwright install chromium` installs the browser used by E2E tests.
 - `npm test` runs Vitest over `tests/**/*.spec.ts`, excluding `tests/e2e/`.
 - `npm run test:e2e` runs the Playwright browser suite in `tests/e2e/`.

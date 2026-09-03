@@ -10,3 +10,6 @@ playwright-report/
 
 # Raw evaluation transcripts. docs/evaluations.md carries the reviewable record.
 evals/results/
+
+# No lockfile: it would be copied on plugin install and only CI ever used it.
+package-lock.json
