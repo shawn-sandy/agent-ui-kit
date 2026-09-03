@@ -39,10 +39,15 @@ jobs:
         # plugin's review subagents were being killed mid-review, so the job went green
         # with nothing posted. Foreground subagents are the measured workaround:
         # https://github.com/anthropics/claude-code-action/issues/1499
+        # Set twice on purpose. Upstream users measured the step-level env reaching the
+        # CLI, but the action's own action.yml warns that its inner step's env block can
+        # shadow caller env, so the settings input covers that case: Claude Code writes
+        # settings `env` entries into the process environment at startup.
         env:
           CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: 1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          settings: '{"env":{"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS":"1"}}'
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
           prompt: '/code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
