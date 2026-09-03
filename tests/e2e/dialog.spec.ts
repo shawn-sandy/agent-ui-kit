@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { demoUrl, activeId, tabTo, focusOutlineWidth } from './support.js';
+import { demoUrl, activeId, expectFocus, tabTo, focusOutlineWidth } from './support.js';
 
 test.beforeEach(async ({ page }) => {
   await page.goto(demoUrl('dialog'));
@@ -27,13 +27,13 @@ test('2.4.3 Focus Order: focus returns to the exact element that opened it', asy
   await page.locator('#open-second').click();
   expect(await isOpen(page)).toBe(true);
   await page.keyboard.press('Escape');
-  expect(await activeId(page)).toBe('open-second');
+  await expectFocus(page, 'open-second');
 
   // ...and to the other opener when that one is used, which is the whole point of
   // storing the opener rather than trusting a single remembered element.
   await page.locator('#open-top').click();
   await page.keyboard.press('Escape');
-  expect(await activeId(page)).toBe('open-top');
+  await expectFocus(page, 'open-top');
 });
 
 test('2.1.2 No Keyboard Trap: Tab never reaches the page behind', async ({ page }) => {
@@ -57,6 +57,9 @@ test('2.1.2 No Keyboard Trap: the trap releases completely on close', async ({ p
   await page.locator('#open-top').click();
   await page.keyboard.press('Escape');
   expect(await isOpen(page)).toBe(false);
+  // Let the deferred focus restoration land before tabbing, or it moves the cursor
+  // out from under the walk.
+  await expectFocus(page, 'open-top');
   // The page behind is reachable again.
   expect(await tabTo(page, 'page-link')).toBeGreaterThan(0);
 });
@@ -108,9 +111,7 @@ test('2.4.3 Focus Order: focus is placed deliberately when the opener is gone', 
   await page.evaluate(() => document.getElementById('open-top')!.remove());
   await page.keyboard.press('Escape');
 
-  expect(await activeId(page), 'focus was not placed on the declared fallback').toBe(
-    'fallback-landing',
-  );
+  await expectFocus(page, 'fallback-landing');
 });
 
 test('2.4.3 Focus Order: focus is not stranded when no fallback is declared', async ({ page }) => {
@@ -123,6 +124,12 @@ test('2.4.3 Focus Order: focus is not stranded when no fallback is declared', as
   await page.evaluate(() => document.getElementById('open-top')!.remove());
   await page.keyboard.press('Escape');
 
+  // The module moves focus out one task later, so settle before reading.
+  await page.waitForFunction(
+    () => !document.getElementById('confirm-delete')!.contains(document.activeElement),
+    null,
+    { timeout: 2000 },
+  );
   const landed = await page.evaluate(() => {
     const active = document.activeElement;
     return {

@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
@@ -36,4 +37,18 @@ export function focusOutlineWidth(page: Page): Promise<number> {
     if (style.outlineStyle === 'none') return 0;
     return parseFloat(style.outlineWidth) || 0;
   });
+}
+
+/**
+ * Wait for focus to settle on `id`, then assert it.
+ *
+ * Closing a dialog places focus one task later on purpose - the module defers it so
+ * Chromium's own handling for a closing modal cannot overwrite the placement. Reading
+ * activeElement immediately after the keypress therefore races that task, which is a
+ * flaky test rather than a real failure.
+ */
+export async function expectFocus(page: Page, id: string): Promise<void> {
+  await expect
+    .poll(() => activeId(page), { message: `focus never settled on #${id}`, timeout: 2000 })
+    .toBe(id);
 }
