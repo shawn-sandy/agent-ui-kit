@@ -18,7 +18,7 @@ try {
 <meta name="plan-effort" content="high">
 <meta name="plan-type" content="feature">
 <meta name="plan-created" content="2026-09-02">
-<meta name="plan-repo" content="agent-ui-kit">
+<meta name="plan-repo" content="agent-ui-skills">
 <meta name="plan-file" content="build-ui-component-skills.html">
 <meta name="plan-path" content="docs/plans/build-ui-component-skills.html">
 <meta name="plan-md" content="docs/plans/build-ui-component-skills.md">
@@ -1574,7 +1574,7 @@ img, video { max-width: 100%; height: auto; }
     </div>
     <div class="plan-meta">
       <span><svg class="icon" aria-hidden="true"><use href="#ic-calendar"/></svg> 2026-09-02</span>
-      <span><svg class="icon" aria-hidden="true"><use href="#ic-code-bracket"/></svg> agent-ui-kit</span>
+      <span><svg class="icon" aria-hidden="true"><use href="#ic-code-bracket"/></svg> agent-ui-skills</span>
       <span><svg class="icon" aria-hidden="true"><use href="#ic-tag"/></svg> feature</span>
       <span><svg class="icon" aria-hidden="true"><use href="#ic-bolt"/></svg> High effort</span>
     </div>
@@ -1691,7 +1691,7 @@ img, video { max-width: 100%; height: auto; }
         Context
       </h2>
       <p class="section-intro">The story behind this plan — what prompted the work and why it matters now.</p>
-      <p><code class="md">agent-ui-kit</code> exists as structure only. The scaffold created both plugin manifests, a marketplace manifest, an empty <code class="md">skills/</code> tree and a README. There are no components, no format specification, no tooling and no tests.</p>
+      <p><code class="md">agent-ui-skills</code> exists as structure only. The scaffold created both plugin manifests, a marketplace manifest, an empty <code class="md">skills/</code> tree and a README. There are no components, no format specification, no tooling and no tests.</p>
       <p>The project packages each UI component as an Agent Skill (a folder with a <code class="md">SKILL.md</code> that agents load on demand). Each skill ships a complete, copyable reference: semantic HTML with a real accessibility contract, plain CSS driven by custom properties, and JavaScript with no dependencies. An agent reads the reference and builds the component into the user&#39;s project, in the user&#39;s stack. Nothing is installed into the consuming app.</p>
       <p>It is deliberately seeded from <code class="md">~/devbox/acss-plugins</code> rather than written from nothing. That repo&#39;s <code class="md">style-agent</code> plugin holds an alpha framework-neutral component specification whose core insight is reusable: HTML structure, CSS and the accessibility contract are framework-agnostic, and only template syntax and reactivity binding are framework-specific. Its <code class="md">acss-kit</code> plugin holds fifteen component references. Only the accessibility contracts, prop models and data-attribute variant strategy transfer from those — the TSX and SCSS templates are bound to <code class="md">@fpkit/acss</code> and do not.</p>
       <p>Three portability hazards found in <code class="md">acss-kit</code> must not be repeated here. It uses <code class="md">${CLAUDE_PLUGIN_ROOT}</code>, a Claude Code variable that Codex does not expand. It uses <code class="md">disable-model-invocation</code> and <code class="md">hint</code> frontmatter, which are Claude Code extensions absent from the Agent Skills open standard and rejected by a strict validator. It shells out to Python helper scripts, which a cross-vendor skill cannot assume exist.</p>
@@ -1711,7 +1711,7 @@ img, video { max-width: 100%; height: auto; }
         <li style="margin-bottom:.5rem;">The upstream specification&#39;s <code class="md">{colors.primary}</code> token references become an optional mapping layer rather than a requirement, so no design-token file needs to exist for a component to function.</li>
         <li style="margin-bottom:.5rem;"><code class="md">SKILL.md</code> orients and points; the reference carries the code. The skill body stays under 60 lines and never contains the component itself, because the body loads whenever the skill triggers while the reference loads only when actually needed.</li>
         <li style="margin-bottom:.5rem;">Accessibility claims are asserted by axe-core and explicit keyboard tests, never stated bare — a criterion claimed in a reference with no matching assertion is a defect, not documentation.</li>
-        <li style="margin-bottom:.5rem;">Version one is four components chosen to stress different parts of the format rather than to be a useful kit: no JavaScript, a live region, heavy focus management, and keyboard navigation.</li>
+        <li style="margin-bottom:.5rem;">Version one is four components chosen to stress different parts of the format rather than to be a useful catalog: no JavaScript, a live region, heavy focus management, and keyboard navigation.</li>
         <li style="margin-bottom:.5rem;"><code class="md">tabs</code> is deliberately absent from <code class="md">acss-kit</code> so one component tests the greenfield path instead of the extraction path.</li>
       </ul>
     </section>
@@ -1723,7 +1723,7 @@ img, video { max-width: 100%; height: auto; }
       </h2>
       <p class="section-intro">Every file this plan touches, and what happens to each one.</p>
       <div class="file-tree">
-        <div class="file-tree-root"><svg class="icon" aria-hidden="true"><use href="#ic-folder"/></svg> agent-ui-kit/</div>
+        <div class="file-tree-root"><svg class="icon" aria-hidden="true"><use href="#ic-folder"/></svg> agent-ui-skills/</div>
         <ul class="file-list">
           <li><code>package.json</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">test runner and browser automation dependencies</span></li>
           <li class="file-dir"><svg class="icon" aria-hidden="true"><use href="#ic-folder"/></svg> docs/
@@ -1744,7 +1744,7 @@ img, video { max-width: 100%; height: auto; }
           <li><code>skills/alert/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference and standalone demo page</span></li>
           <li><code>skills/dialog/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference, focus-management module and demo page</span></li>
           <li><code>skills/tabs/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference, roving-tabindex module and demo page</span></li>
-          <li><code>tests/objective.spec.ts</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">the whole-kit smoke test, data-driven over skills/</span></li>
+          <li><code>tests/objective.spec.ts</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">the whole-repository smoke test, data-driven over skills/</span></li>
           <li><code>tests/unit/frontmatter.spec.ts</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">this repo&#39;s own Agent Skills frontmatter validator</span></li>
           <li><code>tests/integration/manifests.spec.ts</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">both plugin manifests read together</span></li>
           <li><code>tests/e2e/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">one browser spec per component</span></li>
@@ -2004,7 +2004,7 @@ img, video { max-width: 100%; height: auto; }
       </h2>
       <p class="section-intro">The tests that prove the change does what it promises.</p>
       <div class="test-tier-label">Tier 1 — This plan changes application code</div>
-      <div class="objective-test-card">Objective: every skill in the kit is portable and its demo is accessible. File: tests/objective.spec.ts; Type: smoke; Asserts: for every directory under skills/, the frontmatter conforms to the Agent Skills standard, the files contain no vendor-specific token, and the demo page returns zero axe-core violations — iterating the directory so later components are covered without editing the test; Run: npx vitest run tests/objective.spec.ts</div>
+      <div class="objective-test-card">Objective: every skill in the repository is portable and its demo is accessible. File: tests/objective.spec.ts; Type: smoke; Asserts: for every directory under skills/, the frontmatter conforms to the Agent Skills standard, the files contain no vendor-specific token, and the demo page returns zero axe-core violations — iterating the directory so later components are covered without editing the test; Run: npx vitest run tests/objective.spec.ts</div>
       <div class="test-list">
         <div class="test-card">Unit: the repo&#39;s own frontmatter validator, which replaces skills-ref as the enforcing gate. File: tests/unit/frontmatter.spec.ts; Targets: the SKILL.md frontmatter parser; Key cases: name matches its parent directory, name satisfies the standard&#39;s pattern including no consecutive or edge hyphens, description is non-empty and within 1024 characters, description is third person, only standard keys appear — each asserted against a fixture violating exactly that rule so a passing test proves the rule can fail</div>
         <div class="test-card">Integration: both plugin manifests read together. File: tests/integration/manifests.spec.ts; Targets: the Claude Code manifest, the marketplace manifest and the Codex manifest; Key cases: both declare the same name and version, the marketplace source and skills paths resolve to real directories, and the Codex skills path resolves to the same directory Claude Code scans by default</div>
@@ -2079,7 +2079,7 @@ img, video { max-width: 100%; height: auto; }
         Final check
       </h2>
       <p class="section-intro">One last pass to confirm the whole change works end to end.</p>
-      <p>From a clean clone in a temporary directory, run <code class="md">npm ci &amp;&amp; npx playwright install chromium</code>, then <code class="md">bash scripts/check.sh</code>. It must exit zero, having run the unit suite, the portability lint, <code class="md">claude plugin validate . --strict</code> and the browser suite. Then run <code class="md">claude --plugin-dir .</code> and confirm <code class="md">/help</code> lists all four skills under the <code class="md">agent-ui-kit</code> namespace.</p>
+      <p>From a clean clone in a temporary directory, run <code class="md">npm ci &amp;&amp; npx playwright install chromium</code>, then <code class="md">bash scripts/check.sh</code>. It must exit zero, having run the unit suite, the portability lint, <code class="md">claude plugin validate . --strict</code> and the browser suite. Then run <code class="md">claude --plugin-dir .</code> and confirm <code class="md">/help</code> lists all four skills under the <code class="md">agent-ui-skills</code> namespace.</p>
       <p>Read docs/evaluations.md and confirm both baseline and post-skill results are present for all twelve scenarios across three models, so the improvement is visible rather than assumed.</p>
       <p>Finally, open each component&#39;s demo page directly in a browser with no build step and no stylesheet beyond the reference&#39;s own CSS. Each component must render correctly and be fully keyboard operable. This last check matters most: the entire premise is that these references work with nothing else present, so if a demo needs anything the reference did not ship, the component is not vendor-neutral regardless of what the tests report.</p>
     </section>
@@ -2123,11 +2123,11 @@ img, video { max-width: 100%; height: auto; }
       <p class="section-intro">Follow-up ideas that came up along the way — none of them are required to finish this plan.</p>
       <div class="next-steps-list">
         <details class="next-step-item">
-          <summary>Extend version one into a genuinely useful kit</summary>
+          <summary>Extend version one into a genuinely useful component collection</summary>
           <div class="next-step-prompt">
             <p>Adds the components a real project reaches for, once the format is proven.</p>
             <p>Paste this prompt into Claude to execute this follow-up:</p>
-            <pre>In ~/devbox/agent-ui-kit the component skill format is proven by button, alert, dialog and tabs. Read docs/component-spec.md and the four existing skills under skills/, then add combobox (the ARIA 1.2 pattern with filtering), disclosure, tooltip and checkbox. Follow the same structure exactly, including a standalone demo page, three evaluations in evals/, and matching end-to-end assertions for every WCAG criterion claimed. Run scripts/check.sh before finishing and report the result.</pre>
+            <pre>In ~/devbox/agent-ui-skills the component skill format is proven by button, alert, dialog and tabs. Read docs/component-spec.md and the four existing skills under skills/, then add combobox (the ARIA 1.2 pattern with filtering), disclosure, tooltip and checkbox. Follow the same structure exactly, including a standalone demo page, three evaluations in evals/, and matching end-to-end assertions for every WCAG criterion claimed. Run scripts/check.sh before finishing and report the result.</pre>
             <button class="copy-prompt-btn" type="button"
                     onclick="copyPrompt(this)" aria-label="Copy prompt to clipboard">Copy prompt</button>
           </div>
@@ -2138,18 +2138,18 @@ img, video { max-width: 100%; height: auto; }
           <div class="next-step-prompt">
             <p>Removes the manual step from the only check that measures skill triggering.</p>
             <p>Paste this prompt into Claude to execute this follow-up:</p>
-            <pre>~/devbox/agent-ui-kit has evals/*.json holding skill-triggering scenarios, currently run by hand via scripts/eval.sh with results pasted into docs/evaluations.md. Investigate whether `claude -p` with --model can run these non-interactively and whether skill activation is reliably detectable from its output. If it is, build the runner and have it write docs/evaluations.md directly. If it is not, say so plainly and leave the manual protocol alone. Report which you found.</pre>
+            <pre>~/devbox/agent-ui-skills has evals/*.json holding skill-triggering scenarios, currently run by hand via scripts/eval.sh with results pasted into docs/evaluations.md. Investigate whether `claude -p` with --model can run these non-interactively and whether skill activation is reliably detectable from its output. If it is, build the runner and have it write docs/evaluations.md directly. If it is not, say so plainly and leave the manual protocol alone. Report which you found.</pre>
             <button class="copy-prompt-btn" type="button"
                     onclick="copyPrompt(this)" aria-label="Copy prompt to clipboard">Copy prompt</button>
           </div>
         </details>
 
         <details class="next-step-item">
-          <summary>Make acss-kit depend on agent-ui-kit instead of duplicating it</summary>
+          <summary>Make acss-kit depend on agent-ui-skills instead of duplicating it</summary>
           <div class="next-step-prompt">
             <p>Wish list — removes the duplication this project deliberately created.</p>
             <p>Paste this prompt into Claude to execute this follow-up:</p>
-            <pre>~/devbox/acss-plugins/plugins/acss-kit has fifteen component-* skills whose references contain fpkit-bound TSX and SCSS templates alongside framework-neutral accessibility contracts. ~/devbox/agent-ui-kit now owns the neutral contracts. Propose, but do not implement, how acss-kit could consume agent-ui-kit&#39;s references as the neutral source of truth and keep only the fpkit projection layer. Identify what would break for existing acss-kit users and whether Claude Code plugin dependencies can express this relationship. Write the proposal to docs/ and report the path.</pre>
+            <pre>~/devbox/acss-plugins/plugins/acss-kit has fifteen component-* skills whose references contain fpkit-bound TSX and SCSS templates alongside framework-neutral accessibility contracts. ~/devbox/agent-ui-skills now owns the neutral contracts. Propose, but do not implement, how acss-kit could consume agent-ui-skills&#39; references as the neutral source of truth and keep only the fpkit projection layer. Identify what would break for existing acss-kit users and whether Claude Code plugin dependencies can express this relationship. Write the proposal to docs/ and report the path.</pre>
             <button class="copy-prompt-btn" type="button"
                     onclick="copyPrompt(this)" aria-label="Copy prompt to clipboard">Copy prompt</button>
           </div>
@@ -2160,7 +2160,7 @@ img, video { max-width: 100%; height: auto; }
           <div class="next-step-prompt">
             <p>Wish list — lets components inherit a project&#39;s theme automatically.</p>
             <p>Paste this prompt into Claude to execute this follow-up:</p>
-            <pre>In ~/devbox/agent-ui-kit, components ship literal CSS using var(--auk-*, fallback). Design and document an optional mapping layer that lets a project with a design-token file bind its tokens to the --auk-* custom properties so components pick up the project&#39;s theme automatically. This must stay optional: every component must keep working with no token file present. Write the design to docs/ as a proposal first and report the path.</pre>
+            <pre>In ~/devbox/agent-ui-skills, components ship literal CSS using var(--auk-*, fallback). Design and document an optional mapping layer that lets a project with a design-token file bind its tokens to the --auk-* custom properties so components pick up the project&#39;s theme automatically. This must stay optional: every component must keep working with no token file present. Write the design to docs/ as a proposal first and report the path.</pre>
             <button class="copy-prompt-btn" type="button"
                     onclick="copyPrompt(this)" aria-label="Copy prompt to clipboard">Copy prompt</button>
           </div>
@@ -2170,7 +2170,7 @@ img, video { max-width: 100%; height: auto; }
 
     <footer class="plan-footer">
       <svg class="icon" aria-hidden="true"><use href="#ic-sparkles"/></svg>
-      Generated by plan-agent · 2026-09-02 · agent-ui-kit
+      Generated by plan-agent · 2026-09-02 · agent-ui-skills
     </footer>
 
   </main>

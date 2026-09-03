@@ -142,10 +142,10 @@ async function skillsOne(sc, model) {
   ], 420000, cwd);
   const error = isError(out);
   const invoked = skillsInvoked(out);
-  const ours = invoked.filter((n) => n.startsWith('agent-ui-kit'));
+  const ours = invoked.filter((n) => n.startsWith('agent-ui-skills'));
   const fired = ours.some((n) => n.endsWith(':' + sc.skill));
-  // An adjacent scenario asserts that THIS skill stays quiet. Another skill in the
-  // kit answering instead is a correct outcome, not a miss - "blocks the page until
+  // An adjacent scenario asserts that THIS skill stays quiet. Another component
+  // skill answering instead is a correct outcome, not a miss - "blocks the page until
   // they confirm" really is the dialog's job, and the alert must not claim it.
   //
   // A run that never reached a model is never correct. Without this an adjacent

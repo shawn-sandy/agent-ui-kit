@@ -1,7 +1,7 @@
 # Vendor support
 
 What actually happened when each vendor was pointed at this repository, recorded on
-2026-09-02 against `agent-ui-kit` 0.2.0 and updated on 2026-09-03 for the
+2026-09-02 against `agent-ui-skills` 0.2.0 and updated on 2026-09-03 for the
 `ui-` skill-name rule. Every other check in this repo tests the files. This is the
 only one that tests the README's claim that one `skills/` tree serves two vendors.
 
@@ -15,10 +15,10 @@ Version: the `claude` CLI on the author's machine at the time of writing.
 | --- | --- |
 | `claude plugin validate . --strict` | Passes. It is gate 5 of `scripts/check.sh`. |
 | Plugin loads from a local directory | Yes, via `claude --plugin-dir <repo>`. |
-| All four skills register | Yes: `agent-ui-kit:ui-button`, `agent-ui-kit:ui-alert`, `agent-ui-kit:ui-dialog`, `agent-ui-kit:ui-tabs`. |
+| All four skills register | Yes: `agent-ui-skills:ui-button`, `agent-ui-skills:ui-alert`, `agent-ui-skills:ui-dialog`, `agent-ui-skills:ui-tabs`. |
 | Skills are invocable by name | Yes. All four appear in the session's slash-command list. |
 | Skills are model-invocable | Yes. All four appear in the session's auto-invocable skill list, not only as slash commands. |
-| A skill actually fires and is used | Yes. A headless run of the `ui-button-obvious` scenario invoked `Skill(skill: "agent-ui-kit:ui-button")`, read `skills/ui-button/references/ui-button.md`, and edited the target project. |
+| A skill actually fires and is used | Yes. A headless run of the `ui-button-obvious` scenario invoked `Skill(skill: "agent-ui-skills:ui-button")`, read `skills/ui-button/references/ui-button.md`, and edited the target project. |
 
 ### Finding: a request needs a concrete target before any skill fires
 
@@ -54,7 +54,7 @@ Version: `codex-cli 0.145.0`, model `gpt-5.5`.
 
 ### Finding: the Codex manifest supplies the namespace
 
-Linked in through the repository, the skills were reported as `agent-ui-kit:ui-button`
+Linked in through the repository, the skills were reported as `agent-ui-skills:ui-button`
 and so on. The same skill copied to `~/.codex/skills/ui-button/` with no repository
 around it was reported as bare `ui-button`. So `.codex-plugin/plugin.json` is doing real
 work: Codex resolves the skill back to the repository root and takes the plugin name
@@ -67,10 +67,10 @@ Every Codex run emitted:
 > Skill descriptions were shortened to fit the 2% skills context budget. Codex can
 > still see every skill, but some descriptions are shorter.
 
-The four descriptions in this kit are 250 to 340 characters. Under that budget the
+The four descriptions in this repository are 250 to 340 characters. Under that budget the
 tail of a description - which is where the "not for X" disambiguation lives - is the
 part at risk. Putting the distinguishing phrase early in a description, rather than in
-a trailing clause, is a portability concern this kit did not previously know about.
+a trailing clause, is a portability concern this repository did not previously know about.
 
 ## What was changed on the machine, and put back
 

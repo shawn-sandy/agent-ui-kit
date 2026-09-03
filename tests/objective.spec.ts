@@ -1,5 +1,5 @@
 /**
- * Whole-kit smoke test. Data-driven over skills/, so a component added later is
+ * Whole-repository smoke test. Data-driven over skills/, so a component added later is
  * covered by every rule here without this file being edited.
  */
 import { describe, expect, it } from 'vitest';
@@ -36,7 +36,7 @@ function componentSlug(skillName: string): string {
   return skillName.replace(/^ui-/, '');
 }
 
-it('the kit has components in it', () => {
+it('the repository has components in it', () => {
   expect(skills.length).toBeGreaterThan(0);
 });
 

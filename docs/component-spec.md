@@ -11,17 +11,17 @@ files carry the portable component:
 | `skills/<skill-name>/references/<skill-name>.md` | The component itself: markup, styles, behaviour, accessibility contract. Loads only when needed. |
 | `skills/<skill-name>/references/demo.html` | One self-contained page that proves the component in a real browser. |
 
-For Agent UI Kit components, the references folder also carries a React projection
+For Agent UI Skills components, the references folder also carries a React projection
 example. Projection examples are not the canonical component contract:
 
 | File | Job |
 | --- | --- |
-| `skills/<skill-name>/references/react-demo.tsx` | Required React projection reference for Agent UI Kit components, showing a typed props API over the same DOM contract. |
+| `skills/<skill-name>/references/react-demo.tsx` | Required React projection reference for Agent UI Skills components, showing a typed props API over the same DOM contract. |
 
 Read this before writing or reviewing a component. `scripts/check.sh` enforces the
 mechanical half; section 7 lists exactly what it checks.
 
-## 0. Conventions this kit fixes
+## 0. Conventions this repository fixes
 
 These are settled. Do not re-decide them per component.
 
@@ -50,7 +50,7 @@ guess and no reviewer has to arbitrate.
 
 | Question | Answer |
 | --- | --- |
-| How does a component tell the host something changed? | It does not dispatch custom events. State lives in the DOM attributes above, and hosts listen to the native event (`click`, `change`) or observe the attribute. A kit-wide event vocabulary is a thing to add once a component genuinely needs one. |
+| How does a component tell the host something changed? | It does not dispatch custom events. State lives in the DOM attributes above, and hosts listen to the native event (`click`, `change`) or observe the attribute. A shared event vocabulary is a thing to add once a component genuinely needs one. |
 | Where do behavioural options go? | Arguments to the init function, not DOM attributes: `initTabs(root, { wrap: false })`. `data-*` describes what the element *is*, never how the script should treat it. |
 | What belongs in the Props row? | Every attribute a consumer is expected to set or read, including ARIA ones. Attributes the module writes and nobody sets go in the Behaviour section instead. |
 | How is a union type written in a table cell? | With quoted values and the word `or`, not a pipe: `"true" or "false" or "mixed"`. A raw pipe breaks the table. |
@@ -81,7 +81,7 @@ guess and no reviewer has to arbitrate.
 | How is the custom property grammar parsed when the CSS property itself is hyphenated? | Against the qualifier line, below. Anything not in that list is the property. `--auk-combobox-focus-field-outline-color` parses as state `focus`, part `field`, property `outline-color` because `field` is a declared qualifier and `field-outline` is not. |
 | Where are a component's qualifiers declared? | On one line at the top of the Styles section, before the fenced block: `Qualifiers: parts `field`, `list`, `option`; variants none; states `focus`, `selected`, `no-results`.` It is the only place parts and states are declared; the contract table does not carry them. |
 | What goes on the qualifier line? | Every `data-part` the component uses, every value in the Variants row, and every state that appears in a CSS selector or in a custom property name - including `data-state` values and CSS pseudo-states such as `focus`. A state carried only by an ARIA attribute and never styled or named in a property is not declared. Use `none` for an empty category. |
-| What may the final property segment be? | The CSS property name in full (`outline-color`, `padding-block`, `line-height`), or one of the kit's four abbreviations - `bg` for `background-color`, `radius` for `border-radius`, `size` for a min/max dimension pair, `gap` - or, where the value is not a whole property but an argument or one part of a shorthand, the sub-value's own name: `brightness`, `offset`, `duration`. Nothing else is abbreviated. |
+| What may the final property segment be? | The CSS property name in full (`outline-color`, `padding-block`, `line-height`), or one of the shared abbreviations - `bg` for `background-color`, `radius` for `border-radius`, `size` for a min/max dimension pair, `gap` - or, where the value is not a whole property but an argument or one part of a shorthand, the sub-value's own name: `brightness`, `offset`, `duration`. Nothing else is abbreviated. |
 | May `data-slot` and `data-part` carry the same name on one element? | Yes. |
 | Does Structure show state the module writes? | Yes - the same sibling-examples rule. Add one line of prose saying which of those attributes the module maintains, so a reader does not think they have to keep them in sync by hand. |
 | What notation does a Role entry use? | `implicit <role>` for a role the element already has, `<role>` for one written with a `role` attribute, `generic` for an element with no meaningful role, and `presentation` for one hidden from the tree. Entries mirror the Element entries in order and carry the same part labels, so the two rows read side by side. |
@@ -136,8 +136,8 @@ Banned outright, and checked by the portability lint:
 ### Description
 
 The description is the entire discovery mechanism. It loads at startup for every
-skill in the kit; the body does not. A component that triggers on the wrong request,
-or fails to trigger on the right one, cannot be fixed in the body.
+skill in the repository; the body does not. A component that triggers on the wrong
+request, or fails to trigger on the right one, cannot be fixed in the body.
 
 Write it in third person, name the component, and name the situations that should
 reach for it — including phrasings that avoid the component's own jargon.
@@ -306,7 +306,7 @@ and the assertions to back it.
 ## 6. Tests
 
 Every component adds `tests/e2e/<skill-name>.spec.ts` asserting, at minimum, one case per
-WCAG criterion in its contract, plus zero axe-core violations on its demo. Whole-kit
+WCAG criterion in its contract, plus zero axe-core violations on its demo. Whole-repository
 rules — frontmatter, required React projection presence and typed surface,
 portability, demo-matches-reference — are asserted once in `tests/objective.spec.ts`,
 which iterates `skills/`, so a new component is covered by them without editing a

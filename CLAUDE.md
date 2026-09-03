@@ -7,7 +7,7 @@ conflict. Read it before creating or editing anything under `skills/`.
 
 ## What this is
 
-Agent UI Kit ships accessible UI components as vendor-neutral Agent Skills, not as an
+Agent UI Skills ships accessible UI components as vendor-neutral Agent Skills, not as an
 installable library. An agent reads `skills/ui-<component>/references/ui-<component>.md`
 and builds the component into the user's own project; nothing is installed into the
 consuming app. No framework, no build step, no runtime dependency - all deliberate.

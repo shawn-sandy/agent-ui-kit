@@ -1,7 +1,7 @@
 # Evaluations
 
 Whether a realistically phrased request reaches the right skill, and what the models
-produce when it does not. Recorded 2026-09-02 against `agent-ui-kit` 0.2.0.
+produce when it does not. Recorded 2026-09-02 against `agent-ui-skills` 0.2.0.
 
 Scenarios live in `evals/*.json` - three per component. Runs are driven by
 `scripts/eval.sh`; `scripts/eval.sh print <skill> <index>` formats one for a manual
@@ -150,7 +150,7 @@ skill library harms discovery.
 
 ### Adjacent scenarios
 
-An adjacent scenario asserts that *its own* skill stays quiet, not that the kit is
+An adjacent scenario asserts that *its own* skill stays quiet, not that the collection is
 silent. `ui-alert-adjacent` - *"interrupts the user and blocks the page until they
 confirm"* - correctly fired the **dialog** skill on five of six runs. That is the right
 answer, and the alert skill staying out of it is exactly what the scenario tests.

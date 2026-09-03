@@ -1,4 +1,4 @@
-# Agent UI Kit
+# Agent UI Skills
 
 Vendor-neutral UI component skills for AI coding agents.
 
@@ -8,8 +8,8 @@ dependency-free JavaScript. An agent reads the reference and builds the componen
 into your project, in your stack.
 
 There is nothing to install into your app. The canonical references require no
-framework, no design system, no package and no vendor. Each Agent UI Kit
-component also ships a required React projection demo that shows how to wrap the
+framework, no design system, no package and no vendor. Each component in Agent UI
+Skills also ships a required React projection demo that shows how to wrap the
 same DOM contract in typed props when a consuming app already uses React. That
 demo is reference material, not production code.
 
@@ -17,7 +17,7 @@ demo is reference material, not production code.
 
 Version 0.2.0. Four components ship: **button**, **alert**, **dialog** and **tabs**.
 They were chosen to stress different parts of the format rather than to be a useful
-kit - no JavaScript, a live region, heavy focus management, and keyboard navigation.
+catalog - no JavaScript, a live region, heavy focus management, and keyboard navigation.
 Their skill names are prefixed for discovery: `ui-button`, `ui-alert`,
 `ui-dialog` and `ui-tabs`.
 
@@ -33,8 +33,8 @@ The repository is both a plugin and its own marketplace.
 **Claude Code**
 
 ```
-/plugin marketplace add shawn-sandy/agent-ui-kit
-/plugin install agent-ui-kit@agent-ui-kit
+/plugin marketplace add shawn-sandy/agent-ui-skills
+/plugin install agent-ui-skills@agent-ui-skills
 ```
 
 **ChatGPT / Codex**
@@ -50,7 +50,7 @@ Copy any folder from `skills/` into your agent's skills directory, keeping its
 ## Layout
 
 ```
-agent-ui-kit/
+agent-ui-skills/
 ├── .claude-plugin/
 │   ├── plugin.json         # Claude Code plugin manifest
 │   └── marketplace.json    # Claude Code marketplace, source "./"

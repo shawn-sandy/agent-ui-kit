@@ -3,7 +3,7 @@ status: in-progress
 type: feature
 created: 2026-09-02
 modified: 2026-09-02
-repo: agent-ui-kit
+repo: agent-ui-skills
 workflow: never
 glance: Agents keep rebuilding the same accessible components badly, and every existing kit ties you to one framework. This proves a component format that carries real working code and no vendor lock-in, and we will know it worked when four components load in both Claude Code and ChatGPT with their accessibility claims backed by a test run rather than a promise.
 artifact-url: https://claude.ai/code/artifact/aabf412c-2636-4254-9a21-615215b8c4ce
@@ -17,7 +17,7 @@ Ship a vendor-neutral component-skill format, proven by four components that rel
 
 ## Context
 
-`agent-ui-kit` exists as structure only. The scaffold created both plugin manifests, a marketplace manifest, an empty `skills/` tree and a README. There are no components, no format specification, no tooling and no tests.
+`agent-ui-skills` exists as structure only. The scaffold created both plugin manifests, a marketplace manifest, an empty `skills/` tree and a README. There are no components, no format specification, no tooling and no tests.
 
 The project packages each UI component as an Agent Skill (a folder with a `SKILL.md` that agents load on demand). Each skill ships a complete, copyable reference: semantic HTML with a real accessibility contract, plain CSS driven by custom properties, and JavaScript with no dependencies. An agent reads the reference and builds the component into the user's project, in the user's stack. Nothing is installed into the consuming app.
 
@@ -36,7 +36,7 @@ GitHub Actions is frequently billing-blocked on this account, so every check mus
 - The upstream specification's `{colors.primary}` token references become an optional mapping layer rather than a requirement, so no design-token file needs to exist for a component to function.
 - `SKILL.md` orients and points; the reference carries the code. The skill body stays under 60 lines and never contains the component itself, because the body loads whenever the skill triggers while the reference loads only when actually needed.
 - Accessibility claims are asserted by axe-core and explicit keyboard tests, never stated bare — a criterion claimed in a reference with no matching assertion is a defect, not documentation.
-- Version one is four components chosen to stress different parts of the format rather than to be a useful kit: no JavaScript, a live region, heavy focus management, and keyboard navigation.
+- Version one is four components chosen to stress different parts of the format rather than to be a useful catalog: no JavaScript, a live region, heavy focus management, and keyboard navigation.
 - `tabs` is deliberately absent from `acss-kit` so one component tests the greenfield path instead of the extraction path.
 
 ## Files
@@ -52,7 +52,7 @@ GitHub Actions is frequently billing-blocked on this account, so every check mus
 - skills/alert/ (new) — skill, reference and standalone demo page
 - skills/dialog/ (new) — skill, reference, focus-management module and demo page
 - skills/tabs/ (new) — skill, reference, roving-tabindex module and demo page
-- tests/objective.spec.ts (new) — the whole-kit smoke test, data-driven over skills/
+- tests/objective.spec.ts (new) — the whole-repository smoke test, data-driven over skills/
 - tests/unit/frontmatter.spec.ts (new) — this repo's own Agent Skills frontmatter validator
 - tests/integration/manifests.spec.ts (new) — both plugin manifests read together
 - tests/e2e/ (new) — one browser spec per component
@@ -87,7 +87,7 @@ GitHub Actions is frequently billing-blocked on this account, so every check mus
 ## Tests
 
 Tier 1 — This plan changes application code
-- Objective: every skill in the kit is portable and its demo is accessible. File: tests/objective.spec.ts; Type: smoke; Asserts: for every directory under skills/, the frontmatter conforms to the Agent Skills standard, the files contain no vendor-specific token, and the demo page returns zero axe-core violations — iterating the directory so later components are covered without editing the test; Run: npx vitest run tests/objective.spec.ts
+- Objective: every skill in the repository is portable and its demo is accessible. File: tests/objective.spec.ts; Type: smoke; Asserts: for every directory under skills/, the frontmatter conforms to the Agent Skills standard, the files contain no vendor-specific token, and the demo page returns zero axe-core violations — iterating the directory so later components are covered without editing the test; Run: npx vitest run tests/objective.spec.ts
 - Unit: the repo's own frontmatter validator, which replaces skills-ref as the enforcing gate. File: tests/unit/frontmatter.spec.ts; Targets: the SKILL.md frontmatter parser; Key cases: name matches its parent directory, name satisfies the standard's pattern including no consecutive or edge hyphens, description is non-empty and within 1024 characters, description is third person, only standard keys appear — each asserted against a fixture violating exactly that rule so a passing test proves the rule can fail
 - Integration: both plugin manifests read together. File: tests/integration/manifests.spec.ts; Targets: the Claude Code manifest, the marketplace manifest and the Codex manifest; Key cases: both declare the same name and version, the marketplace source and skills paths resolve to real directories, and the Codex skills path resolves to the same directory Claude Code scans by default
 - E2E: per-component keyboard and focus behaviour in a real browser. File: tests/e2e/button.spec.ts, alert.spec.ts, dialog.spec.ts, tabs.spec.ts; Targets: each component's demo page loaded from disk with no server and no build step; Key cases: the behaviours named in steps 5 to 8, with every WCAG criterion a reference claims carrying a matching assertion here
@@ -120,7 +120,7 @@ Tier 1 — This plan changes application code
 
 ## Verification
 
-From a clean clone in a temporary directory, run `npm ci && npx playwright install chromium`, then `bash scripts/check.sh`. It must exit zero, having run the unit suite, the portability lint, `claude plugin validate . --strict` and the browser suite. Then run `claude --plugin-dir .` and confirm `/help` lists all four skills under the `agent-ui-kit` namespace.
+From a clean clone in a temporary directory, run `npm ci && npx playwright install chromium`, then `bash scripts/check.sh`. It must exit zero, having run the unit suite, the portability lint, `claude plugin validate . --strict` and the browser suite. Then run `claude --plugin-dir .` and confirm `/help` lists all four skills under the `agent-ui-skills` namespace.
 
 Read docs/evaluations.md and confirm both baseline and post-skill results are present for all twelve scenarios across three models, so the improvement is visible rather than assumed.
 
@@ -128,33 +128,33 @@ Finally, open each component's demo page directly in a browser with no build ste
 
 ## Next Steps
 
-- Extend version one into a genuinely useful kit
+- Extend version one into a genuinely useful component collection
   Adds the components a real project reaches for, once the format is proven.
   ```text
-  In ~/devbox/agent-ui-kit the component skill format is proven by button, alert, dialog and tabs. Read docs/component-spec.md and the four existing skills under skills/, then add combobox (the ARIA 1.2 pattern with filtering), disclosure, tooltip and checkbox. Follow the same structure exactly, including a standalone demo page, three evaluations in evals/, and matching end-to-end assertions for every WCAG criterion claimed. Run scripts/check.sh before finishing and report the result.
+  In ~/devbox/agent-ui-skills the component skill format is proven by button, alert, dialog and tabs. Read docs/component-spec.md and the four existing skills under skills/, then add combobox (the ARIA 1.2 pattern with filtering), disclosure, tooltip and checkbox. Follow the same structure exactly, including a standalone demo page, three evaluations in evals/, and matching end-to-end assertions for every WCAG criterion claimed. Run scripts/check.sh before finishing and report the result.
   ```
 
 - Automate the evaluation runner
   Removes the manual step from the only check that measures skill triggering.
   ```text
-  ~/devbox/agent-ui-kit has evals/*.json holding skill-triggering scenarios, currently run by hand via scripts/eval.sh with results pasted into docs/evaluations.md. Investigate whether `claude -p` with --model can run these non-interactively and whether skill activation is reliably detectable from its output. If it is, build the runner and have it write docs/evaluations.md directly. If it is not, say so plainly and leave the manual protocol alone. Report which you found.
+  ~/devbox/agent-ui-skills has evals/*.json holding skill-triggering scenarios, currently run by hand via scripts/eval.sh with results pasted into docs/evaluations.md. Investigate whether `claude -p` with --model can run these non-interactively and whether skill activation is reliably detectable from its output. If it is, build the runner and have it write docs/evaluations.md directly. If it is not, say so plainly and leave the manual protocol alone. Report which you found.
   ```
 
-- Make acss-kit depend on agent-ui-kit instead of duplicating it
+- Make acss-kit depend on agent-ui-skills instead of duplicating it
   Wish list — removes the duplication this project deliberately created.
   ```text
-  ~/devbox/acss-plugins/plugins/acss-kit has fifteen component-* skills whose references contain fpkit-bound TSX and SCSS templates alongside framework-neutral accessibility contracts. ~/devbox/agent-ui-kit now owns the neutral contracts. Propose, but do not implement, how acss-kit could consume agent-ui-kit's references as the neutral source of truth and keep only the fpkit projection layer. Identify what would break for existing acss-kit users and whether Claude Code plugin dependencies can express this relationship. Write the proposal to docs/ and report the path.
+  ~/devbox/acss-plugins/plugins/acss-kit has fifteen component-* skills whose references contain fpkit-bound TSX and SCSS templates alongside framework-neutral accessibility contracts. ~/devbox/agent-ui-skills now owns the neutral contracts. Propose, but do not implement, how acss-kit could consume agent-ui-skills' references as the neutral source of truth and keep only the fpkit projection layer. Identify what would break for existing acss-kit users and whether Claude Code plugin dependencies can express this relationship. Write the proposal to docs/ and report the path.
   ```
 
 - Add an optional design-token bridge
   Wish list — lets components inherit a project's theme automatically.
   ```text
-  In ~/devbox/agent-ui-kit, components ship literal CSS using var(--auk-*, fallback). Design and document an optional mapping layer that lets a project with a design-token file bind its tokens to the --auk-* custom properties so components pick up the project's theme automatically. This must stay optional: every component must keep working with no token file present. Write the design to docs/ as a proposal first and report the path.
+  In ~/devbox/agent-ui-skills, components ship literal CSS using var(--auk-*, fallback). Design and document an optional mapping layer that lets a project with a design-token file bind its tokens to the --auk-* custom properties so components pick up the project's theme automatically. This must stay optional: every component must keep working with no token file present. Write the design to docs/ as a proposal first and report the path.
   ```
 
 ## Unresolved Questions
 
-- The plugin and the marketplace share the name `agent-ui-kit`, so installation reads `/plugin install agent-ui-kit@agent-ui-kit` and skills invoke as `/agent-ui-kit:button`. Renaming the plugin (not the repository) to something shorter would improve both, but renaming after publication may break existing installs. Worth settling before any public submission.
+- The plugin and the marketplace share the name `agent-ui-skills`, so installation reads `/plugin install agent-ui-skills@agent-ui-skills` and skills invoke as `/agent-ui-skills:ui-button`. Renaming the plugin (not the repository) to something shorter would improve both, but renaming after publication may break existing installs. Worth settling before any public submission.
 - Whether a four-component version one on an alpha reference format belongs in the public marketplaces yet. Approved Claude Code plugins are pinned to a commit SHA with CI bumping the pin, so submitting early commits the format sooner than it may be ready.
 
 ## Resources

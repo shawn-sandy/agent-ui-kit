@@ -34,7 +34,7 @@ columns; tables and code may exceed that when clearer.
 
 ## Testing Guidelines
 
-Every new or changed component needs a matching `tests/e2e/<component>.spec.ts`
+Every new or changed component needs a matching `tests/e2e/ui-<component>.spec.ts`
 covering the WCAG claims made in its reference. Unit and integration tests use
 Vitest naming like `tests/unit/frontmatter.spec.ts` and
 `tests/integration/manifests.spec.ts`. Do not claim measured accessibility values
@@ -46,7 +46,7 @@ CSS/JS under `skills/`.
 
 History uses Conventional Commits, for example `docs: add component authoring
 specification`, `feat: vendor-neutral UI component skills`, and `chore: scaffold
-agent-ui-kit repository structure`. Use the same format for new commits. Pull
+agent-ui-skills repository structure`. Use the same format for new commits. Pull
 requests should summarize the affected skill or script, note contract or demo
 changes, link issues when available, and report `npm run check` results. Include
 screenshots or demo notes for visible component changes.
