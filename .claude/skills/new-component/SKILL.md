@@ -6,11 +6,17 @@ disable-model-invocation: true
 
 # New component skill
 
-Adds one component to `skills/`, following the authoring contract. The component name is
-`$ARGUMENTS` (lowercase, single word, used verbatim as the directory name, the `name`
-frontmatter value, and the `auk-<name>` class root).
+Adds one component to `skills/`, following the authoring contract. The component name
+is `$ARGUMENTS`, used verbatim as the directory name, the `name` frontmatter value and
+the `auk-<name>` class root.
 
-If `$ARGUMENTS` is empty, ask which component to add before doing anything else.
+Check the name before creating anything. It must match
+`^[a-z0-9]+(?:-[a-z0-9]+)*$` - lowercase letters and digits, single inner hyphens, no
+leading, trailing or doubled hyphen - and run to 64 characters or fewer, both enforced
+by `tests/lib/frontmatter.ts`. If `$ARGUMENTS` is empty or fails that pattern, say
+which rule it breaks and ask for a valid name. Do not silently normalise it: the name
+reaches the directory, the frontmatter and the class root, and a late gate-1 failure
+arrives after the files already exist.
 
 This is the running order only. `docs/component-spec.md` holds every rule and wins
 on any conflict - read it first, and do not rely on this file restating it.
