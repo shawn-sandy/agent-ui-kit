@@ -27,7 +27,7 @@ jobs:
 
       - run: npx playwright install --with-deps chromium
 
-      # Gate 3 of scripts/check.sh needs the Claude Code CLI. Everything else runs
+      # Gate 5 of scripts/check.sh needs the Claude Code CLI. Everything else runs
       # from the repo's own dependencies.
       - run: npm install -g @anthropic-ai/claude-code
 
