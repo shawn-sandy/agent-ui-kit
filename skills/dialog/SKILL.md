@@ -42,7 +42,7 @@ A modal overlay that blocks interaction with the rest of the page until it close
   chance to disagree with the browser.
 - Focus returns to the element that opened the dialog. If that element can be removed
   while the dialog is open, declare `data-dialog-fallback` so focus has somewhere
-  deliberate to land; without it the browser decides and the result is not portable.
+  deliberate to land. Either way focus never stays inside the closed dialog.
 - Initial focus is set with the native `autofocus` attribute, not with a `focus()`
   call. A scripted focus move does not match `:focus-visible`, so a mouse user would
   open the dialog and see no focus ring anywhere.

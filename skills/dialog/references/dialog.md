@@ -193,22 +193,28 @@ export function initDialog(dialog) {
   // Fires for every close path, including Escape, which the browser routes through
   // `cancel` and then `close`.
   function onClose() {
-    if (opener && opener.isConnected) {
-      opener.focus();
-    } else {
-      // The opener was removed while the dialog was open - a row deleted, a list
-      // re-rendered. Doing nothing drops focus to <body>, which is the accident this
-      // component promises to avoid, so land somewhere the author chose.
-      const fallback = dialog.getAttribute('data-dialog-fallback');
-      const target = fallback ? document.getElementById(fallback) : null;
-      // With no fallback declared there is nothing deliberate left to choose, and
-      // the browser decides. Focusing <body> was tried and rejected: it is not
-      // reliably honoured across engines, so it looked like a guarantee while
-      // behaving like a coin toss. Declare data-dialog-fallback on any dialog whose
-      // opener can be removed.
-      if (target) target.focus();
-    }
+    // The opener can be removed while the dialog is open - a deleted row, a
+    // re-rendered list - so it is not always there to receive focus back.
+    const fallbackId = dialog.getAttribute('data-dialog-fallback');
+    const target = opener && opener.isConnected
+      ? opener
+      : (fallbackId ? document.getElementById(fallbackId) : null);
     opener = null;
+
+    // Deferred by one task on purpose. Chromium finishes its own focus handling for
+    // a closing modal after this handler returns, and on some platforms that leaves
+    // focus on the control inside the dialog that had it - now hidden, and a dead
+    // end for a keyboard user. Placing focus afterwards is what makes this stick.
+    setTimeout(() => {
+      if (target && target.isConnected) {
+        target.focus();
+        return;
+      }
+      // Nothing was declared to catch it. Getting focus out of the closed dialog is
+      // still mandatory; where it lands next is then the browser's business.
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && dialog.contains(active)) active.blur();
+    }, 0);
   }
 
   openers.forEach((el) => el.addEventListener('click', open));
@@ -254,8 +260,10 @@ export function initDialog(dialog) {
   `focus()` is what keeps the focus ring visible for keyboard users.
 - On close, focus returns to the opener. If the opener is gone - a deleted row, a
   re-rendered list - focus goes to the element named by `data-dialog-fallback`.
-  Declare that attribute on any dialog whose opener can be removed while it is open;
-  without it the browser chooses, and where it lands is not guaranteed.
+  Declare that attribute on any dialog whose opener can be removed while it is open.
+  With neither available the module still pulls focus out of the closed dialog,
+  because focus stranded on a hidden control is a dead end for a keyboard user; where
+  it lands after that is the browser's choice, not a guarantee this component makes.
 - While open, the page behind is inert. That is `showModal()` doing it, not a
   hand-rolled trap, which is why `show()` is banned in this component.
 - On close, focus returns to the stored opener. The `isConnected` check avoids
