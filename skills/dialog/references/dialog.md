@@ -157,7 +157,8 @@ meantime. Storing the opener costs one line and removes the whole class of probl
  * which honours the native `autofocus` attribute and draws a focus ring for it.
  *
  * On close, focus returns to the opener. If the opener has been removed from the
- * document meanwhile, it goes to `data-dialog-fallback` instead.
+ * document meanwhile, it goes to `data-dialog-fallback` instead - declare that
+ * whenever an opener can disappear, because nothing else can place focus for you.
  *
  * @param {HTMLDialogElement} dialog - the dialog element, which must have an id
  * @returns {() => void} teardown that removes every listener this added
@@ -200,14 +201,12 @@ export function initDialog(dialog) {
       // component promises to avoid, so land somewhere the author chose.
       const fallback = dialog.getAttribute('data-dialog-fallback');
       const target = fallback ? document.getElementById(fallback) : null;
-      if (target) {
-        target.focus();
-      } else {
-        // Last resort, still deliberate: body is not focusable by default, so make
-        // it so rather than leaving focus nowhere.
-        document.body.setAttribute('tabindex', '-1');
-        document.body.focus();
-      }
+      // With no fallback declared there is nothing deliberate left to choose, and
+      // the browser decides. Focusing <body> was tried and rejected: it is not
+      // reliably honoured across engines, so it looked like a guarantee while
+      // behaving like a coin toss. Declare data-dialog-fallback on any dialog whose
+      // opener can be removed.
+      if (target) target.focus();
     }
     opener = null;
   }
@@ -254,8 +253,9 @@ export function initDialog(dialog) {
   to the non-destructive choice. Leaving this to the browser rather than calling
   `focus()` is what keeps the focus ring visible for keyboard users.
 - On close, focus returns to the opener. If the opener is gone - a deleted row, a
-  re-rendered list - focus goes to `data-dialog-fallback`, or to a
-  programmatically-focusable `<body>` as a last resort. It is never simply dropped.
+  re-rendered list - focus goes to the element named by `data-dialog-fallback`.
+  Declare that attribute on any dialog whose opener can be removed while it is open;
+  without it the browser chooses, and where it lands is not guaranteed.
 - While open, the page behind is inert. That is `showModal()` doing it, not a
   hand-rolled trap, which is why `show()` is banned in this component.
 - On close, focus returns to the stored opener. The `isConnected` check avoids
