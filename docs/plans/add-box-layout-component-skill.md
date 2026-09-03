@@ -121,8 +121,8 @@ reference is reconciled to what the browser actually did.
    Props `data-variant` — `"invert"` — `absent`, since the plain box writes no
    attribute; Slots `none`; Variants `` `invert` ``; Behaviour `none`; WCAG
    `1.4.3 Contrast (Minimum); 1.4.4 Resize Text; 1.4.12 Text Spacing`. The Styles
-   section opens with `Qualifiers: parts none; variants `invert`; states none.` and
-   holds one `css` fence. Structural values stay literal - `box-sizing:
+   section opens with the qualifier line (parts none, variants `invert`, states none)
+   and holds one `css` fence. Structural values stay literal - `box-sizing:
    border-box`, `display: block`, `border-style` - while every themeable value is
    `var(--auk-box-*, <literal>)` with no nested `var()`: padding, border width,
    border colour, radius, colour, background, `min-block-size`, and the three
@@ -133,7 +133,7 @@ reference is reconciled to what the browser actually did.
    every-var-has-a-literal-fallback assertions for `box`.
 
 3. [x] Create `skills/ui-box/references/demo.html` by copying `skills/alert/references/demo.html`
-   - the CSS-only shape - and **rename the marker line** to `Generated from box.md by
+   - the CSS-only shape - and **rename the marker line** to `Generated from ui-box.md by
    scripts/build-demos.mjs. Edit the reference, not this.` before anything else. A
    copied marker still naming `alert` throws inside the loop over every component and
    aborts the build for all of them. Replace the page chrome and markup: a plain box,
@@ -187,8 +187,8 @@ reference is reconciled to what the browser actually did.
 
 7. [x] Update `README.md`. The Status section claims "Four components ship" and names
    the four; make it five, add **box**, and extend the following sentence so the
-   roster still explains what each component stresses - box stresses the layout
-   primitive and the colour pair. Leave the version string alone. Why: the count is a
+   roster still explains what each component stresses - box stresses a purely
+   presentational primitive. Leave the version string alone. Why: the count is a
    factual claim that this change falsifies. Verify: `grep -n 'components ship' README.md`
    shows five and the sentence names box.
 

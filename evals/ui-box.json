@@ -10,7 +10,7 @@
       "detect": {
         "foreground declared": "(^|[^-\\w])color\\s*:",
         "background declared": "background(-color)?\\s*:",
-        "border declared on the light variant": "border\\s*:|border-width\\s*:|border-style\\s*:",
+        "border declared": "border\\s*:|border-width\\s*:|border-style\\s*:",
         "pins a height": "(?<!min-|line-)\\b(?:height|block-size)\\s*:\\s*(?!auto\\b)[0-9]",
         "border-box declared": "box-sizing\\s*:\\s*border-box"
       }
