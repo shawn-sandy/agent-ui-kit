@@ -1,0 +1,39 @@
+{
+  "skill": "ui-popover",
+  "scenarios": [
+    {
+      "id": "ui-popover-obvious",
+      "kind": "obvious",
+      "expect": "ui-popover",
+      "prompt": "In index.html, build a popover for the column chooser. It opens from a 'Columns' button in the table toolbar, and the table behind it has to stay usable while it is open.",
+      "baselineFailure": "reaches for the popover attribute but leaves the container a bare div, which carries no implicit role at all - so the layer is an unnamed generic box that a screen reader announces nothing on entering - and leaves the trigger with no aria-expanded, because the popovertarget relationship supplies that implicitly to the accessibility tree and never as an attribute",
+      "detect": {
+        "declarative trigger wiring": "popovertarget=",
+        "explicit role on the layer": "role=[\"']?(group|dialog)",
+        "accessible name on the layer": "aria-labelledby=",
+        "trigger state kept in step": "aria-expanded"
+      }
+    },
+    {
+      "id": "ui-popover-oblique",
+      "kind": "oblique",
+      "expect": "ui-popover",
+      "prompt": "In index.html I need a small panel hanging off the 'More actions' button. It has to sit above everything so no parent's overflow can clip it, go away when the user presses Escape or clicks elsewhere, and leave the table behind it fully clickable the whole time.",
+      "baselineFailure": "hand-rolls an absolutely positioned div with a z-index and a document-level click listener, which any ancestor overflow:hidden still clips, and which offers no keyboard route back to the trigger once the panel closes",
+      "detect": {
+        "uses the platform top layer": "popovertarget=|showPopover\\(|\\bpopover=",
+        "hand-rolled stacking instead of the top layer": "z-index",
+        "hand-rolled outside-click dismissal": "document\\.addEventListener\\(\\s*[\"']click",
+        "trigger state kept in step": "aria-expanded"
+      }
+    },
+    {
+      "id": "ui-popover-adjacent",
+      "kind": "adjacent",
+      "expect": null,
+      "prompt": "In index.html, add a confirmation step in front of the 'Delete workspace' button. The user must not be able to carry on with anything else until they answer it.",
+      "baselineFailure": "n/a - this scenario asserts the popover skill stays quiet, because a step the user must answer before continuing is modal and belongs to ui-dialog",
+      "detect": {}
+    }
+  ]
+}

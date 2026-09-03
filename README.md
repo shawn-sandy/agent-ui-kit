@@ -15,11 +15,12 @@ demo is reference material, not production code.
 
 ## Status
 
-Version 0.2.0. Four components ship: **button**, **alert**, **dialog** and **tabs**.
-They were chosen to stress different parts of the format rather than to be a useful
-catalog - no JavaScript, a live region, heavy focus management, and keyboard navigation.
-Their skill names are prefixed for discovery: `ui-button`, `ui-alert`,
-`ui-dialog` and `ui-tabs`.
+Version 0.2.0. Five components ship: **button**, **alert**, **dialog**, **tabs** and
+**popover**. They were chosen to stress different parts of the format rather than to
+be a useful catalog - no JavaScript, a live region, heavy focus management, keyboard
+navigation, and a non-modal layer in the browser's top layer. Their skill names are
+prefixed for discovery: `ui-button`, `ui-alert`, `ui-dialog`, `ui-tabs` and
+`ui-popover`.
 
 Both vendors load the tree and use it: see [docs/vendor-support.md](docs/vendor-support.md)
 for what actually happened, including what did not work.
