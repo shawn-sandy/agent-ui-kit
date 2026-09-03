@@ -22,6 +22,16 @@ export const RULES = [
   ['npm-install', /\bnpm\s+(?:i|install|add)\b|\byarn\s+add\b|\bpnpm\s+add\b/, 'tells the reader to install a package'],
 ];
 
+export function shouldLintFile(file) {
+  const parts = relative(ROOT, file).split(/[\\/]/);
+  return !(
+    parts.length === 4 &&
+    parts[0] === 'skills' &&
+    parts[2] === 'references' &&
+    parts[3] === 'react-demo.tsx'
+  );
+}
+
 function walk(dir) {
   const out = [];
   for (const entry of readdirSync(dir)) {
@@ -37,7 +47,12 @@ if (!IS_CLI) {
 } else {
 let failures = 0;
 let scanned = 0;
+let skipped = 0;
 for (const file of walk(SKILLS)) {
+  if (!shouldLintFile(file)) {
+    skipped += 1;
+    continue;
+  }
   const text = readFileSync(file, 'utf8');
   scanned += 1;
   for (const [rule, pattern, why] of RULES) {
@@ -50,6 +65,7 @@ for (const file of walk(SKILLS)) {
 }
 
 console.log(`  scanned ${scanned} files under ${relative(ROOT, SKILLS)}/`);
+if (skipped > 0) console.log(`  skipped ${skipped} React projection demo file(s)`);
 if (failures > 0) {
   console.error(`  ${failures} portability violation(s)`);
   process.exit(1);
