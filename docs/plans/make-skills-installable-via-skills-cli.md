@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: completed
 modified: 2026-09-03
 type: chore
 created: 2026-09-03
@@ -94,7 +94,7 @@ Tier 1 — This plan changes application code
 ## Acceptance Criteria
 
 - [x] `gh repo view shawn-sandy/agent-ui-skills --json name` succeeds, and `git ls-remote https://github.com/shawn-sandy/agent-ui-kit.git HEAD` still resolves through GitHub's redirect.
-- [ ] `npx skills add shawn-sandy/agent-ui-skills --list` prints "Found 6 skills" and lists only ui-alert, ui-box, ui-button, ui-dialog, ui-popover and ui-tabs.
+- [x] `npx skills add shawn-sandy/agent-ui-skills --list` prints "Found 6 skills" and lists only ui-alert, ui-box, ui-button, ui-dialog, ui-popover and ui-tabs.
 - [x] `npx vitest run tests/integration/internal-skills.spec.ts` passes, and fails again when the two metadata lines are removed from the scaffolder.
 - [x] The Install section of README.md contains a fenced block whose only content is `npx skills add shawn-sandy/agent-ui-skills`.
 - [x] `npm run check` prints "check.sh: all gates passed".
