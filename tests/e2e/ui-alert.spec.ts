@@ -10,7 +10,7 @@ const VARIANTS = [
 ];
 
 test.beforeEach(async ({ page }) => {
-  await page.goto(demoUrl('alert'));
+  await page.goto(demoUrl('ui-alert'));
 });
 
 test('4.1.3 Status Messages: every region is in the document before any message is', async ({ page }) => {

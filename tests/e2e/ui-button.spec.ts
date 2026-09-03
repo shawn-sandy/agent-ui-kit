@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { demoUrl, activeId, tabTo, focusOutlineWidth } from './support.js';
 
 test.beforeEach(async ({ page }) => {
-  await page.goto(demoUrl('button'));
+  await page.goto(demoUrl('ui-button'));
 });
 
 test('1.4.3 Contrast (Minimum): every variant and the unavailable state pass', async ({ page }) => {

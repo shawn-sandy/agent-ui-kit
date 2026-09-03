@@ -164,7 +164,7 @@ being heard immediately.
 
 - **1.4.1 Use of Color** — severity is conveyed three ways: a distinct icon glyph, a
   visually hidden severity word, and the palette. Removing colour still leaves two.
-  The icon and the hidden word are asserted per variant in `tests/e2e/alert.spec.ts`.
+  The icon and the hidden word are asserted per variant in `tests/e2e/ui-alert.spec.ts`.
 - **1.4.3 Contrast (Minimum)** — message text on its variant background, measured by
   axe-core against the populated demo.
 - **4.1.3 Status Messages** — the region carries a live role, resolves to the right

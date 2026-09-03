@@ -148,7 +148,7 @@ ring is drawn for the unavailable state too, since that state is still focusable
 
 - **1.4.3 Contrast (Minimum)** — label on surface for every variant, including the
   unavailable state, which is why that state is a muted palette and not an opacity.
-  Measured by axe-core in `tests/e2e/button.spec.ts`.
+  Measured by axe-core in `tests/e2e/ui-button.spec.ts`.
 - **2.1.1 Keyboard** — every variant and state is reachable and operable by keyboard.
   The unavailable state is deliberately reachable and deliberately inert.
 - **2.4.7 Focus Visible** — a non-zero `:focus-visible` outline, asserted from

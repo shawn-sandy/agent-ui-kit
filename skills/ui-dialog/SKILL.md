@@ -1,5 +1,5 @@
 ---
-name: dialog
+name: ui-dialog
 description: Accessible modal dialog - an overlay that blocks the page until dismissed. Use when adding a modal, a confirmation step, a blocking popup, or an overlay the keyboard must not escape, including focus trapping, Escape handling, and returning focus to the opener. Not a non-blocking alert.
 license: MIT
 ---
@@ -31,7 +31,7 @@ request already maps cleanly to the contract, proceed and state any assumptions.
 
 ## Build it
 
-1. Read `references/dialog.md` for the markup, styles, module and accessibility
+1. Read `references/ui-dialog.md` for the markup, styles, module and accessibility
    contract.
 2. Copy the Structure block. The root is a native `<dialog>` with an `id`; openers
    reference it with `data-dialog-open="<id>"`.

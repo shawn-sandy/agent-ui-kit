@@ -6,14 +6,14 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { validateSkill, NAME_PATTERN, STANDARD_KEYS, MAX_DESCRIPTION } from '../lib/frontmatter.js';
+import { validateSkill, NAME_PATTERN, NAME_PREFIX, STANDARD_KEYS, MAX_DESCRIPTION } from '../lib/frontmatter.js';
 
-const AT = '/repo/skills/button/SKILL.md';
+const AT = '/repo/skills/ui-button/SKILL.md';
 
 /** Build a SKILL.md with the given frontmatter lines. */
 const skill = (lines: string[]) => `---\n${lines.join('\n')}\n---\n\n# Button\n\nBody.\n`;
 
-const VALID = ['name: button', 'description: Use when building a button that performs an action.'];
+const VALID = ['name: ui-button', 'description: Use when building a button that performs an action.'];
 
 const rulesOf = (source: string, at = AT) => validateSkill(source, at).map((v) => v.rule);
 
@@ -31,55 +31,60 @@ describe('each rule rejects a fixture that breaks exactly it', () => {
   });
 
   it('name-pattern: consecutive hyphens', () => {
-    expect(rulesOf(skill(['name: icon--button', ...VALID.slice(1)]), '/repo/skills/icon--button/SKILL.md'))
+    expect(rulesOf(skill(['name: icon--button', ...VALID.slice(1)]), '/repo/other/icon--button/SKILL.md'))
       .toContain('name-pattern');
   });
 
   it('name-pattern: leading hyphen', () => {
-    expect(rulesOf(skill(['name: -button', ...VALID.slice(1)]), '/repo/skills/-button/SKILL.md'))
+    expect(rulesOf(skill(['name: -button', ...VALID.slice(1)]), '/repo/other/-button/SKILL.md'))
       .toContain('name-pattern');
   });
 
   it('name-pattern: trailing hyphen', () => {
-    expect(rulesOf(skill(['name: button-', ...VALID.slice(1)]), '/repo/skills/button-/SKILL.md'))
+    expect(rulesOf(skill(['name: button-', ...VALID.slice(1)]), '/repo/other/button-/SKILL.md'))
       .toContain('name-pattern');
   });
 
   it('name-pattern: uppercase', () => {
-    expect(rulesOf(skill(['name: Button', ...VALID.slice(1)]), '/repo/skills/Button/SKILL.md'))
+    expect(rulesOf(skill(['name: Button', ...VALID.slice(1)]), '/repo/other/Button/SKILL.md'))
       .toContain('name-pattern');
+  });
+
+  it('name-prefix: packaged skills use the ui- prefix', () => {
+    expect(rulesOf(skill(['name: button', ...VALID.slice(1)]), '/repo/skills/button/SKILL.md'))
+      .toContain('name-prefix');
   });
 
   it('name-length: over 64 characters', () => {
     const long = 'a'.repeat(65);
-    expect(rulesOf(skill([`name: ${long}`, ...VALID.slice(1)]), `/repo/skills/${long}/SKILL.md`))
+    expect(rulesOf(skill([`name: ${long}`, ...VALID.slice(1)]), `/repo/other/${long}/SKILL.md`))
       .toContain('name-length');
   });
 
   it('name-matches-directory: name disagrees with its folder', () => {
-    expect(rulesOf(skill(['name: alert', ...VALID.slice(1)]))).toContain('name-matches-directory');
+    expect(rulesOf(skill(['name: ui-alert', ...VALID.slice(1)]))).toContain('name-matches-directory');
   });
 
   it('description-required: description missing', () => {
-    expect(rulesOf(skill(['name: button']))).toContain('description-required');
+    expect(rulesOf(skill(['name: ui-button']))).toContain('description-required');
   });
 
   it('description-required: description empty', () => {
-    expect(rulesOf(skill(['name: button', 'description: "   "']))).toContain('description-required');
+    expect(rulesOf(skill(['name: ui-button', 'description: "   "']))).toContain('description-required');
   });
 
   it('description-length: over 1024 characters', () => {
     const long = 'a'.repeat(MAX_DESCRIPTION + 1);
-    expect(rulesOf(skill(['name: button', `description: ${long}`]))).toContain('description-length');
+    expect(rulesOf(skill(['name: ui-button', `description: ${long}`]))).toContain('description-length');
   });
 
   it('description-third-person: first person', () => {
-    expect(rulesOf(skill(['name: button', 'description: I build buttons for pages.'])))
+    expect(rulesOf(skill(['name: ui-button', 'description: I build buttons for pages.'])))
       .toContain('description-third-person');
   });
 
   it('description-third-person: second person', () => {
-    expect(rulesOf(skill(['name: button', 'description: Use when your page needs a button.'])))
+    expect(rulesOf(skill(['name: ui-button', 'description: Use when your page needs a button.'])))
       .toContain('description-third-person');
   });
 
@@ -92,7 +97,7 @@ describe('each rule rejects a fixture that breaks exactly it', () => {
   });
 
   it('parseable: malformed YAML', () => {
-    expect(rulesOf('---\nname: [button\n---\n\n# Button\n')).toContain('parseable');
+    expect(rulesOf('---\nname: [ui-button\n---\n\n# Button\n')).toContain('parseable');
   });
 });
 
@@ -104,11 +109,19 @@ describe('the validator does not over-reject', () => {
 
   it('allows a description at exactly the limit', () => {
     const exact = 'Use when building a control. '.repeat(1).padEnd(MAX_DESCRIPTION, 'x');
-    expect(rulesOf(skill(['name: button', `description: ${exact}`]))).not.toContain('description-length');
+    expect(rulesOf(skill(['name: ui-button', `description: ${exact}`]))).not.toContain('description-length');
   });
 
   it('allows hyphenated names', () => {
-    expect(validateSkill(skill(['name: icon-button', ...VALID.slice(1)]), '/repo/skills/icon-button/SKILL.md'))
+    expect(validateSkill(skill(['name: ui-icon-button', ...VALID.slice(1)]), '/repo/skills/ui-icon-button/SKILL.md'))
+      .toEqual([]);
+  });
+
+  it('allows unprefixed project-local helper skills outside the packaged skills tree', () => {
+    expect(validateSkill(
+      skill(['name: new-component', ...VALID.slice(1)]),
+      '/repo/.claude/skills/new-component/SKILL.md',
+    ))
       .toEqual([]);
   });
 });
@@ -118,9 +131,13 @@ describe('exported constants match the standard', () => {
     expect([...STANDARD_KEYS]).toEqual(['name', 'description', 'license', 'allowed-tools', 'metadata']);
   });
 
+  it('lists the repository skill prefix', () => {
+    expect(NAME_PREFIX).toBe('ui-');
+  });
+
   it('name pattern rejects what the standard rejects', () => {
-    expect(NAME_PATTERN.test('button')).toBe(true);
-    expect(NAME_PATTERN.test('icon-button')).toBe(true);
+    expect(NAME_PATTERN.test('ui-button')).toBe(true);
+    expect(NAME_PATTERN.test('ui-icon-button')).toBe(true);
     expect(NAME_PATTERN.test('icon--button')).toBe(false);
     expect(NAME_PATTERN.test('Button')).toBe(false);
     expect(NAME_PATTERN.test('button_group')).toBe(false);

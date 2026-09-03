@@ -3,8 +3,8 @@
 ## Project Structure & Module Organization
 
 This repository publishes vendor-neutral UI component skills. The canonical
-component content lives under `skills/<component>/`: `SKILL.md` contains trigger
-guidance, `references/<component>.md` contains the contract, HTML, CSS, JS, and
+component content lives under `skills/ui-<component>/`: `SKILL.md` contains trigger
+guidance, `references/ui-<component>.md` contains the contract, HTML, CSS, JS, and
 accessibility notes, and `references/demo.html` is the self-contained browser
 demo. Keep shared documentation in `docs/`, evaluation scenarios in `evals/`,
 automation in `scripts/`, and tests in `tests/` (`unit`, `integration`, and
@@ -25,8 +25,9 @@ automation in `scripts/`, and tests in `tests/` (`unit`, `integration`, and
 
 Use ESM syntax for scripts and TypeScript tests. Match the existing style:
 2-space indentation, single quotes, semicolons, and concise comments only where
-they explain a non-obvious constraint. Component names are lowercase directory
-names with single inner hyphens. Root classes use `auk-<component>`, parts use
+they explain a non-obvious constraint. Skill names and directories must be
+`ui-<component>` with single inner hyphens. Component slugs stay unprefixed for
+the public DOM contract: root classes use `auk-<component>`, parts use
 `data-part`, variants use `data-variant`, and custom properties use
 `--auk-<component>-<property>`. Component reference prose should wrap near 88
 columns; tables and code may exceed that when clearer.
@@ -52,7 +53,7 @@ screenshots or demo notes for visible component changes.
 
 ## Agent-Specific Instructions
 
-Edit `references/<component>.md` first, then regenerate `demo.html`; do not
+Edit `references/ui-<component>.md` first, then regenerate `demo.html`; do not
 hand-maintain generated demo regions. Keep the `skills/` tree portable across
 Codex and Claude Code, and update both plugin manifests only when their shared
 contract changes.

@@ -1,10 +1,10 @@
 {
-  "skill": "alert",
+  "skill": "ui-alert",
   "scenarios": [
     {
-      "id": "alert-obvious",
+      "id": "ui-alert-obvious",
       "kind": "obvious",
-      "expect": "alert",
+      "expect": "ui-alert",
       "prompt": "In index.html, when the save fails pop up a notification in the corner of the screen that fades away after a few seconds. Screen reader users have to hear it too.",
       "baselineFailure": "builds the notification element at the moment the message arrives, so the live region does not exist when the content is inserted and nothing is announced",
       "detect": {
@@ -14,9 +14,9 @@
       }
     },
     {
-      "id": "alert-oblique",
+      "id": "ui-alert-oblique",
       "kind": "oblique",
-      "expect": "alert",
+      "expect": "ui-alert",
       "prompt": "In index.html, when a background upload finishes the user needs to be told, without moving their focus or interrupting what they are typing.",
       "baselineFailure": "no live region at all, or an assertive one that interrupts the typing the prompt asked to protect",
       "detect": {
@@ -26,7 +26,7 @@
       }
     },
     {
-      "id": "alert-adjacent",
+      "id": "ui-alert-adjacent",
       "kind": "adjacent",
       "expect": null,
       "prompt": "In index.html I need something that interrupts the user and blocks the page until they confirm they really want to delete their account.",

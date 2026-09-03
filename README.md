@@ -18,6 +18,8 @@ demo is reference material, not production code.
 Version 0.2.0. Four components ship: **button**, **alert**, **dialog** and **tabs**.
 They were chosen to stress different parts of the format rather than to be a useful
 kit - no JavaScript, a live region, heavy focus management, and keyboard navigation.
+Their skill names are prefixed for discovery: `ui-button`, `ui-alert`,
+`ui-dialog` and `ui-tabs`.
 
 Both vendors load the tree and use it: see [docs/vendor-support.md](docs/vendor-support.md)
 for what actually happened, including what did not work.
@@ -42,7 +44,8 @@ Install from the plugin directory, or add this repository to a workspace marketp
 **Any other agent**
 
 Skills follow the [Agent Skills open standard](https://agentskills.io/specification).
-Copy any folder from `skills/` into your agent's skills directory.
+Copy any folder from `skills/` into your agent's skills directory, keeping its
+`ui-` prefix.
 
 ## Layout
 
@@ -53,11 +56,11 @@ agent-ui-kit/
 │   └── marketplace.json    # Claude Code marketplace, source "./"
 ├── .codex-plugin/
 │   └── plugin.json         # ChatGPT / Codex plugin manifest
-├── skills/                 # one directory per component
-│   └── <component>/
+├── skills/                 # one directory per component skill
+│   └── ui-<component>/
 │       ├── SKILL.md        # what it is, when to use it, how to build it
 │       └── references/
-│           ├── <component>.md   # contract, HTML, CSS, JS, accessibility
+│           ├── ui-<component>.md   # contract, HTML, CSS, JS, accessibility
 │           ├── demo.html        # standalone, opens from disk
 │           └── react-demo.tsx   # required typed React projection reference
 ├── evals/                  # skill-triggering scenarios, three per component
@@ -70,6 +73,10 @@ agent-ui-kit/
 
 One `skills/` tree serves every vendor. The manifests are thin and additive; there
 is no build step and no duplicated content.
+
+The `ui-` prefix belongs to the skill identity only. Component DOM contracts stay
+unprefixed: the button skill still ships `auk-button`, `--auk-button-*`,
+`initButton` and `AukButtonProps`.
 
 ## Verifying it
 
@@ -91,7 +98,7 @@ Every demo also opens directly from disk with no server, no build step and no
 stylesheet beyond the reference's own CSS:
 
 ```
-open skills/dialog/references/demo.html
+open skills/ui-dialog/references/demo.html
 ```
 
 A demo inlines its component's CSS and JavaScript so it stays self-contained, which

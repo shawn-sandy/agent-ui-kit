@@ -30,6 +30,11 @@ function htmlBlock(html: string, tag: 'style' | 'script'): string | null {
 
 const REQUIRED_SECTIONS = ['Structure', 'Styles', 'Behaviour', 'Accessibility', 'Demo'];
 const REQUIRED_CONTRACT_ROWS = ['Element', 'Role', 'Props', 'Slots', 'Variants', 'Behaviour', 'WCAG'];
+const SKILL_NAME_PATTERN = /^ui-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function componentSlug(skillName: string): string {
+  return skillName.replace(/^ui-/, '');
+}
 
 it('the kit has components in it', () => {
   expect(skills.length).toBeGreaterThan(0);
@@ -46,6 +51,10 @@ describe.each(skills)('skills/%s', (name) => {
     expect(existsSync(skillPath), `${skillPath} missing`).toBe(true);
     expect(existsSync(referencePath), `${referencePath} missing`).toBe(true);
     expect(existsSync(demoPath), `${demoPath} missing`).toBe(true);
+  });
+
+  it('uses the required ui- skill prefix', () => {
+    expect(name).toMatch(SKILL_NAME_PATTERN);
   });
 
   it('frontmatter conforms to the Agent Skills standard', () => {
@@ -83,7 +92,8 @@ describe.each(skills)('skills/%s', (name) => {
   it('requires a React projection demo with a typed props surface', () => {
     expect(existsSync(reactDemoPath), `${reactDemoPath} missing`).toBe(true);
     const source = readFileSync(reactDemoPath, 'utf8');
-    const componentName = name
+    const slug = componentSlug(name);
+    const componentName = slug
       .split('-')
       .map((part) => part[0].toUpperCase() + part.slice(1))
       .join('');
@@ -97,7 +107,7 @@ describe.each(skills)('skills/%s', (name) => {
     expect(source, 'projection demo should export a runnable demo component').toMatch(
       new RegExp(`export function Auk${componentName}Demo\\b`),
     );
-    expect(source, 'projection demo should render the canonical root class').toContain(`auk-${name}`);
+    expect(source, 'projection demo should render the canonical root class').toContain(`auk-${slug}`);
   });
 
   it('only excludes the React projection demo from portability lint', () => {
@@ -131,12 +141,13 @@ describe.each(skills)('skills/%s', (name) => {
 
   it('every themeable CSS value is a var(--auk-<component>-*) with a literal fallback', () => {
     const css = fencedBlock(readFileSync(referencePath, 'utf8'), 'css');
+    const slug = componentSlug(name);
     expect(css, 'reference has no css block').not.toBeNull();
     const vars = [...css!.matchAll(/var\(([^),]*)(,)?/g)];
     expect(vars.length).toBeGreaterThan(0);
     for (const [whole, propertyName, comma] of vars) {
-      expect(propertyName.trim(), `${whole} is not an --auk-${name}-* property`).toMatch(
-        new RegExp(`^--auk-${name}-[a-z0-9-]+$`),
+      expect(propertyName.trim(), `${whole} is not an --auk-${slug}-* property`).toMatch(
+        new RegExp(`^--auk-${slug}-[a-z0-9-]+$`),
       );
       expect(comma, `${whole} has no fallback`).toBe(',');
     }
@@ -181,8 +192,9 @@ describe.each(skills)('skills/%s', (name) => {
     const css = fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!;
     const style = htmlBlock(readFileSync(demoPath, 'utf8'), 'style')!.trimEnd();
     const chrome = style.slice(0, style.length - css.trim().length);
-    expect(chrome, `demo chrome styles auk-${name} outside the reference css`).not.toMatch(
-      new RegExp(`auk-${name}\\b`),
+    const slug = componentSlug(name);
+    expect(chrome, `demo chrome styles auk-${slug} outside the reference css`).not.toMatch(
+      new RegExp(`auk-${slug}\\b`),
     );
   });
 

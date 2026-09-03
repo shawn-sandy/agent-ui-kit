@@ -1,10 +1,10 @@
 {
-  "skill": "tabs",
+  "skill": "ui-tabs",
   "scenarios": [
     {
-      "id": "tabs-obvious",
+      "id": "ui-tabs-obvious",
       "kind": "obvious",
-      "expect": "tabs",
+      "expect": "ui-tabs",
       "prompt": "In index.html, add a tabbed interface with three panels - Profile, Billing and Notifications - to the settings page.",
       "baselineFailure": "leaves every tab in the keyboard tab order instead of using roving tabindex, and ships no Home or End handling",
       "detect": {
@@ -14,9 +14,9 @@
       }
     },
     {
-      "id": "tabs-oblique",
+      "id": "ui-tabs-oblique",
       "kind": "oblique",
-      "expect": "tabs",
+      "expect": "ui-tabs",
       "prompt": "In index.html I want to flip between sections of the settings page with the arrow keys, one section visible at a time, and a single Tab press should carry you past the switchers into the content.",
       "baselineFailure": "no Home or End handling, so the keyboard contract is only partly met even when the arrow keys are wired",
       "detect": {
@@ -26,7 +26,7 @@
       }
     },
     {
-      "id": "tabs-adjacent",
+      "id": "ui-tabs-adjacent",
       "kind": "adjacent",
       "expect": null,
       "prompt": "In index.html, add breadcrumb navigation showing where the user is in the site hierarchy.",

@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { demoUrl, activeId, expectFocus, tabTo, focusOutlineWidth } from './support.js';
 
 test.beforeEach(async ({ page }) => {
-  await page.goto(demoUrl('dialog'));
+  await page.goto(demoUrl('ui-dialog'));
 });
 
 const isOpen = (page: import('@playwright/test').Page) =>
@@ -97,7 +97,7 @@ test('2.4.3 Focus Order: focus is placed deliberately when the opener is gone', 
   // A row deleted, a list re-rendered: the element that opened the dialog can be
   // removed while it is open. Doing nothing drops focus to <body> by accident, which
   // is what the skill promises not to do.
-  await page.goto(demoUrl('dialog'));
+  await page.goto(demoUrl('ui-dialog'));
   await page.evaluate(() => {
     const dialog = document.getElementById('confirm-delete')!;
     const landing = document.createElement('button');
@@ -119,7 +119,7 @@ test('2.4.3 Focus Order: focus is not stranded when no fallback is declared', as
   // not portable - Linux and macOS Chromium disagree. What must hold everywhere is
   // that focus is not left on the detached opener or anywhere inside the closed
   // dialog, so assert that rather than an element identity.
-  await page.goto(demoUrl('dialog'));
+  await page.goto(demoUrl('ui-dialog'));
   await page.locator('#open-top').click();
   await page.evaluate(() => document.getElementById('open-top')!.remove());
   await page.keyboard.press('Escape');
