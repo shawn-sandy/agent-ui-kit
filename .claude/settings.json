@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" 2>/dev/null || exit 0; [ -f scripts/build-demos.mjs ] || exit 0; node scripts/build-demos.mjs --check >/dev/null 2>&1 || printf \"%s\" \"{\\\"systemMessage\\\":\\\"Demo pages are stale or incomplete. Run: node scripts/build-demos.mjs\\\"}\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -13,7 +13,7 @@ Version: the `claude` CLI on the author's machine at the time of writing.
 
 | Check | Result |
 | --- | --- |
-| `claude plugin validate . --strict` | Passes. It is gate 3 of `scripts/check.sh`. |
+| `claude plugin validate . --strict` | Passes. It is gate 5 of `scripts/check.sh`. |
 | Plugin loads from a local directory | Yes, via `claude --plugin-dir <repo>`. |
 | All four skills register | Yes: `agent-ui-kit:button`, `agent-ui-kit:alert`, `agent-ui-kit:dialog`, `agent-ui-kit:tabs`. |
 | Skills are invocable by name | Yes. All four appear in the session's slash-command list. |
