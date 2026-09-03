@@ -9,12 +9,12 @@ the portable component:
 | `skills/<name>/references/<name>.md` | The component itself: markup, styles, behaviour, accessibility contract. Loads only when needed. |
 | `skills/<name>/references/demo.html` | One self-contained page that proves the component in a real browser. |
 
-A references folder may also carry framework projection examples. These examples
-are not the canonical component contract:
+For Agent UI Kit components, the references folder also carries a React projection
+example. Projection examples are not the canonical component contract:
 
 | File | Job |
 | --- | --- |
-| `skills/<name>/references/react-demo.tsx` | Optional React projection showing a typed props API over the same DOM contract. |
+| `skills/<name>/references/react-demo.tsx` | Required React projection reference for Agent UI Kit components, showing a typed props API over the same DOM contract. |
 
 Read this before writing or reviewing a component. `scripts/check.sh` enforces the
 mechanical half; section 7 lists exactly what it checks.
@@ -256,11 +256,12 @@ template syntax and reactivity binding are framework-specific, and neither belon
 a reference. No reference may name a framework, a preprocessor, a CSS-in-JS library
 or an external package.
 
-The one exception is an optional `references/react-demo.tsx` projection demo. It may
-name React and import React types or hooks because it is an adapter example for apps
-that already use React. That exception is deliberately file-scoped: `SKILL.md`,
-`references/<name>.md` and `references/demo.html` remain framework-neutral, and the
-portability lint excludes only `skills/<name>/references/react-demo.tsx`.
+The one exception is the required `references/react-demo.tsx` projection demo. It
+may name React and import React types or hooks because it is an adapter reference
+for apps that already use React, not production code shipped to consumers. That
+exception is deliberately file-scoped: `SKILL.md`, `references/<name>.md` and
+`references/demo.html` remain framework-neutral, and the portability lint excludes
+only `skills/<name>/references/react-demo.tsx`.
 
 Design tokens are an optional mapping layer, never a requirement. A reference ships
 literal CSS with `var(--auk-*, fallback)`; it does not reference a token file, and no
@@ -303,9 +304,10 @@ and the assertions to back it.
 
 Every component adds `tests/e2e/<name>.spec.ts` asserting, at minimum, one case per
 WCAG criterion in its contract, plus zero axe-core violations on its demo. Whole-kit
-rules — frontmatter, portability, demo-matches-reference — are asserted once in
-`tests/objective.spec.ts`, which iterates `skills/`, so a new component is covered by
-them without editing a test.
+rules — frontmatter, required React projection presence and typed surface,
+portability, demo-matches-reference — are asserted once in `tests/objective.spec.ts`,
+which iterates `skills/`, so a new component is covered by them without editing a
+test.
 
 ## 7. What scripts/check.sh enforces
 
@@ -340,7 +342,8 @@ Before a component is done:
 - [ ] Contract table has all seven rows, in order.
 - [ ] All five reference sections present, in order, one fenced block each.
 - [ ] Every themeable CSS value is `var(--auk-<component>-*, literal)`.
-- [ ] No framework, preprocessor or package named anywhere.
+- [ ] No framework, preprocessor or package named outside the scoped React projection reference.
+- [ ] `references/react-demo.tsx` exists as a typed React projection reference.
 - [ ] Demo opens from `file://` and matches the reference verbatim.
 - [ ] Every WCAG criterion claimed has a passing assertion in `tests/e2e/`.
 - [ ] Three evaluations exist with a recorded baseline.

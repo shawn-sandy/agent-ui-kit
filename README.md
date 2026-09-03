@@ -8,9 +8,10 @@ dependency-free JavaScript. An agent reads the reference and builds the componen
 into your project, in your stack.
 
 There is nothing to install into your app. The canonical references require no
-framework, no design system, no package and no vendor. Optional React projection
-demos show how to wrap the same DOM contract in typed props when a consuming app
-already uses React.
+framework, no design system, no package and no vendor. Each Agent UI Kit
+component also ships a required React projection demo that shows how to wrap the
+same DOM contract in typed props when a consuming app already uses React. That
+demo is reference material, not production code.
 
 ## Status
 
@@ -58,7 +59,7 @@ agent-ui-kit/
 │       └── references/
 │           ├── <component>.md   # contract, HTML, CSS, JS, accessibility
 │           ├── demo.html        # standalone, opens from disk
-│           └── react-demo.tsx   # optional typed React projection example
+│           └── react-demo.tsx   # required typed React projection reference
 ├── evals/                  # skill-triggering scenarios, three per component
 ├── tests/                  # frontmatter, manifests, and browser suites
 ├── scripts/

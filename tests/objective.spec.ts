@@ -42,7 +42,7 @@ describe.each(skills)('skills/%s', (name) => {
   const demoPath = join(dir, 'references', 'demo.html');
   const reactDemoPath = join(dir, 'references', 'react-demo.tsx');
 
-  it('has the three files the spec requires', () => {
+  it('has the three canonical portable files', () => {
     expect(existsSync(skillPath), `${skillPath} missing`).toBe(true);
     expect(existsSync(referencePath), `${referencePath} missing`).toBe(true);
     expect(existsSync(demoPath), `${demoPath} missing`).toBe(true);
@@ -80,7 +80,7 @@ describe.each(skills)('skills/%s', (name) => {
     }
   });
 
-  it('has a React projection demo with a typed props surface', () => {
+  it('requires a React projection demo with a typed props surface', () => {
     expect(existsSync(reactDemoPath), `${reactDemoPath} missing`).toBe(true);
     const source = readFileSync(reactDemoPath, 'utf8');
     const componentName = name
