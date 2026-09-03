@@ -31,6 +31,15 @@ The reference format is still moving - pin a commit if you depend on it.
 
 The repository is both a plugin and its own marketplace.
 
+**Skills CLI**
+
+```
+npx skills add shawn-sandy/agent-ui-skills
+```
+
+One command installs the six skills into Claude Code, Codex, Cursor, Copilot and the
+other agents the CLI supports.
+
 **Claude Code**
 
 ```
