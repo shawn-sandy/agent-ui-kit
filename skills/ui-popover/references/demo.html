@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Popover - agent-ui-skills demo</title>
+<style>
+/* Page chrome for the demo only. Not part of the component. The .auk-button rules
+   here are a minimal stand-in so this page stays self-contained; the real button
+   lives in its own skill. */
+body { font-family: system-ui, sans-serif; margin: 0; padding: 2rem; color: #111827; background: #ffffff; }
+h1 { font-size: 1.25rem; }
+h2.section { font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #374151; }
+p { max-width: 44rem; line-height: 1.5; }
+.row { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+a { color: #1a56db; }
+a:focus-visible { outline: 3px solid #111827; outline-offset: 2px; }
+.auk-button { display: inline-flex; align-items: center; justify-content: center; min-height: 2.75rem; padding: 0.625rem 1rem; border: 1px solid transparent; border-radius: 0.375rem; font: inherit; font-weight: 600; color: #ffffff; background: #1a56db; cursor: pointer; }
+.auk-button[data-variant="secondary"] { color: #1f2937; background: #ffffff; border-color: #6b7280; }
+.auk-button:focus-visible { outline: 3px solid #111827; outline-offset: 2px; }
+
+/* Generated from ui-popover.md by scripts/build-demos.mjs. Edit the reference, not this. */
+.auk-popover {
+  inline-size: var(--auk-popover-inline-size, min(22rem, calc(100vw - 2rem)));
+  max-block-size: var(--auk-popover-max-block-size, calc(100vh - 4rem));
+  padding: 0;
+  border: var(--auk-popover-border-width, 1px) solid var(--auk-popover-border-color, #d1d5db);
+  border-radius: var(--auk-popover-radius, 0.5rem);
+  font-family: var(--auk-popover-font-family, inherit);
+  color: var(--auk-popover-color, #111827);
+  background-color: var(--auk-popover-bg, #ffffff);
+  box-shadow: var(--auk-popover-box-shadow, 0 10px 25px rgba(17, 24, 39, 0.18));
+}
+
+.auk-popover:popover-open {
+  display: flex;
+  flex-direction: column;
+}
+
+@supports (position-area: block-end) {
+  .auk-popover:popover-open {
+    inset: auto;
+    margin: var(--auk-popover-offset, 0.25rem) 0 0;
+    position-area: var(--auk-popover-position-area, block-end span-inline-end);
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+}
+
+.auk-popover [data-part="header"] {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--auk-popover-gap, 0.75rem);
+  padding: var(--auk-popover-padding, 1rem);
+  border-block-end: var(--auk-popover-divider-width, 1px) solid var(--auk-popover-divider-color, #e5e7eb);
+}
+
+.auk-popover [data-part="title"] {
+  margin: 0;
+  font-size: var(--auk-popover-title-size, 1rem);
+  line-height: var(--auk-popover-title-line-height, 1.4);
+}
+
+.auk-popover [data-part="body"] {
+  padding: var(--auk-popover-padding, 1rem);
+  overflow-y: auto;
+  color: var(--auk-popover-body-color, #374151);
+  line-height: var(--auk-popover-line-height, 1.5);
+}
+
+.auk-popover [data-part="close"] {
+  flex: none;
+  min-inline-size: var(--auk-popover-close-size, 2.75rem);
+  min-block-size: var(--auk-popover-close-size, 2.75rem);
+  border: var(--auk-popover-close-border-width, 1px) solid var(--auk-popover-close-border-color, transparent);
+  border-radius: var(--auk-popover-close-radius, 0.375rem);
+  font-family: var(--auk-popover-font-family, inherit);
+  font-size: var(--auk-popover-close-font-size, 1.25rem);
+  color: var(--auk-popover-close-color, #1f2937);
+  background-color: var(--auk-popover-close-bg, transparent);
+  cursor: pointer;
+}
+
+.auk-popover [data-part="close"]:focus-visible,
+.auk-popover [data-part="body"] :focus-visible {
+  outline: var(--auk-popover-focus-width, 3px) solid var(--auk-popover-focus-color, #111827);
+  outline-offset: var(--auk-popover-focus-offset, 2px);
+}
+</style>
+</head>
+<body>
+
+<h1>Popover</h1>
+
+<p>
+  Everything on this page stays usable while a popover is open - that is the whole
+  difference from a modal. Try <a id="page-link" href="#behind">this link behind the
+  popovers</a> without closing anything first.
+</p>
+
+<h2 class="section">Auto and manual</h2>
+
+<div class="row">
+  <button class="auk-button" type="button" id="filters-trigger"
+          popovertarget="filters-popover" aria-expanded="false">
+    Filters
+  </button>
+  <button class="auk-button" type="button" data-variant="secondary" id="notes-trigger"
+          popovertarget="notes-popover" aria-expanded="false">
+    Release notes
+  </button>
+</div>
+
+<p id="behind">
+  A <a id="tail-link" href="#behind">second link</a> sits after the triggers, so
+  tabbing on from inside an open popover has somewhere real to land.
+</p>
+
+<div class="auk-popover" id="filters-popover" popover="auto" role="group"
+     aria-labelledby="filters-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="filters-popover-title">Filter results</h2>
+  </div>
+  <div data-part="body">
+    <p>An auto popover closes on Escape and on a click outside it.</p>
+    <button class="auk-button" type="button" id="filters-apply" autofocus>Apply</button>
+  </div>
+</div>
+
+<div class="auk-popover" id="notes-popover" popover="manual" role="group"
+     aria-labelledby="notes-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="notes-popover-title">What changed</h2>
+    <button data-part="close" type="button" id="notes-close" popovertarget="notes-popover"
+            popovertargetaction="hide" aria-label="Close release notes">
+      <span aria-hidden="true">&#215;</span>
+    </button>
+  </div>
+  <div data-part="body">
+    <p>A manual popover ignores Escape and outside clicks. It closes only here.</p>
+  </div>
+</div>
+
+<script>
+/**
+ * Wire a native popover for accessible use.
+ *
+ * Triggers are any element outside the popover carrying
+ * `popovertarget="<popover id>"`. A control inside the popover that carries the same
+ * attribute - a close button using `popovertargetaction="hide"` - is not a trigger
+ * and is skipped, so it never advertises the popover's open state as its own.
+ *
+ * @param {HTMLElement} popover - the popover element, which must have an id
+ * @returns {() => void} teardown that removes every listener this added
+ */
+function initPopover(popover) {
+  if (!popover || !popover.id) throw new Error('initPopover needs an element with an id');
+
+  const triggers = Array.from(
+    document.querySelectorAll('[popovertarget="' + popover.id + '"]'),
+  ).filter((el) => !popover.contains(el));
+
+  function onToggle(event) {
+    const open = event.newState === 'open';
+    triggers.forEach((el) => el.setAttribute('aria-expanded', String(open)));
+    if (open || popover.popover !== 'manual') return;
+
+    // Only `manual` reaches here. Closing one from a control inside it leaves focus
+    // on that control, which the close has just made `display: none`; closing one
+    // any other way can drop focus on the body. Both are dead ends for a keyboard
+    // user. Focus landing anywhere else means the user moved it deliberately, and
+    // moving it again would be the component fighting them.
+    const active = document.activeElement;
+    const stranded = !active || active === document.body || popover.contains(active);
+    if (!stranded) return;
+
+    const target = triggers.find((el) => el.isConnected);
+    if (target) target.focus();
+  }
+
+  // Match the markup to reality before the first toggle, so a popover that is
+  // already open on load does not advertise itself as closed.
+  const openNow = String(popover.matches(':popover-open'));
+  triggers.forEach((el) => el.setAttribute('aria-expanded', openNow));
+  popover.addEventListener('toggle', onToggle);
+
+  return function teardown() {
+    popover.removeEventListener('toggle', onToggle);
+  };
+}
+/* Generated from ui-popover.md by scripts/build-demos.mjs. Edit the reference, not this. */
+
+initPopover(document.getElementById('filters-popover'));
+initPopover(document.getElementById('notes-popover'));
+</script>
+</body>
+</html>
