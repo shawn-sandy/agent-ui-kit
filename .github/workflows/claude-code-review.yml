@@ -34,12 +34,21 @@ jobs:
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@v1
+        # Claude Code 2.1.198+ runs subagents in the background by default, and the
+        # action ends the session on the orchestrator's first completed turn. The
+        # plugin's review subagents were being killed mid-review, so the job went green
+        # with nothing posted. Foreground subagents are the measured workaround:
+        # https://github.com/anthropics/claude-code-action/issues/1499
+        env:
+          CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: 1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
           prompt: '/code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment"'
+          # The plugin reads the PR with gh and posts its "no issues" summary with
+          # `gh pr comment`; without these the clean-PR case posts nothing.
+          claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"'
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
 
