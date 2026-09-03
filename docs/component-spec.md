@@ -1,12 +1,20 @@
 # Component skill specification
 
-The authoring contract for every skill in `skills/`. Three files carry a component:
+The authoring contract for every skill in `skills/`. Three canonical files carry
+the portable component:
 
 | File | Job |
 | --- | --- |
 | `skills/<name>/SKILL.md` | Orients the agent. Loads whenever the skill triggers. Holds no component code. |
 | `skills/<name>/references/<name>.md` | The component itself: markup, styles, behaviour, accessibility contract. Loads only when needed. |
 | `skills/<name>/references/demo.html` | One self-contained page that proves the component in a real browser. |
+
+For Agent UI Kit components, the references folder also carries a React projection
+example. Projection examples are not the canonical component contract:
+
+| File | Job |
+| --- | --- |
+| `skills/<name>/references/react-demo.tsx` | Required React projection reference for Agent UI Kit components, showing a typed props API over the same DOM contract. |
 
 Read this before writing or reviewing a component. `scripts/check.sh` enforces the
 mechanical half; section 7 lists exactly what it checks.
@@ -159,6 +167,13 @@ One sentence: what it is.
 ## When not to use
 - ... (name the sibling component that is the right answer instead)
 
+## Clarify when needed
+- Accept a plain-language component description and use it to infer the closest
+  contract-backed props, slots, behaviour and defaults. Ask targeted questions when
+  the description, missing props or requirements would change the element, ARIA,
+  state model, slots, behaviour or defaults. Proceed with stated assumptions when
+  the request already maps cleanly to the contract.
+
 ## Build it
 1. Read `references/<component>.md`.
 2. Copy the Structure and Styles blocks; adapt only the template syntax to the stack.
@@ -241,6 +256,13 @@ template syntax and reactivity binding are framework-specific, and neither belon
 a reference. No reference may name a framework, a preprocessor, a CSS-in-JS library
 or an external package.
 
+The one exception is the required `references/react-demo.tsx` projection demo. It
+may name React and import React types or hooks because it is an adapter reference
+for apps that already use React, not production code shipped to consumers. That
+exception is deliberately file-scoped: `SKILL.md`, `references/<name>.md` and
+`references/demo.html` remain framework-neutral, and the portability lint excludes
+only `skills/<name>/references/react-demo.tsx`.
+
 Design tokens are an optional mapping layer, never a requirement. A reference ships
 literal CSS with `var(--auk-*, fallback)`; it does not reference a token file, and no
 token file needs to exist for a component to function. A project that has tokens
@@ -282,9 +304,10 @@ and the assertions to back it.
 
 Every component adds `tests/e2e/<name>.spec.ts` asserting, at minimum, one case per
 WCAG criterion in its contract, plus zero axe-core violations on its demo. Whole-kit
-rules — frontmatter, portability, demo-matches-reference — are asserted once in
-`tests/objective.spec.ts`, which iterates `skills/`, so a new component is covered by
-them without editing a test.
+rules — frontmatter, required React projection presence and typed surface,
+portability, demo-matches-reference — are asserted once in `tests/objective.spec.ts`,
+which iterates `skills/`, so a new component is covered by them without editing a
+test.
 
 ## 7. What scripts/check.sh enforces
 
@@ -293,9 +316,10 @@ Six gates, in order. Any failure stops the run.
 1. **Vitest** — `tests/objective.spec.ts` (frontmatter conforms, no vendor token,
    demo matches reference), `tests/unit/frontmatter.spec.ts` (the validator itself),
    `tests/integration/manifests.spec.ts` (both plugin manifests agree).
-2. **Portability lint** — `scripts/lint-portability.mjs`, over `skills/` only:
-   `${CLAUDE_PLUGIN_ROOT}`, `disable-model-invocation:`, `hint:`, backslash paths,
-   framework names, preprocessor names, package imports, install instructions.
+2. **Portability lint** — `scripts/lint-portability.mjs`, over `skills/` only,
+   except `skills/<name>/references/react-demo.tsx`: `${CLAUDE_PLUGIN_ROOT}`,
+   `disable-model-invocation:`, `hint:`, backslash paths, framework names,
+   preprocessor names, package imports, install instructions.
 3. **No external resources** — nothing under `skills/` may carry `src`, `srcset`,
    a `<link href>`, an `@import` or a `url()`. A component split across sibling
    files runs under headless Chrome and then fails in a real browser opened from
@@ -318,7 +342,8 @@ Before a component is done:
 - [ ] Contract table has all seven rows, in order.
 - [ ] All five reference sections present, in order, one fenced block each.
 - [ ] Every themeable CSS value is `var(--auk-<component>-*, literal)`.
-- [ ] No framework, preprocessor or package named anywhere.
+- [ ] No framework, preprocessor or package named outside the scoped React projection reference.
+- [ ] `references/react-demo.tsx` exists as a typed React projection reference.
 - [ ] Demo opens from `file://` and matches the reference verbatim.
 - [ ] Every WCAG criterion claimed has a passing assertion in `tests/e2e/`.
 - [ ] Three evaluations exist with a recorded baseline.

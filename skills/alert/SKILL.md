@@ -21,6 +21,15 @@ A message region that announces its contents to assistive technology when they c
 - Static page content that is present at load and never changes. That is a plain
   region and needs no live semantics.
 
+## Clarify when needed
+
+Use any component description the user provides to infer contract-backed props,
+variant, message source, dismiss behaviour and defaults. If the description,
+missing props or requirements leave multiple valid mappings that would change the
+variant, live-region timing or message semantics, ask targeted questions before
+building. If the request already maps cleanly to the contract, proceed and state
+any assumptions.
+
 ## Build it
 
 1. Read `references/alert.md` for the markup, styles and accessibility contract.

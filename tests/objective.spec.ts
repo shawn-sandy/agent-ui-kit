@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { validateSkill } from './lib/frontmatter.js';
-import { RULES } from '../scripts/lint-portability.mjs';
+import { RULES, shouldLintFile } from '../scripts/lint-portability.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const SKILLS_DIR = resolve(ROOT, 'skills');
@@ -40,8 +40,9 @@ describe.each(skills)('skills/%s', (name) => {
   const skillPath = join(dir, 'SKILL.md');
   const referencePath = join(dir, 'references', `${name}.md`);
   const demoPath = join(dir, 'references', 'demo.html');
+  const reactDemoPath = join(dir, 'references', 'react-demo.tsx');
 
-  it('has the three files the spec requires', () => {
+  it('has the three canonical portable files', () => {
     expect(existsSync(skillPath), `${skillPath} missing`).toBe(true);
     expect(existsSync(referencePath), `${referencePath} missing`).toBe(true);
     expect(existsSync(demoPath), `${demoPath} missing`).toBe(true);
@@ -59,6 +60,17 @@ describe.each(skills)('skills/%s', (name) => {
     expect(body).not.toMatch(/```(?:html|css|js|javascript)/);
   });
 
+  it('SKILL.md tells agents when to ask about missing descriptions, props, or requirements', () => {
+    const source = readFileSync(skillPath, 'utf8');
+    const body = source.replace(/^---\n[\s\S]*?\n---\n/, '');
+
+    expect(body).toMatch(/^## Clarify when needed$/m);
+    expect(body).toMatch(/\bdescriptions?\b/i);
+    expect(body).toMatch(/\bprops?\b/i);
+    expect(body).toMatch(/\brequirements?\b/i);
+    expect(body).toMatch(/\bask\b/i);
+  });
+
   it('contains no vendor-specific or framework-specific token', () => {
     for (const file of [skillPath, referencePath, demoPath]) {
       const text = readFileSync(file, 'utf8');
@@ -66,6 +78,34 @@ describe.each(skills)('skills/%s', (name) => {
         expect(pattern.test(text), `${file} breaks ${rule}`).toBe(false);
       }
     }
+  });
+
+  it('requires a React projection demo with a typed props surface', () => {
+    expect(existsSync(reactDemoPath), `${reactDemoPath} missing`).toBe(true);
+    const source = readFileSync(reactDemoPath, 'utf8');
+    const componentName = name
+      .split('-')
+      .map((part) => part[0].toUpperCase() + part.slice(1))
+      .join('');
+
+    expect(source, 'projection demo should import React types or hooks').toMatch(
+      /from ['"]react['"]/,
+    );
+    expect(source, 'projection demo should export typed props').toMatch(
+      new RegExp(`export (?:interface|type) Auk${componentName}Props\\b`),
+    );
+    expect(source, 'projection demo should export a runnable demo component').toMatch(
+      new RegExp(`export function Auk${componentName}Demo\\b`),
+    );
+    expect(source, 'projection demo should render the canonical root class').toContain(`auk-${name}`);
+  });
+
+  it('only excludes the React projection demo from portability lint', () => {
+    expect(shouldLintFile(reactDemoPath)).toBe(false);
+    expect(shouldLintFile(referencePath)).toBe(true);
+    expect(shouldLintFile(demoPath)).toBe(true);
+    expect(shouldLintFile(join(dir, 'references', 'react-demo.ts'))).toBe(true);
+    expect(shouldLintFile(join(dir, 'react-demo.tsx'))).toBe(true);
   });
 
   it('reference has the full contract table', () => {

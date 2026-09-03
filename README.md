@@ -7,8 +7,11 @@ with a real accessibility contract, plain CSS driven by custom properties, and
 dependency-free JavaScript. An agent reads the reference and builds the component
 into your project, in your stack.
 
-There is nothing to install into your app. No framework, no design system, no
-package, no vendor.
+There is nothing to install into your app. The canonical references require no
+framework, no design system, no package and no vendor. Each Agent UI Kit
+component also ships a required React projection demo that shows how to wrap the
+same DOM contract in typed props when a consuming app already uses React. That
+demo is reference material, not production code.
 
 ## Status
 
@@ -55,7 +58,8 @@ agent-ui-kit/
 │       ├── SKILL.md        # what it is, when to use it, how to build it
 │       └── references/
 │           ├── <component>.md   # contract, HTML, CSS, JS, accessibility
-│           └── demo.html        # standalone, opens from disk
+│           ├── demo.html        # standalone, opens from disk
+│           └── react-demo.tsx   # required typed React projection reference
 ├── evals/                  # skill-triggering scenarios, three per component
 ├── tests/                  # frontmatter, manifests, and browser suites
 ├── scripts/
