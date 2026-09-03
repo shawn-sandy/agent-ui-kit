@@ -1,36 +1,39 @@
 # Component skill specification
 
-The authoring contract for every skill in `skills/`. Three canonical files carry
-the portable component:
+The authoring contract for every skill in `skills/`. A skill name is always
+`ui-<component-slug>`. The component slug is the same name with the leading `ui-`
+removed, and it stays unprefixed in the public DOM/API contract. Three canonical
+files carry the portable component:
 
 | File | Job |
 | --- | --- |
-| `skills/<name>/SKILL.md` | Orients the agent. Loads whenever the skill triggers. Holds no component code. |
-| `skills/<name>/references/<name>.md` | The component itself: markup, styles, behaviour, accessibility contract. Loads only when needed. |
-| `skills/<name>/references/demo.html` | One self-contained page that proves the component in a real browser. |
+| `skills/<skill-name>/SKILL.md` | Orients the agent. Loads whenever the skill triggers. Holds no component code. |
+| `skills/<skill-name>/references/<skill-name>.md` | The component itself: markup, styles, behaviour, accessibility contract. Loads only when needed. |
+| `skills/<skill-name>/references/demo.html` | One self-contained page that proves the component in a real browser. |
 
-For Agent UI Kit components, the references folder also carries a React projection
+For Agent UI Skills components, the references folder also carries a React projection
 example. Projection examples are not the canonical component contract:
 
 | File | Job |
 | --- | --- |
-| `skills/<name>/references/react-demo.tsx` | Required React projection reference for Agent UI Kit components, showing a typed props API over the same DOM contract. |
+| `skills/<skill-name>/references/react-demo.tsx` | Required React projection reference for Agent UI Skills components, showing a typed props API over the same DOM contract. |
 
 Read this before writing or reviewing a component. `scripts/check.sh` enforces the
 mechanical half; section 7 lists exactly what it checks.
 
-## 0. Conventions this kit fixes
+## 0. Conventions this repository fixes
 
 These are settled. Do not re-decide them per component.
 
 | Thing | Rule | Example |
 | --- | --- | --- |
+| Skill name | `ui-<component-slug>`, matching the directory and reference filename | `ui-button` |
 | Accessibility target | WCAG 2.2, Level AA | `2.4.7 Focus Visible` |
-| Root class | `auk-<component>`, one per component, on the root element | `auk-button` |
+| Root class | `auk-<component-slug>`, one per component, on the root element | `auk-button` |
 | Internal parts | `data-part="<name>"` — never a second class | `data-part="tablist"` |
 | Variants | `data-variant="<value>"` | `data-variant="destructive"` |
 | Named content regions ("slots") | `data-slot="<name>"` on the wrapping element, or `none` | `data-slot="icon"` |
-| Custom property | `--auk-<component>-<property>` | `--auk-button-bg` |
+| Custom property | `--auk-<component-slug>-<property>` | `--auk-button-bg` |
 | Fallback | A literal value. Never a nested `var()`. | `var(--auk-button-bg, #1a56db)` |
 | Behaviour export | `export function init<Component>(root)` taking the root element, returning a teardown `() => void` | `export function initDialog(root)` |
 | Module shape | Named export. `demo.html` strips `export ` and calls the function by name, so a default export cannot work. | |
@@ -47,12 +50,12 @@ guess and no reviewer has to arbitrate.
 
 | Question | Answer |
 | --- | --- |
-| How does a component tell the host something changed? | It does not dispatch custom events. State lives in the DOM attributes above, and hosts listen to the native event (`click`, `change`) or observe the attribute. A kit-wide event vocabulary is a thing to add once a component genuinely needs one. |
+| How does a component tell the host something changed? | It does not dispatch custom events. State lives in the DOM attributes above, and hosts listen to the native event (`click`, `change`) or observe the attribute. A shared event vocabulary is a thing to add once a component genuinely needs one. |
 | Where do behavioural options go? | Arguments to the init function, not DOM attributes: `initTabs(root, { wrap: false })`. `data-*` describes what the element *is*, never how the script should treat it. |
 | What belongs in the Props row? | Every attribute a consumer is expected to set or read, including ARIA ones. Attributes the module writes and nobody sets go in the Behaviour section instead. |
 | How is a union type written in a table cell? | With quoted values and the word `or`, not a pipe: `"true" or "false" or "mixed"`. A raw pipe breaks the table. |
-| What is the full custom property grammar? | `--auk-<component>[-<variant-or-state>][-<part>]-<property>`. The property is always last; qualifiers sit between the component and the property, variant or state before part. `--auk-dialog-close-bg`, `--auk-alert-success-bg`, `--auk-tab-selected-indicator-color`. Segments are omitted when there is only one of the thing. |
-| How do hyphenated component names map? | Root class and directory keep the hyphens (`auk-icon-button`); the init function is `init` plus the segments in PascalCase (`initIconButton`); the H1 is the segments in title case. |
+| What is the full custom property grammar? | `--auk-<component-slug>[-<variant-or-state>][-<part>]-<property>`. The property is always last; qualifiers sit between the component slug and the property, variant or state before part. `--auk-dialog-close-bg`, `--auk-alert-success-bg`, `--auk-tab-selected-indicator-color`. Segments are omitted when there is only one of the thing. |
+| How do skill names and component slugs map? | The skill name and directory are `ui-<component-slug>`. Strip exactly one leading `ui-` for the root class (`auk-icon-button`), custom properties, init function (`initIconButton`), React projection names and H1. |
 | Are `###` subheadings allowed inside a section? | No. Sections are flat. The Accessibility section uses the bold labels **Keyboard**, **ARIA**, **Focus management** and **WCAG 2.2 AA criteria claimed**, in that order. |
 | Is an applicable-but-unclaimed WCAG criterion a defect? | No. Only an unbacked claim is. Claim what the browser suite actually asserts, and leave the rest out rather than writing an assertion-free promise. |
 | May a reference land without its `tests/e2e/` sibling? | No. A reference and the assertions backing its WCAG row land in the same change. |
@@ -78,7 +81,7 @@ guess and no reviewer has to arbitrate.
 | How is the custom property grammar parsed when the CSS property itself is hyphenated? | Against the qualifier line, below. Anything not in that list is the property. `--auk-combobox-focus-field-outline-color` parses as state `focus`, part `field`, property `outline-color` because `field` is a declared qualifier and `field-outline` is not. |
 | Where are a component's qualifiers declared? | On one line at the top of the Styles section, before the fenced block: `Qualifiers: parts `field`, `list`, `option`; variants none; states `focus`, `selected`, `no-results`.` It is the only place parts and states are declared; the contract table does not carry them. |
 | What goes on the qualifier line? | Every `data-part` the component uses, every value in the Variants row, and every state that appears in a CSS selector or in a custom property name - including `data-state` values and CSS pseudo-states such as `focus`. A state carried only by an ARIA attribute and never styled or named in a property is not declared. Use `none` for an empty category. |
-| What may the final property segment be? | The CSS property name in full (`outline-color`, `padding-block`, `line-height`), or one of the kit's four abbreviations - `bg` for `background-color`, `radius` for `border-radius`, `size` for a min/max dimension pair, `gap` - or, where the value is not a whole property but an argument or one part of a shorthand, the sub-value's own name: `brightness`, `offset`, `duration`. Nothing else is abbreviated. |
+| What may the final property segment be? | The CSS property name in full (`outline-color`, `padding-block`, `line-height`), or one of the shared abbreviations - `bg` for `background-color`, `radius` for `border-radius`, `size` for a min/max dimension pair, `gap` - or, where the value is not a whole property but an argument or one part of a shorthand, the sub-value's own name: `brightness`, `offset`, `duration`. Nothing else is abbreviated. |
 | May `data-slot` and `data-part` carry the same name on one element? | Yes. |
 | Does Structure show state the module writes? | Yes - the same sibling-examples rule. Add one line of prose saying which of those attributes the module maintains, so a reader does not think they have to keep them in sync by hand. |
 | What notation does a Role entry use? | `implicit <role>` for a role the element already has, `<role>` for one written with a `role` attribute, `generic` for an element with no meaningful role, and `presentation` for one hidden from the tree. Entries mirror the Element entries in order and carry the same part labels, so the two rows read side by side. |
@@ -117,7 +120,7 @@ every other vendor.
 
 | Key | Required | Rule |
 | --- | --- | --- |
-| `name` | yes | Matches the parent directory exactly. Lowercase letters, digits and single inner hyphens; no leading, trailing or doubled hyphen; 64 characters or fewer. |
+| `name` | yes | Matches the parent directory exactly, starts with `ui-`, and otherwise uses lowercase letters, digits and single inner hyphens; no leading, trailing or doubled hyphen; 64 characters or fewer. |
 | `description` | yes | Third person, 1–1024 characters, no first- or second-person pronoun. States what the component is and when an agent should reach for it. |
 | `license` | no | SPDX identifier. |
 | `allowed-tools` | no | Comma-separated tool list. |
@@ -127,14 +130,14 @@ Banned outright, and checked by the portability lint:
 
 - `disable-model-invocation`, `hint` — Claude Code extensions, not in the standard.
 - `${CLAUDE_PLUGIN_ROOT}` — a Claude Code variable Codex does not expand. Reference
-  sibling files with a relative path instead: `references/button.md`.
+  sibling files with a relative path instead: `references/ui-button.md`.
 - Backslash paths — Windows separators break POSIX agents.
 
 ### Description
 
 The description is the entire discovery mechanism. It loads at startup for every
-skill in the kit; the body does not. A component that triggers on the wrong request,
-or fails to trigger on the right one, cannot be fixed in the body.
+skill in the repository; the body does not. A component that triggers on the wrong
+request, or fails to trigger on the right one, cannot be fixed in the body.
 
 Write it in third person, name the component, and name the situations that should
 reach for it — including phrasings that avoid the component's own jargon.
@@ -153,7 +156,7 @@ the reference and state the rules an agent must not get wrong.
 
 ```markdown
 ---
-name: <component>
+name: ui-<component-slug>
 description: <third person, one or two sentences>
 ---
 
@@ -175,7 +178,7 @@ One sentence: what it is.
   the request already maps cleanly to the contract.
 
 ## Build it
-1. Read `references/<component>.md`.
+1. Read `references/ui-<component-slug>.md`.
 2. Copy the Structure and Styles blocks; adapt only the template syntax to the stack.
 3. ...
 
@@ -183,7 +186,7 @@ One sentence: what it is.
 - the accessibility rules that must survive any port
 ```
 
-## 2. references/&lt;name&gt;.md
+## 2. references/&lt;skill-name&gt;.md
 
 ### Skeleton
 
@@ -240,7 +243,7 @@ Rules for the shape:
    internal parts, no framework template syntax.
 2. **Styles** — opens with the one-line qualifier declaration (see the settled
    questions), then plain CSS. Every themeable value is
-   `var(--auk-<component>-<prop>, <literal>)`. The fallback makes the component work
+   `var(--auk-<component-slug>-<prop>, <literal>)`. The fallback makes the component work
    with no custom properties defined anywhere; the variable makes it theme cleanly.
 3. **Behaviour** — a dependency-free ES module exporting `init<Component>(root)`. It
    may export other helpers, but that init function must exist and must return a
@@ -259,9 +262,9 @@ or an external package.
 The one exception is the required `references/react-demo.tsx` projection demo. It
 may name React and import React types or hooks because it is an adapter reference
 for apps that already use React, not production code shipped to consumers. That
-exception is deliberately file-scoped: `SKILL.md`, `references/<name>.md` and
+exception is deliberately file-scoped: `SKILL.md`, `references/<skill-name>.md` and
 `references/demo.html` remain framework-neutral, and the portability lint excludes
-only `skills/<name>/references/react-demo.tsx`.
+only `skills/<skill-name>/references/react-demo.tsx`.
 
 Design tokens are an optional mapping layer, never a requirement. A reference ships
 literal CSS with `var(--auk-*, fallback)`; it does not reference a token file, and no
@@ -285,7 +288,7 @@ the browser suite can drive them.
 
 ## 4. Evaluations
 
-Each skill has `evals/<name>.json` holding at least three scenarios:
+Each skill has `evals/<skill-name>.json` holding at least three scenarios:
 
 - one **obvious** request using the component's own vocabulary;
 - one **oblique** request that avoids that vocabulary entirely;
@@ -302,8 +305,8 @@ and the assertions to back it.
 
 ## 6. Tests
 
-Every component adds `tests/e2e/<name>.spec.ts` asserting, at minimum, one case per
-WCAG criterion in its contract, plus zero axe-core violations on its demo. Whole-kit
+Every component adds `tests/e2e/<skill-name>.spec.ts` asserting, at minimum, one case per
+WCAG criterion in its contract, plus zero axe-core violations on its demo. Whole-repository
 rules — frontmatter, required React projection presence and typed surface,
 portability, demo-matches-reference — are asserted once in `tests/objective.spec.ts`,
 which iterates `skills/`, so a new component is covered by them without editing a
@@ -317,7 +320,7 @@ Six gates, in order. Any failure stops the run.
    demo matches reference), `tests/unit/frontmatter.spec.ts` (the validator itself),
    `tests/integration/manifests.spec.ts` (both plugin manifests agree).
 2. **Portability lint** — `scripts/lint-portability.mjs`, over `skills/` only,
-   except `skills/<name>/references/react-demo.tsx`: `${CLAUDE_PLUGIN_ROOT}`,
+   except `skills/<skill-name>/references/react-demo.tsx`: `${CLAUDE_PLUGIN_ROOT}`,
    `disable-model-invocation:`, `hint:`, backslash paths, framework names,
    preprocessor names, package imports, install instructions.
 3. **No external resources** — nothing under `skills/` may carry `src`, `srcset`,
@@ -336,12 +339,12 @@ through the gate, so each check is known to be able to fail.
 
 Before a component is done:
 
-- [ ] Frontmatter uses standard keys only and `name` matches the directory.
+- [ ] Frontmatter uses standard keys only and `name` matches the directory with the `ui-` prefix.
 - [ ] Description is third person, pronoun-free, and covers oblique phrasing.
 - [ ] Body is under 60 lines and holds no component code.
 - [ ] Contract table has all seven rows, in order.
 - [ ] All five reference sections present, in order, one fenced block each.
-- [ ] Every themeable CSS value is `var(--auk-<component>-*, literal)`.
+- [ ] Every themeable CSS value is `var(--auk-<component-slug>-*, literal)`.
 - [ ] No framework, preprocessor or package named outside the scoped React projection reference.
 - [ ] `references/react-demo.tsx` exists as a typed React projection reference.
 - [ ] Demo opens from `file://` and matches the reference verbatim.

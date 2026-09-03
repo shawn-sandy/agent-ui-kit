@@ -7,10 +7,10 @@ conflict. Read it before creating or editing anything under `skills/`.
 
 ## What this is
 
-Agent UI Kit ships accessible UI components as vendor-neutral Agent Skills, not as an
-installable library. An agent reads `skills/<name>/references/<name>.md` and builds the
-component into the user's own project; nothing is installed into the consuming app. No
-framework, no build step, no runtime dependency - all deliberate.
+Agent UI Skills ships accessible UI components as vendor-neutral Agent Skills, not as an
+installable library. An agent reads `skills/ui-<component>/references/ui-<component>.md`
+and builds the component into the user's own project; nothing is installed into the
+consuming app. No framework, no build step, no runtime dependency - all deliberate.
 
 ## Commands
 
@@ -45,12 +45,16 @@ have its marker line renamed before the build can find the region.
 
 ## Adding a component
 
+Skill names and directories use `ui-<component>`. The public component slug stays
+unprefixed, so `skills/ui-button/` still ships `auk-button`, `--auk-button-*`,
+`initButton` and `AukButtonProps`.
+
 Beyond `SKILL.md`, the reference and the demo, two files are required and easy to miss:
 
-- `tests/e2e/<name>.spec.ts` - every WCAG criterion in the contract table needs a test
+- `tests/e2e/ui-<component>.spec.ts` - every WCAG criterion in the contract table needs a test
   whose title starts with that criterion, matched by prefix in
   `tests/objective.spec.ts`.
-- `evals/<name>.json` - at least three scenarios whose kinds include `obvious`,
+- `evals/ui-<component>.json` - at least three scenarios whose kinds include `obvious`,
   `oblique` and `adjacent`. Asserted by `tests/objective.spec.ts`.
 
 `/new-component` walks the whole running order.
@@ -83,6 +87,7 @@ under a context budget, so a trailing clause is lost.
 
 - `description` must be third person and free of first- and second-person pronouns
   (`tests/lib/frontmatter.ts`). The reflex phrasing "Use when you need..." fails.
+- `name` must match the directory and start with `ui-`.
 - `SKILL.md` body under 60 lines, with no component code fences.
 - Wrap reference prose at 88 columns. Tables, code fences, contract cells and the
   qualifier line are exempt.

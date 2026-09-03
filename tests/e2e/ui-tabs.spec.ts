@@ -6,7 +6,7 @@ const TABS = ['tab-profile', 'tab-billing', 'tab-notifications'];
 const PANELS = ['panel-profile', 'panel-billing', 'panel-notifications'];
 
 test.beforeEach(async ({ page }) => {
-  await page.goto(demoUrl('tabs'));
+  await page.goto(demoUrl('ui-tabs'));
 });
 
 /** ids of every tab currently in the page's tab order. */
@@ -100,7 +100,7 @@ test('4.1.2 Name, Role, Value: every tab is paired to its panel both ways', asyn
 test('a panel id that is not a legal CSS selector still resolves', async ({ page }) => {
   // "panel:billing" is legal HTML but querySelector('#panel:billing') throws, which
   // would take out the whole tab set rather than just missing the panel.
-  await page.goto(demoUrl('tabs'));
+  await page.goto(demoUrl('ui-tabs'));
   const rewired = await page.evaluate(() => {
     const panel = document.getElementById('panel-billing')!;
     const tab = document.querySelector('[aria-controls="panel-billing"]')!;

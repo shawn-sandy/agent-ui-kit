@@ -1,15 +1,15 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
-  "name": "agent-ui-kit",
-  "displayName": "Agent UI Kit",
+  "name": "agent-ui-skills",
+  "displayName": "Agent UI Skills",
   "version": "0.2.0",
   "description": "Vendor-neutral UI component skills. Each skill ships a complete reference - semantic HTML, plain CSS custom properties, and dependency-free JavaScript - that an agent builds into your project in your stack. No framework, no design system, no package to install.",
   "author": {
     "name": "Shawn Sandy",
     "url": "https://github.com/shawn-sandy"
   },
-  "homepage": "https://github.com/shawn-sandy/agent-ui-kit",
-  "repository": "https://github.com/shawn-sandy/agent-ui-kit",
+  "homepage": "https://github.com/shawn-sandy/agent-ui-skills",
+  "repository": "https://github.com/shawn-sandy/agent-ui-skills",
   "license": "MIT",
   "keywords": [
     "ui",

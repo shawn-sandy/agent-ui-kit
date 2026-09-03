@@ -1,9 +1,9 @@
 # Vendor support
 
 What actually happened when each vendor was pointed at this repository, recorded on
-2026-09-02 against `agent-ui-kit` 0.2.0. Every other check in this repo tests the
-files. This is the only one that tests the README's claim that one `skills/` tree
-serves two vendors.
+2026-09-02 against `agent-ui-skills` 0.2.0 and updated on 2026-09-03 for the
+`ui-` skill-name rule. Every other check in this repo tests the files. This is the
+only one that tests the README's claim that one `skills/` tree serves two vendors.
 
 Failures are recorded here rather than fixed silently.
 
@@ -15,10 +15,10 @@ Version: the `claude` CLI on the author's machine at the time of writing.
 | --- | --- |
 | `claude plugin validate . --strict` | Passes. It is gate 5 of `scripts/check.sh`. |
 | Plugin loads from a local directory | Yes, via `claude --plugin-dir <repo>`. |
-| All four skills register | Yes: `agent-ui-kit:button`, `agent-ui-kit:alert`, `agent-ui-kit:dialog`, `agent-ui-kit:tabs`. |
+| All four skills register | Yes: `agent-ui-skills:ui-button`, `agent-ui-skills:ui-alert`, `agent-ui-skills:ui-dialog`, `agent-ui-skills:ui-tabs`. |
 | Skills are invocable by name | Yes. All four appear in the session's slash-command list. |
 | Skills are model-invocable | Yes. All four appear in the session's auto-invocable skill list, not only as slash commands. |
-| A skill actually fires and is used | Yes. A headless run of the `button-obvious` scenario invoked `Skill(skill: "agent-ui-kit:button")`, read `skills/button/references/button.md`, and edited the target project. |
+| A skill actually fires and is used | Yes. A headless run of the `ui-button-obvious` scenario invoked `Skill(skill: "agent-ui-skills:ui-button")`, read `skills/ui-button/references/ui-button.md`, and edited the target project. |
 
 ### Finding: a request needs a concrete target before any skill fires
 
@@ -45,18 +45,18 @@ Version: `codex-cli 0.145.0`, model `gpt-5.5`.
 
 | Check | Result |
 | --- | --- |
-| Discovery path | `~/.codex/skills/<name>/SKILL.md`. The four skill directories were linked in under their own names. |
+| Discovery path | `~/.codex/skills/<skill-name>/SKILL.md`. The four skill directories were linked in under their own names. |
 | All four skills discovered | Yes. Codex listed all four with their descriptions when asked. |
 | Frontmatter accepted | Yes. No warning about `license`, and no complaint about any key. |
-| A skill actually fires and is used | Yes. `codex exec --full-auto` on the `button-obvious` scenario produced `class="auk-button"` with `data-variant="primary"` and `data-variant="destructive"`, wrote 26 `var(--auk-button-*, …)` declarations into the project stylesheet, and set `aria-disabled="true"` for the in-flight state. |
+| A skill actually fires and is used | Yes. `codex exec --full-auto` on the `ui-button-obvious` scenario produced `class="auk-button"` with `data-variant="primary"` and `data-variant="destructive"`, wrote 26 `var(--auk-button-*, …)` declarations into the project stylesheet, and set `aria-disabled="true"` for the in-flight state. |
 | The `aria-disabled` guard survived the port | Yes. Codex wrote `if (saveButton.getAttribute("aria-disabled") === "true") return;` - the exact contract the reference states, in the consumer's own handler. |
 | `codex plugin add` from a local directory | Not supported. `codex plugin add` installs from a configured marketplace snapshot, so the plugin-install path was not exercised; only the skills tree was. |
 
 ### Finding: the Codex manifest supplies the namespace
 
-Linked in through the repository, the skills were reported as `agent-ui-kit:button`
-and so on. The same skill copied to `~/.codex/skills/button/` with no repository
-around it was reported as bare `button`. So `.codex-plugin/plugin.json` is doing real
+Linked in through the repository, the skills were reported as `agent-ui-skills:ui-button`
+and so on. The same skill copied to `~/.codex/skills/ui-button/` with no repository
+around it was reported as bare `ui-button`. So `.codex-plugin/plugin.json` is doing real
 work: Codex resolves the skill back to the repository root and takes the plugin name
 from that manifest.
 
@@ -67,13 +67,14 @@ Every Codex run emitted:
 > Skill descriptions were shortened to fit the 2% skills context budget. Codex can
 > still see every skill, but some descriptions are shorter.
 
-The four descriptions in this kit are 250 to 340 characters. Under that budget the
+The four descriptions in this repository are 250 to 340 characters. Under that budget the
 tail of a description - which is where the "not for X" disambiguation lives - is the
 part at risk. Putting the distinguishing phrase early in a description, rather than in
-a trailing clause, is a portability concern this kit did not previously know about.
+a trailing clause, is a portability concern this repository did not previously know about.
 
 ## What was changed on the machine, and put back
 
-The Codex check placed four symlinks in `~/.codex/skills/` and, for the namespace
-check, one copied directory. All five were removed afterwards; that directory is back
-to the 24 entries it held before. Nothing else outside this repository was touched.
+The Codex check placed four `ui-` prefixed symlinks in `~/.codex/skills/` and, for
+the namespace check, one copied directory. All five were removed afterwards; that
+directory is back to the 24 entries it held before. Nothing else outside this
+repository was touched.

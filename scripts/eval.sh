@@ -12,7 +12,7 @@ usage:
   scripts/eval.sh baseline                run every scenario with all skills disabled
   scripts/eval.sh skills                  run every scenario with this repo loaded as a plugin
 
-skills: button alert dialog tabs
+skills: ui-button ui-alert ui-dialog ui-tabs
 env: EVAL_MODELS=haiku,sonnet,opus  EVAL_CONCURRENCY=4
 USAGE
 }

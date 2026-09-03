@@ -3,8 +3,8 @@
 ## Project Structure & Module Organization
 
 This repository publishes vendor-neutral UI component skills. The canonical
-component content lives under `skills/<component>/`: `SKILL.md` contains trigger
-guidance, `references/<component>.md` contains the contract, HTML, CSS, JS, and
+component content lives under `skills/ui-<component>/`: `SKILL.md` contains trigger
+guidance, `references/ui-<component>.md` contains the contract, HTML, CSS, JS, and
 accessibility notes, and `references/demo.html` is the self-contained browser
 demo. Keep shared documentation in `docs/`, evaluation scenarios in `evals/`,
 automation in `scripts/`, and tests in `tests/` (`unit`, `integration`, and
@@ -25,15 +25,16 @@ automation in `scripts/`, and tests in `tests/` (`unit`, `integration`, and
 
 Use ESM syntax for scripts and TypeScript tests. Match the existing style:
 2-space indentation, single quotes, semicolons, and concise comments only where
-they explain a non-obvious constraint. Component names are lowercase directory
-names with single inner hyphens. Root classes use `auk-<component>`, parts use
+they explain a non-obvious constraint. Skill names and directories must be
+`ui-<component>` with single inner hyphens. Component slugs stay unprefixed for
+the public DOM contract: root classes use `auk-<component>`, parts use
 `data-part`, variants use `data-variant`, and custom properties use
 `--auk-<component>-<property>`. Component reference prose should wrap near 88
 columns; tables and code may exceed that when clearer.
 
 ## Testing Guidelines
 
-Every new or changed component needs a matching `tests/e2e/<component>.spec.ts`
+Every new or changed component needs a matching `tests/e2e/ui-<component>.spec.ts`
 covering the WCAG claims made in its reference. Unit and integration tests use
 Vitest naming like `tests/unit/frontmatter.spec.ts` and
 `tests/integration/manifests.spec.ts`. Do not claim measured accessibility values
@@ -45,14 +46,14 @@ CSS/JS under `skills/`.
 
 History uses Conventional Commits, for example `docs: add component authoring
 specification`, `feat: vendor-neutral UI component skills`, and `chore: scaffold
-agent-ui-kit repository structure`. Use the same format for new commits. Pull
+agent-ui-skills repository structure`. Use the same format for new commits. Pull
 requests should summarize the affected skill or script, note contract or demo
 changes, link issues when available, and report `npm run check` results. Include
 screenshots or demo notes for visible component changes.
 
 ## Agent-Specific Instructions
 
-Edit `references/<component>.md` first, then regenerate `demo.html`; do not
+Edit `references/ui-<component>.md` first, then regenerate `demo.html`; do not
 hand-maintain generated demo regions. Keep the `skills/` tree portable across
 Codex and Claude Code, and update both plugin manifests only when their shared
 contract changes.

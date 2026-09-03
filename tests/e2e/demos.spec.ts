@@ -1,5 +1,5 @@
 /**
- * Whole-kit accessibility sweep, data-driven over skills/ so a component added later
+ * Whole-repository accessibility sweep, data-driven over skills/ so a component added later
  * is scanned without this file being edited. Per-component specs drive the states
  * that only exist after an interaction; this one covers the page as it loads.
  */
@@ -14,7 +14,7 @@ const skills = readdirSync(resolve(import.meta.dirname, '../../skills'), { withF
   .map((e) => e.name)
   .sort();
 
-test('the kit has components in it', () => {
+test('the repository has components in it', () => {
   expect(skills.length).toBeGreaterThan(0);
 });
 

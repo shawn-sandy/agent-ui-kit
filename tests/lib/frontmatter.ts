@@ -10,6 +10,7 @@ export const STANDARD_KEYS = ['name', 'description', 'license', 'allowed-tools',
 
 /** Lowercase alphanumeric segments joined by single hyphens; no edge or doubled hyphen. */
 export const NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+export const NAME_PREFIX = 'ui-';
 
 export const MAX_NAME = 64;
 export const MAX_DESCRIPTION = 1024;
@@ -20,6 +21,12 @@ const PRONOUNS = /\b(?:I|I'm|we|we're|our|us|me|my|you|you're|your|yours)\b/i;
 export interface Violation {
   rule: string;
   message: string;
+}
+
+function isPackagedSkill(skillPath: string): boolean {
+  const normalized = skillPath.replace(/\\/g, '/');
+  if (/(?:^|\/)\.(?:agents|claude|codex)\/skills\//.test(normalized)) return false;
+  return /(?:^|\/)skills\/[^/]+\/SKILL\.md$/.test(normalized);
 }
 
 /**
@@ -55,6 +62,9 @@ export function validateSkill(source: string, skillPath: string): Violation[] {
     fail('name-required', 'name is missing or not a string');
   } else {
     if (!NAME_PATTERN.test(name)) fail('name-pattern', `name "${name}" is not lowercase-hyphen-separated`);
+    if (isPackagedSkill(skillPath) && !name.startsWith(NAME_PREFIX)) {
+      fail('name-prefix', `name "${name}" must start with "${NAME_PREFIX}"`);
+    }
     if (name.length > MAX_NAME) fail('name-length', `name is ${name.length} characters, max ${MAX_NAME}`);
     const dir = basename(dirname(skillPath));
     if (name !== dir) fail('name-matches-directory', `name "${name}" does not match directory "${dir}"`);

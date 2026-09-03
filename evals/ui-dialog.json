@@ -1,10 +1,10 @@
 {
-  "skill": "dialog",
+  "skill": "ui-dialog",
   "scenarios": [
     {
-      "id": "dialog-obvious",
+      "id": "ui-dialog-obvious",
       "kind": "obvious",
-      "expect": "dialog",
+      "expect": "ui-dialog",
       "prompt": "In index.html, build a modal dialog that confirms account deletion. It opens from a button in the account settings panel.",
       "baselineFailure": "never chooses where focus lands on open, so the browser focuses the first focusable element - typically the close button, one keystroke from the destructive action",
       "detect": {
@@ -14,9 +14,9 @@
       }
     },
     {
-      "id": "dialog-oblique",
+      "id": "ui-dialog-oblique",
       "kind": "oblique",
-      "expect": "dialog",
+      "expect": "ui-dialog",
       "prompt": "In index.html I need an overlay panel where the keyboard cannot wander off behind it, Escape gets you out, and when it closes the cursor lands back on whatever opened it.",
       "baselineFailure": "hand-rolls a focus trap over a div with role=dialog instead of using the native element, which means the page behind stays reachable",
       "detect": {
@@ -26,7 +26,7 @@
       }
     },
     {
-      "id": "dialog-adjacent",
+      "id": "ui-dialog-adjacent",
       "kind": "adjacent",
       "expect": null,
       "prompt": "In index.html, add a dropdown menu under the avatar in the header, with profile and sign-out items.",

@@ -1,5 +1,5 @@
 ---
-name: button
+name: ui-button
 description: Accessible button - a clickable control that runs an action in the current page. Use when adding, styling or fixing a button, a submit or action control, or when making one unavailable while keeping it reachable by keyboard. Not a link to another page.
 license: MIT
 ---
@@ -31,7 +31,7 @@ cleanly to the contract, proceed and state any assumptions.
 
 ## Build it
 
-1. Read `references/button.md` for the markup, styles and accessibility contract.
+1. Read `references/ui-button.md` for the markup, styles and accessibility contract.
 2. Copy the Structure block. Keep the element, `type`, `data-variant` and the ARIA
    attributes exactly; adapt only template syntax to the target stack.
 3. Copy the Styles block as-is. It needs no custom properties to be defined - every

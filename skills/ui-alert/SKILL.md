@@ -1,5 +1,5 @@
 ---
-name: alert
+name: ui-alert
 description: Accessible alert - a live region that announces text appearing after page load. Use when adding an error banner, validation summary, success message, toast, notification or snackbar, or when a screen reader user must hear that something failed or finished. Not a blocking dialog.
 license: MIT
 ---
@@ -32,7 +32,7 @@ any assumptions.
 
 ## Build it
 
-1. Read `references/alert.md` for the markup, styles and accessibility contract.
+1. Read `references/ui-alert.md` for the markup, styles and accessibility contract.
 2. Copy the Structure block. Pick the variant, and take the `role`, `aria-live` and
    `aria-atomic` values that go with it from the table in that file.
 3. Render the region into the page **empty**, at load. Fill it later.

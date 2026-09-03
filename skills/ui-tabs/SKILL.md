@@ -1,5 +1,5 @@
 ---
-name: tabs
+name: ui-tabs
 description: Accessible tabs - a row of controls showing one panel at a time. Use when adding tabs, a tabbed interface, or switchable sections driven by the arrow keys, including roving tabindex so a single Tab press clears the whole row. Not navigation between pages.
 license: MIT
 ---
@@ -33,7 +33,7 @@ request already maps cleanly to the contract, proceed and state any assumptions.
 
 ## Build it
 
-1. Read `references/tabs.md` for the markup, styles, module and accessibility
+1. Read `references/ui-tabs.md` for the markup, styles, module and accessibility
    contract.
 2. Copy the Structure block. Every tab needs an `id` and an `aria-controls`; every
    panel needs an `id` and an `aria-labelledby` pointing back. The pairing is what
