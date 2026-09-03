@@ -211,3 +211,46 @@ test('opening the auto popover a second time closes the first', async ({ page })
   expect(await isOpen(page, 'notes-popover')).toBe(true);
   expect(await isOpen(page, 'filters-popover')).toBe(false);
 });
+
+/** Viewport boxes of a trigger and its popover, read together so neither can move between reads. */
+const boxes = (page: Page, triggerId: string, popoverId: string) =>
+  page.evaluate(
+    ([t, p]) => {
+      const rect = (id: string) => {
+        const b = document.getElementById(id)!.getBoundingClientRect();
+        return { x: b.x, y: b.y, right: b.right, bottom: b.bottom };
+      };
+      return { trigger: rect(t), popover: rect(p) };
+    },
+    [triggerId, popoverId],
+  );
+
+test('the popover opens adjacent to its trigger rather than centred', async ({ page }) => {
+  await page.locator('#filters-trigger').click();
+  expect(await isOpen(page, 'filters-popover')).toBe(true);
+
+  const { trigger, popover } = await boxes(page, 'filters-trigger', 'filters-popover');
+  // Directly below, left edges aligned. The gap between them is the offset property;
+  // anything wider than a line of text means the popover is somewhere else entirely.
+  expect(popover.x).toBeCloseTo(trigger.x, 0);
+  expect(popover.y).toBeGreaterThanOrEqual(trigger.bottom);
+  expect(popover.y - trigger.bottom).toBeLessThan(16);
+});
+
+test('the popover flips above a trigger that sits near the bottom of the viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1000, height: 700 });
+  await page.evaluate(() => {
+    document.getElementById('filters-trigger')!.style.cssText = 'position:fixed;left:32px;bottom:8px;';
+  });
+  await page.locator('#filters-trigger').click();
+  expect(await isOpen(page, 'filters-popover')).toBe(true);
+
+  // No room below, so the fallback places it above. It must still be fully on screen:
+  // a popover that flips and then runs off the top is no better than one that overflows.
+  const { trigger, popover } = await boxes(page, 'filters-trigger', 'filters-popover');
+  expect(popover.bottom).toBeLessThanOrEqual(trigger.y);
+  expect(popover.y).toBeGreaterThanOrEqual(0);
+  expect(popover.x).toBeCloseTo(trigger.x, 0);
+});

@@ -88,6 +88,19 @@ is open, so the closed state stays the browser's. There is deliberately no
 `::backdrop` rule: the page behind a popover is not inert, and a scrim over content
 that is still clickable tells the user the opposite of the truth.
 
+The `@supports` block moves the popover next to its trigger. A popover opened through
+`popovertarget` already has that trigger as its implicit anchor, so `position-area`
+places it with no `anchor-name` on the button and no script. `position-try-fallbacks`
+is what makes the placement dynamic: when the default position would overflow the
+viewport, the browser flips the popover above the trigger, to its other side, or
+both, and re-evaluates on every scroll and resize. The user agent's `inset: 0` and
+`margin: auto` are reset inside the block so that neither competes with the anchor
+for the same axis. A browser without anchor positioning skips the block and keeps
+the browser's centred placement, so the component degrades to what it was rather
+than to something broken. Placement is themeable through
+`--auk-popover-position-area`; the gap between trigger and popover through
+`--auk-popover-offset`, which sits on the block axis and flips with it.
+
 ```css
 .auk-popover {
   inline-size: var(--auk-popover-inline-size, min(22rem, calc(100vw - 2rem)));
@@ -104,6 +117,15 @@ that is still clickable tells the user the opposite of the truth.
 .auk-popover:popover-open {
   display: flex;
   flex-direction: column;
+}
+
+@supports (position-area: block-end) {
+  .auk-popover:popover-open {
+    inset: auto;
+    margin: var(--auk-popover-offset, 0.25rem) 0 0;
+    position-area: var(--auk-popover-position-area, block-end span-inline-end);
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
 }
 
 .auk-popover [data-part="header"] {
@@ -285,7 +307,9 @@ export function initPopover(popover) {
 modes plus page content behind them, which is how the non-modal behaviour becomes
 visible.
 
-Look for: the `auto` popover closing on Escape and on a click anywhere outside it;
-the `manual` popover ignoring both and closing only from its own button; a link
-behind an open popover still responding to a click; and each trigger's
-`aria-expanded` flipping to `true` while its own popover is open.
+Look for: each popover opening directly under its own trigger with their left edges
+aligned, and flipping above it once the window is short enough that there is no room
+below; the `auto` popover closing on Escape and on a click anywhere outside it; the
+`manual` popover ignoring both and closing only from its own button; a link behind
+an open popover still responding to a click; and each trigger's `aria-expanded`
+flipping to `true` while its own popover is open.

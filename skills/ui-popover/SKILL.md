@@ -1,6 +1,6 @@
 ---
 name: ui-popover
-description: Accessible non-modal popover on the native HTML popover attribute - a panel that opens above the page without blocking it. Use when adding a filter panel, a disclosure card, a settings flyout, an inline notice, a dropdown surface, or any layer that closes on Escape or an outside click while the page behind stays clickable and tabbable. Covers auto and manual modes, top-layer placement that no overflow or z-index can clip, and trigger state. Not a modal.
+description: Accessible non-modal popover on the native HTML popover attribute - a panel that opens above the page without blocking it. Use when adding a filter panel, a disclosure card, a settings flyout, an inline notice, a dropdown surface, or any layer that closes on Escape or an outside click while the page behind stays clickable and tabbable. Covers auto and manual modes, anchoring beside the trigger with automatic flipping to stay on screen, top-layer placement that no overflow or z-index can clip, and trigger state. Not a modal.
 license: MIT
 ---
 
@@ -45,7 +45,7 @@ proceed and state any assumptions.
    control carrying `popovertargetaction="hide"`.
 4. Copy the Behaviour module and call `initPopover(popoverElement)` once per popover.
 5. Copy the Styles block as-is.
-6. Open `references/demo.html` and check the four behaviours listed there.
+6. Open `references/demo.html` and check the behaviours listed there.
 
 ## Non-negotiable
 

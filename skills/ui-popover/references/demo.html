@@ -37,6 +37,15 @@ a:focus-visible { outline: 3px solid #111827; outline-offset: 2px; }
   flex-direction: column;
 }
 
+@supports (position-area: block-end) {
+  .auk-popover:popover-open {
+    inset: auto;
+    margin: var(--auk-popover-offset, 0.25rem) 0 0;
+    position-area: var(--auk-popover-position-area, block-end span-inline-end);
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+}
+
 .auk-popover [data-part="header"] {
   display: flex;
   align-items: flex-start;
