@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Box - agent-ui-skills demo</title>
+<style>
+/* Page chrome for the demo only. Not part of the component. The page ground is grey
+   on purpose: the plain variant is white with a transparent border, so on a white
+   page there would be nothing to look at. */
+body { font-family: system-ui, sans-serif; margin: 0; padding: 2rem; color: #111827; background: #f3f4f6; }
+h1 { font-size: 1.25rem; }
+h2 { font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #374151; }
+h3 { font-size: 1rem; margin-block: 0 0.5rem; }
+p { margin-block: 0; }
+p + p { margin-block-start: 0.5rem; }
+section { margin-block-end: 1.5rem; max-inline-size: 34rem; }
+
+/* Generated from ui-box.md by scripts/build-demos.mjs. Edit the reference, not this. */
+.auk-box {
+  box-sizing: border-box;
+  display: block;
+  padding: var(--auk-box-padding, 1rem);
+  border: var(--auk-box-border-width, 1px) solid var(--auk-box-border-color, transparent);
+  border-radius: var(--auk-box-radius, 0.375rem);
+  min-block-size: var(--auk-box-min-block-size, auto);
+  color: var(--auk-box-color, #1f2937);
+  background-color: var(--auk-box-bg, #ffffff);
+}
+
+.auk-box[data-variant="invert"] {
+  color: var(--auk-box-invert-color, #f9fafb);
+  background-color: var(--auk-box-invert-bg, #1f2937);
+  border-color: var(--auk-box-invert-border-color, transparent);
+}
+</style>
+</head>
+<body>
+<h1>Box</h1>
+
+<section>
+  <h2>Plain - the base rule, no attribute</h2>
+  <div class="auk-box" id="box-plain">
+    <h3>Delivery window</h3>
+    <p>Orders placed before 4pm ship the same working day. Anything later goes out on the next
+      collection, which for most addresses means one extra day in transit.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Inverted - both colours swap, never one alone</h2>
+  <div class="auk-box" data-variant="invert" id="box-invert">
+    <h3>Out of stock</h3>
+    <p>This item is expected back in three weeks. Nothing is charged until it ships, and the
+      order can be cancelled at any point before then.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Nested - the composition story</h2>
+  <div class="auk-box" id="box-outer">
+    <h3>Payment</h3>
+    <p>Cards are charged when the order ships, not when it is placed.</p>
+    <div class="auk-box" data-variant="invert" id="box-inner">
+      <p>Refunds take up to five working days to appear on a statement.</p>
+    </div>
+  </div>
+</section>
+</body>
+</html>
