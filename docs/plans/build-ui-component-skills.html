@@ -1607,10 +1607,10 @@ img, video { max-width: 100%; height: auto; }
         <li><a class="rail-step" href="#step-2"><span class="rail-no">2</span><span class="rail-text">Write docs/component-spec.md defining both halves of the authoring contract — what belongs in SKILL.md (standard frontmatter keys only, a third-person description, a body under 60 lines, no component code) and what belongs in the reference (element, role, props, slots, variants, behaviour, WCAG criteria, plus the five body sections Structure, Styles, Behaviour, Accessibility and Demo).</span><span class="rail-state">step 2 of 11</span></a></li>
         <li><a class="rail-step done" href="#step-3"><span class="rail-no">✓</span><span class="rail-text">Write three evaluation scenarios per component in evals/ and record a baseline run, with no skills installed, in docs/evaluations.md.</span><span class="rail-state">step 3 of 11, done</span></a></li>
         <li><a class="rail-step done" href="#step-4"><span class="rail-no">✓</span><span class="rail-text">Build scripts/check.sh running four gates in order — the Vitest unit suite, a portability lint over every file under skills/, <code class="md">claude plugin validate . --strict</code>, and the Playwright browser suite.</span><span class="rail-state">step 4 of 11, done</span></a></li>
-        <li><a class="rail-step done" href="#step-5"><span class="rail-no">✓</span><span class="rail-text">Write skills/button/ with no JavaScript, lifting from acss-kit the decision to use <code class="md">aria-disabled</code> instead of the native disabled attribute so a disabled button stays in the keyboard tab order.</span><span class="rail-state">step 5 of 11, done</span></a></li>
-        <li><a class="rail-step done" href="#step-6"><span class="rail-no">✓</span><span class="rail-text">Write skills/alert/ as an ARIA live region (the mechanism that makes a screen reader announce content appearing after page load), still with no JavaScript.</span><span class="rail-state">step 6 of 11, done</span></a></li>
-        <li><a class="rail-step done" href="#step-7"><span class="rail-no">✓</span><span class="rail-text">Write skills/dialog/ using the native dialog element plus a dependency-free ES module for focus management.</span><span class="rail-state">step 7 of 11, done</span></a></li>
-        <li><a class="rail-step done" href="#step-8"><span class="rail-no">✓</span><span class="rail-text">Write skills/tabs/ using roving tabindex (keeping exactly one tab in the keyboard tab order and moving it with the arrow keys), with no acss-kit source to lift from.</span><span class="rail-state">step 8 of 11, done</span></a></li>
+        <li><a class="rail-step done" href="#step-5"><span class="rail-no">✓</span><span class="rail-text">Write skills/ui-button/ with no JavaScript, lifting from acss-kit the decision to use <code class="md">aria-disabled</code> instead of the native disabled attribute so a disabled button stays in the keyboard tab order.</span><span class="rail-state">step 5 of 11, done</span></a></li>
+        <li><a class="rail-step done" href="#step-6"><span class="rail-no">✓</span><span class="rail-text">Write skills/ui-alert/ as an ARIA live region (the mechanism that makes a screen reader announce content appearing after page load), still with no JavaScript.</span><span class="rail-state">step 6 of 11, done</span></a></li>
+        <li><a class="rail-step done" href="#step-7"><span class="rail-no">✓</span><span class="rail-text">Write skills/ui-dialog/ using the native dialog element plus a dependency-free ES module for focus management.</span><span class="rail-state">step 7 of 11, done</span></a></li>
+        <li><a class="rail-step done" href="#step-8"><span class="rail-no">✓</span><span class="rail-text">Write skills/ui-tabs/ using roving tabindex (keeping exactly one tab in the keyboard tab order and moving it with the arrow keys), with no acss-kit source to lift from.</span><span class="rail-state">step 8 of 11, done</span></a></li>
         <li><a class="rail-step done" href="#step-9"><span class="rail-no">✓</span><span class="rail-text">Run all twelve evaluations against Haiku, Sonnet and Opus and record every result beside the baseline in docs/evaluations.md.</span><span class="rail-state">step 9 of 11, done</span></a></li>
         <li><a class="rail-step done" href="#step-10"><span class="rail-no">✓</span><span class="rail-text">Install the plugin into Claude Code from the local directory, place the same skills tree where Codex looks for it, and write down what happened in docs/vendor-support.md.</span><span class="rail-state">step 10 of 11, done</span></a></li>
         <li><a class="rail-step done" href="#step-11"><span class="rail-no">✓</span><span class="rail-text">Update README.md, bump both plugin manifests to 0.2.0, and add .github/workflows/check.yml running scripts/check.sh.</span><span class="rail-state">step 11 of 11, done</span></a></li>
@@ -1740,10 +1740,10 @@ img, video { max-width: 100%; height: auto; }
             </ul>
           </li>
           <li><code>evals/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">twelve triggering scenarios, three per component</span></li>
-          <li><code>skills/button/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference and standalone demo page</span></li>
-          <li><code>skills/alert/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference and standalone demo page</span></li>
-          <li><code>skills/dialog/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference, focus-management module and demo page</span></li>
-          <li><code>skills/tabs/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference, roving-tabindex module and demo page</span></li>
+          <li><code>skills/ui-button/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference and standalone demo page</span></li>
+          <li><code>skills/ui-alert/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference and standalone demo page</span></li>
+          <li><code>skills/ui-dialog/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference, focus-management module and demo page</span></li>
+          <li><code>skills/ui-tabs/</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">skill, reference, roving-tabindex module and demo page</span></li>
           <li><code>tests/objective.spec.ts</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">the whole-repository smoke test, data-driven over skills/</span></li>
           <li><code>tests/unit/frontmatter.spec.ts</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">this repo&#39;s own Agent Skills frontmatter validator</span></li>
           <li><code>tests/integration/manifests.spec.ts</code> <span class="file-badge file-badge-new">new</span> <span class="file-note">both plugin manifests read together</span></li>
@@ -1856,7 +1856,7 @@ img, video { max-width: 100%; height: auto; }
             <div class="step-body">
               <div class="step-action">
                 <span class="step-chip">done</span>
-                <span class="step-chip-text">Write skills/button/ with no JavaScript, lifting from acss-kit the decision to use <code class="md">aria-disabled</code> instead of the native disabled attribute so a disabled button stays in the keyboard tab order.</span>
+                <span class="step-chip-text">Write skills/ui-button/ with no JavaScript, lifting from acss-kit the decision to use <code class="md">aria-disabled</code> instead of the native disabled attribute so a disabled button stays in the keyboard tab order.</span>
               </div>
               <div class="step-note step-why-note">
                 <span class="step-note-label">Why</span>
@@ -1864,7 +1864,7 @@ img, video { max-width: 100%; height: auto; }
               </div>
               <div class="step-note step-verify">
                 <span class="step-note-label">Verify</span>
-                <div class="verify-body">check.sh passes, and tests/e2e/button.spec.ts confirms zero axe violations plus a disabled button that is reachable by Tab but does not fire on Enter, with all three button evaluations passing.</div>
+                <div class="verify-body">check.sh passes, and tests/e2e/ui-button.spec.ts confirms zero axe violations plus a disabled button that is reachable by Tab but does not fire on Enter, with all three ui-button evaluations passing.</div>
               </div>
             </div>
           </div>
@@ -1876,7 +1876,7 @@ img, video { max-width: 100%; height: auto; }
             <div class="step-body">
               <div class="step-action">
                 <span class="step-chip">done</span>
-                <span class="step-chip-text">Write skills/alert/ as an ARIA live region (the mechanism that makes a screen reader announce content appearing after page load), still with no JavaScript.</span>
+                <span class="step-chip-text">Write skills/ui-alert/ as an ARIA live region (the mechanism that makes a screen reader announce content appearing after page load), still with no JavaScript.</span>
               </div>
               <div class="step-note step-why-note">
                 <span class="step-note-label">Why</span>
@@ -1884,7 +1884,7 @@ img, video { max-width: 100%; height: auto; }
               </div>
               <div class="step-note step-verify">
                 <span class="step-note-label">Verify</span>
-                <div class="verify-body">tests/e2e/alert.spec.ts confirms zero axe violations, the alert role present, the live-region setting resolving to assertive, and the region already in the page before any content arrives.</div>
+                <div class="verify-body">tests/e2e/ui-alert.spec.ts confirms zero axe violations, the alert role present, the live-region setting resolving to assertive, and the region already in the page before any content arrives.</div>
               </div>
             </div>
           </div>
@@ -1896,7 +1896,7 @@ img, video { max-width: 100%; height: auto; }
             <div class="step-body">
               <div class="step-action">
                 <span class="step-chip">done</span>
-                <span class="step-chip-text">Write skills/dialog/ using the native dialog element plus a dependency-free ES module for focus management.</span>
+                <span class="step-chip-text">Write skills/ui-dialog/ using the native dialog element plus a dependency-free ES module for focus management.</span>
               </div>
               <div class="step-note step-why-note">
                 <span class="step-note-label">Why</span>
@@ -1904,7 +1904,7 @@ img, video { max-width: 100%; height: auto; }
               </div>
               <div class="step-note step-verify">
                 <span class="step-note-label">Verify</span>
-                <div class="verify-body">tests/e2e/dialog.spec.ts confirms focus moves inside on open, Tab cycles only within the dialog, Escape closes it, and focus returns to the exact element that opened it.</div>
+                <div class="verify-body">tests/e2e/ui-dialog.spec.ts confirms focus moves inside on open, Tab cycles only within the dialog, Escape closes it, and focus returns to the exact element that opened it.</div>
               </div>
             </div>
           </div>
@@ -1916,7 +1916,7 @@ img, video { max-width: 100%; height: auto; }
             <div class="step-body">
               <div class="step-action">
                 <span class="step-chip">done</span>
-                <span class="step-chip-text">Write skills/tabs/ using roving tabindex (keeping exactly one tab in the keyboard tab order and moving it with the arrow keys), with no acss-kit source to lift from.</span>
+                <span class="step-chip-text">Write skills/ui-tabs/ using roving tabindex (keeping exactly one tab in the keyboard tab order and moving it with the arrow keys), with no acss-kit source to lift from.</span>
               </div>
               <div class="step-note step-why-note">
                 <span class="step-note-label">Why</span>
@@ -1924,7 +1924,7 @@ img, video { max-width: 100%; height: auto; }
               </div>
               <div class="step-note step-verify">
                 <span class="step-note-label">Verify</span>
-                <div class="verify-body">tests/e2e/tabs.spec.ts confirms one tab in the tab order at a time, arrow keys moving selection, Home and End jumping to the ends, and each tab paired to its panel by aria-controls and aria-labelledby.</div>
+                <div class="verify-body">tests/e2e/ui-tabs.spec.ts confirms one tab in the tab order at a time, arrow keys moving selection, Home and End jumping to the ends, and each tab paired to its panel by aria-controls and aria-labelledby.</div>
               </div>
             </div>
           </div>
@@ -2008,8 +2008,8 @@ img, video { max-width: 100%; height: auto; }
       <div class="test-list">
         <div class="test-card">Unit: the repo&#39;s own frontmatter validator, which replaces skills-ref as the enforcing gate. File: tests/unit/frontmatter.spec.ts; Targets: the SKILL.md frontmatter parser; Key cases: name matches its parent directory, name satisfies the standard&#39;s pattern including no consecutive or edge hyphens, description is non-empty and within 1024 characters, description is third person, only standard keys appear — each asserted against a fixture violating exactly that rule so a passing test proves the rule can fail</div>
         <div class="test-card">Integration: both plugin manifests read together. File: tests/integration/manifests.spec.ts; Targets: the Claude Code manifest, the marketplace manifest and the Codex manifest; Key cases: both declare the same name and version, the marketplace source and skills paths resolve to real directories, and the Codex skills path resolves to the same directory Claude Code scans by default</div>
-        <div class="test-card">E2E: per-component keyboard and focus behaviour in a real browser. File: tests/e2e/button.spec.ts, alert.spec.ts, dialog.spec.ts, tabs.spec.ts; Targets: each component&#39;s demo page loaded from disk with no server and no build step; Key cases: the behaviours named in steps 5 to 8, with every WCAG criterion a reference claims carrying a matching assertion here</div>
-        <div class="test-card">Evaluations: whether a realistically-phrased request activates the right skill. File: evals/button.json, alert.json, dialog.json, tabs.json; Targets: the description field, run semi-manually since the format is documented but no runner ships; Key cases: per skill one obvious request, one oblique request avoiding the skill&#39;s own vocabulary, and one adjacent request that must not trigger it</div>
+        <div class="test-card">E2E: per-component keyboard and focus behaviour in a real browser. File: tests/e2e/ui-button.spec.ts, ui-alert.spec.ts, ui-dialog.spec.ts, ui-tabs.spec.ts; Targets: each component&#39;s demo page loaded from disk with no server and no build step; Key cases: the behaviours named in steps 5 to 8, with every WCAG criterion a reference claims carrying a matching assertion here</div>
+        <div class="test-card">Evaluations: whether a realistically-phrased request activates the right skill. File: evals/ui-button.json, ui-alert.json, ui-dialog.json, ui-tabs.json; Targets: the description field, run semi-manually since the format is documented but no runner ships; Key cases: per skill one obvious request, one oblique request avoiding the skill&#39;s own vocabulary, and one adjacent request that must not trigger it</div>
       </div>
     </section>
 
