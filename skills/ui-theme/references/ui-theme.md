@@ -209,7 +209,22 @@ code pages were each truncated before any token name, so Carbon has no column. W
 Awesome's border-radius page returned 404 and its tokens index names no radius or
 shadow token, so those two cells stay blank.
 
-Sources: https://ui.shadcn.com/docs/theming ; https://material-web.dev/theming/color/ ; https://material-web.dev/theming/typography/ ; https://material-web.dev/theming/shape/ ; https://primer.style/foundations/primitives/color ; https://primer.style/foundations/primitives/typography ; https://primer.style/foundations/primitives/size ; https://getbootstrap.com/docs/5.3/customize/css-variables/ ; https://webawesome.com/docs/tokens/ ; https://webawesome.com/docs/tokens/color/ ; https://webawesome.com/docs/tokens/typography/ ; https://www.radix-ui.com/themes/docs/theme/color ; https://www.radix-ui.com/themes/docs/theme/radius ; https://www.radix-ui.com/themes/docs/theme/shadows ; https://www.radix-ui.com/themes/docs/theme/typography ; https://atlassian.design/foundations/tokens/ ; https://atlassian.design/foundations/tokens/design-tokens/ ; https://atlassian.design/foundations/tokens/use-tokens-in-code/
+Sources: https://ui.shadcn.com/docs/theming ; https://material-web.dev/theming/color/ ;
+ https://material-web.dev/theming/typography/ ;
+ https://material-web.dev/theming/shape/ ;
+ https://primer.style/foundations/primitives/color ;
+ https://primer.style/foundations/primitives/typography ;
+ https://primer.style/foundations/primitives/size ;
+ https://getbootstrap.com/docs/5.3/customize/css-variables/ ;
+ https://webawesome.com/docs/tokens/ ; https://webawesome.com/docs/tokens/color/ ;
+ https://webawesome.com/docs/tokens/typography/ ;
+ https://www.radix-ui.com/themes/docs/theme/color ;
+ https://www.radix-ui.com/themes/docs/theme/radius ;
+ https://www.radix-ui.com/themes/docs/theme/shadows ;
+ https://www.radix-ui.com/themes/docs/theme/typography ;
+ https://atlassian.design/foundations/tokens/ ;
+ https://atlassian.design/foundations/tokens/design-tokens/ ;
+ https://atlassian.design/foundations/tokens/use-tokens-in-code/
 
 ## Output contract
 
@@ -312,7 +327,7 @@ brand; with them it themes that subtree and nothing above it.
 One trade, stated so the project can decline it. Figma's own guidance is that a
 semantic variable aliases a primitive, never another semantic. A role is a semantic
 and a project's token usually is too, so the chain bends that rule to make a brand
-23 bindings instead of 137. A project that wants to keep the rule binds the component
+23 bindings instead of 69. A project that wants to keep the rule binds the component
 properties directly instead, one line per property from the repository's
 `docs/properties.md`, and does not copy the roles file.
 
