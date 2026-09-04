@@ -32,6 +32,7 @@ from the same frontmatter.
 | [Plan: Prove each skill by testing what an agent actually builds from it](https://claude.ai/code/artifact/dee6ed17-545d-4356-b5ba-2063e66d4436) | todo | `docs/plans/add-build-layer-for-agent-built-components.md` |
 | [Plan: Add the ui-theme workflow skill that binds a project's styles to the auk custom properties](https://claude.ai/code/artifact/f21dc0a6-79c1-453a-b568-9bc98ef8ec2b) | completed | `docs/plans/add-ui-theme-workflow-skill.md` |
 | [Plan: Bring ui-dialog back in line with the native dialog element](https://claude.ai/code/artifact/f56741f9-bfb0-4616-bc12-78e829d5d996) | todo | `docs/plans/sync-ui-dialog-with-native-spec.md` |
+| [Plan: Support any design system by publishing the auk role layer as a contract](https://claude.ai/code/artifact/1c4b9538-2e3b-4319-b65c-6f5f18c31d71) | in-progress | `docs/plans/support-any-design-system.md` |
 
 ## Designs
 
@@ -69,4 +70,3 @@ Rows the hook appended. Keep this table last in the file: the hook appends to th
 | --- | --- |
 | [Plan: Make restyling an auk component a one-line job, whichever door a user picks](https://claude.ai/code/artifact/40ddb8f5-3d38-4923-b9c8-c49a0060b12f) | 2026-09-04 |
 | [Plan: Add the ui-compose workflow skill so agent-built components follow Component Driven Design](https://claude.ai/code/artifact/5acfc646-e9c4-42b5-a36e-48efc40ffe5a) | 2026-09-04 |
-| [Plan: Support any design system by publishing the auk role layer as a contract](https://claude.ai/code/artifact/1c4b9538-2e3b-4319-b65c-6f5f18c31d71) | 2026-09-04 |

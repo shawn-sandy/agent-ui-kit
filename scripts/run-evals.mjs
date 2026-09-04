@@ -69,12 +69,17 @@ const mode = process.argv[2];
 const ISOLATE = process.env.EVAL_ISOLATE !== '0';
 const LABEL = ISOLATE ? 'isolated' : 'crowded';
 
+// EVAL_SKILLS=ui-theme,ui-button limits a sweep to those skills' scenarios. A full
+// sweep is about 75 model calls; re-measuring one skill's description should not
+// have to pay for the other six.
+const ONLY = process.env.EVAL_SKILLS ? new Set(process.env.EVAL_SKILLS.split(',')) : null;
 const scenarios = readdirSync(resolve(ROOT, 'evals'))
   .filter((f) => f.endsWith('.json'))
   .flatMap((f) => {
     const doc = JSON.parse(readFileSync(resolve(ROOT, 'evals', f), 'utf8'));
     return doc.scenarios.map((s) => ({ ...s, skill: doc.skill }));
-  });
+  })
+  .filter((s) => !ONLY || ONLY.has(s.skill));
 
 const BASELINE_PREAMBLE =
   'You are answering a frontend question. Reply with the HTML, CSS and JavaScript ' +
@@ -167,6 +172,13 @@ async function skillsOne(sc, model) {
   const invoked = skillsInvoked(out);
   const ours = invoked.filter((n) => n.startsWith('agent-ui-skills'));
   const fired = ours.some((n) => n.endsWith(':' + sc.skill));
+  // The model ran when the stream holds at least one assistant message. A non-zero
+  // exit after that - the turn cap, a tool the sandbox refused - is still a complete
+  // observation of the trigger, which is captured at the Skill call; only a run with
+  // no assistant message never reached a model. `exit` and `subtype` say which.
+  const reached = /"type":\s*"assistant"/.test(out);
+  const subtype = [...out.matchAll(/"subtype":\s*"([a-z_]+)"/g)].map((m) => m[1]).at(-1) ?? null;
+  const exit = error ? out.split('\n')[0].replace('__EVAL_ERROR__ ', '') : 'exit 0';
   // An adjacent scenario asserts that THIS skill stays quiet. Another component
   // skill answering instead is a correct outcome, not a miss - "blocks the page until
   // they confirm" really is the dialog's job, and the alert must not claim it.
@@ -174,10 +186,10 @@ async function skillsOne(sc, model) {
   // A run that never reached a model is never correct. Without this an adjacent
   // scenario would score as a pass precisely because the CLI crashed and nothing
   // fired, which is the one outcome that proves nothing.
-  const correct = error ? false : sc.expect === null ? !fired : fired;
+  const correct = !reached ? false : sc.expect === null ? !fired : fired;
   return {
     id: sc.id, skill: sc.skill, kind: sc.kind, expect: sc.expect,
-    model, mode: LABEL, invoked, error, correct,
+    model, mode: LABEL, invoked, error, reached, exit, subtype, correct,
   };
 }
 

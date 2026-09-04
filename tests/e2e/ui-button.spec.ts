@@ -41,12 +41,14 @@ test('2.4.7 Focus Visible: every variant draws a focus ring', async ({ page }) =
   }
 });
 
-test('2.5.8 Target Size (Minimum): the default size clears 44 by 44', async ({ page }) => {
+test('2.5.8 Target Size (Minimum): the default size clears 24 by 24', async ({ page }) => {
+  // The criterion's own bound, and the floor skills/ui-theme/references/auk.tokens.json
+  // records for --auk-button-min-size. The shipped 2.75rem clears it by a wide margin.
   for (const id of ['primary', 'secondary', 'destructive', 'iconOnly']) {
     const box = await page.locator(`#${id}`).boundingBox();
     expect(box, `${id} has no box`).not.toBeNull();
-    expect(box!.width, `${id} width`).toBeGreaterThanOrEqual(44);
-    expect(box!.height, `${id} height`).toBeGreaterThanOrEqual(44);
+    expect(box!.width, `${id} width`).toBeGreaterThanOrEqual(24);
+    expect(box!.height, `${id} height`).toBeGreaterThanOrEqual(24);
   }
 });
 

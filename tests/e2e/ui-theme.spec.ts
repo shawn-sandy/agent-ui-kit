@@ -1,25 +1,28 @@
 /**
- * What ui-theme emits, measured. A project palette bound over the brand-bearing
- * --auk-* properties is the skill's whole output, and the two ways it can go wrong -
- * a colour pair that fails contrast, a focus ring that sinks into its surface - are
- * only visible in a browser. Nothing here is estimated: axe judges text contrast,
- * and the focus ring's contrast is computed from the colours the page actually
- * paints.
+ * What ui-theme emits, measured. Version two of the skill emits a roles file plus one
+ * block of `--auk-role-*` bindings, so that is the shape bound here: the generated
+ * skills/ui-theme/references/auk-roles.css chains every brand-bearing --auk-* property
+ * to a role, and a project palette of 23 role lines restyles every component through
+ * that chain. The two ways it can go wrong - a colour pair that fails contrast, a focus
+ * ring that sinks into its surface - are only visible in a browser. Nothing here is
+ * estimated: axe judges text contrast, and the focus ring's contrast is computed from
+ * the colours the page actually paints.
  *
- * The palette sets every one of the 69 properties in the skill's mapping table and
- * none of the shipped values, so a component that quietly read a literal instead of
- * its property would show up as an unchanged colour. Its values were chosen so that
- * axe passes them; the assertions below are what say it does.
+ * The roles file sets every one of the 69 brand-bearing properties and none of the
+ * shipped values, so a component that quietly read a literal instead of its property
+ * would show up as an unchanged colour. The role values were chosen so that axe passes
+ * them; the assertions below are what say it does.
  */
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { demoUrl, tabTo, focusOutlineWidth } from './support.js';
 import { skillKind } from '../../scripts/skill-kind.mjs';
 
 const SKILLS_DIR = resolve(import.meta.dirname, '../../skills');
+const ROLES_CSS = resolve(SKILLS_DIR, 'ui-theme/references/auk-roles.css');
 const components = readdirSync(SKILLS_DIR, { withFileTypes: true })
   .filter((e) => e.isDirectory())
   .map((e) => e.name)
@@ -32,79 +35,42 @@ const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 const FOCUS = '#7c2d12';
 
 /** One value per role, in the mapping table's order, as a project's block would set them. */
-const PALETTE = `
+const ROLE_BLOCK = `
 :root {
-  --auk-button-bg: #155e75;
-  --auk-button-border-color: #155e75;
-  --auk-tabs-selected-tab-color: #155e75;
-  --auk-tabs-selected-tab-border-block-end-color: #155e75;
-  --auk-button-color: #ffffff;
-  --auk-button-destructive-color: #ffffff;
-  --auk-box-color: #1c1917;
-  --auk-button-secondary-color: #1c1917;
-  --auk-dialog-color: #1c1917;
-  --auk-dialog-body-color: #1c1917;
-  --auk-dialog-close-color: #1c1917;
-  --auk-popover-color: #1c1917;
-  --auk-popover-body-color: #1c1917;
-  --auk-popover-close-color: #1c1917;
-  --auk-tabs-color: #1c1917;
-  --auk-tabs-tab-color: #1c1917;
-  --auk-box-bg: #fafaf9;
-  --auk-button-secondary-bg: #fafaf9;
-  --auk-dialog-bg: #fafaf9;
-  --auk-dialog-close-bg: #fafaf9;
-  --auk-popover-bg: #fafaf9;
-  --auk-popover-close-bg: #fafaf9;
-  --auk-tabs-tab-bg: #fafaf9;
-  --auk-box-border-color: #a8a29e;
-  --auk-button-secondary-border-color: #a8a29e;
-  --auk-dialog-border-color: #a8a29e;
-  --auk-dialog-close-border-color: #a8a29e;
-  --auk-popover-border-color: #a8a29e;
-  --auk-popover-close-border-color: #a8a29e;
-  --auk-tabs-border-color: #a8a29e;
-  --auk-dialog-divider-color: #e7e5e4;
-  --auk-popover-divider-color: #e7e5e4;
-  --auk-button-focus-color: ${FOCUS};
-  --auk-dialog-focus-color: ${FOCUS};
-  --auk-popover-focus-color: ${FOCUS};
-  --auk-tabs-focus-color: ${FOCUS};
-  --auk-alert-color: #0c4a6e;
-  --auk-alert-border-color: #0c4a6e;
-  --auk-alert-bg: #e0f2fe;
-  --auk-alert-error-color: #9f1239;
-  --auk-alert-error-border-color: #9f1239;
-  --auk-button-destructive-bg: #9f1239;
-  --auk-alert-error-bg: #ffe4e6;
-  --auk-alert-success-color: #365314;
-  --auk-alert-success-border-color: #365314;
-  --auk-alert-success-bg: #ecfccb;
-  --auk-alert-warning-color: #7c2d12;
-  --auk-alert-warning-border-color: #7c2d12;
-  --auk-alert-warning-bg: #ffedd5;
-  --auk-button-disabled-bg: #57534e;
-  --auk-button-disabled-border-color: transparent;
-  --auk-button-disabled-color: #ffffff;
-  --auk-box-invert-bg: #292524;
-  --auk-box-invert-color: #fafaf9;
-  --auk-box-invert-border-color: transparent;
-  --auk-dialog-backdrop-bg: rgba(28, 25, 23, 0.7);
-  --auk-popover-box-shadow: 0 12px 28px rgba(28, 25, 23, 0.2);
-  --auk-alert-radius: 0.75rem;
-  --auk-box-radius: 0.75rem;
-  --auk-button-radius: 0.75rem;
-  --auk-dialog-radius: 0.75rem;
-  --auk-dialog-close-radius: 0.75rem;
-  --auk-popover-radius: 0.75rem;
-  --auk-popover-close-radius: 0.75rem;
-  --auk-alert-font-family: Georgia, "Times New Roman", serif;
-  --auk-button-font-family: Georgia, "Times New Roman", serif;
-  --auk-dialog-font-family: Georgia, "Times New Roman", serif;
-  --auk-popover-font-family: Georgia, "Times New Roman", serif;
-  --auk-tabs-font-family: Georgia, "Times New Roman", serif;
+  --auk-role-primary: #155e75;
+  --auk-role-on-primary: #ffffff;
+  --auk-role-text: #1c1917;
+  --auk-role-surface: #fafaf9;
+  --auk-role-border: #a8a29e;
+  --auk-role-divider: #e7e5e4;
+  --auk-role-focus: ${FOCUS};
+  --auk-role-info: #0c4a6e;
+  --auk-role-info-surface: #e0f2fe;
+  --auk-role-danger: #9f1239;
+  --auk-role-danger-surface: #ffe4e6;
+  --auk-role-success: #365314;
+  --auk-role-success-surface: #ecfccb;
+  --auk-role-warning: #7c2d12;
+  --auk-role-warning-surface: #ffedd5;
+  --auk-role-muted: #57534e;
+  --auk-role-on-muted: #ffffff;
+  --auk-role-inverse: #292524;
+  --auk-role-on-inverse: #fafaf9;
+  --auk-role-overlay: rgba(28, 25, 23, 0.7);
+  --auk-role-shadow: 0 12px 28px rgba(28, 25, 23, 0.2);
+  --auk-role-radius: 0.75rem;
+  --auk-role-font: Georgia, "Times New Roman", serif;
 }
 `;
+
+/** The generated roles file, read once. Its absence is the first thing this suite reports. */
+function rolesCss(): string {
+  expect(existsSync(ROLES_CSS), `${ROLES_CSS} missing - run: node scripts/build-tokens.mjs`).toBe(true);
+  return readFileSync(ROLES_CSS, 'utf8');
+}
+
+/** The version-two palette: the roles file, then the project's 23 role lines. */
+const palette = () => rolesCss() + ROLE_BLOCK;
 
 /**
  * Bring each demo to the state where its themed surfaces are actually painted. A
@@ -131,13 +97,14 @@ const arrange: Record<string, (page: Page) => Promise<void>> = {
 /** Open a demo with the palette bound over it, and prove the binding reached the page. */
 async function openThemed(page: Page, skill: string): Promise<void> {
   await page.goto(demoUrl(skill));
-  await page.addStyleTag({ content: PALETTE });
+  await page.addStyleTag({ content: palette() });
   // Guard the guard: a palette that never reached :root would leave every scan
-  // below measuring the shipped colours and passing for the wrong reason.
+  // below measuring the shipped colours and passing for the wrong reason. The read
+  // goes through the chain - --auk-button-bg is set only by the roles file.
   const bound = await page.evaluate(() =>
     getComputedStyle(document.documentElement).getPropertyValue('--auk-button-bg').trim(),
   );
-  expect(bound, 'the palette did not reach :root').toBe('#155e75');
+  expect(bound, 'the palette did not reach :root through the roles file').toBe('#155e75');
 }
 
 /** Relative luminance per WCAG 2.x, from a computed rgb() or rgba() colour string. */
@@ -217,4 +184,50 @@ test("an undefined project token falls back to the component's shipped literal",
   // The mechanism is identical for every property, so one proof is enough.
   await page.addStyleTag({ content: ':root { --auk-button-bg: var(--brand-primary-undefined); }' });
   expect(await background()).toBe('rgb(26, 86, 219)');
+});
+
+// The two-hop chain the roles file adds, measured on the button demo. Each case is one
+// promise docs/theming.md makes to a design-system team.
+
+const primaryBackground = (page: Page) =>
+  page.locator('#primary').evaluate((el) => getComputedStyle(el).backgroundColor);
+
+test('the roles file with no role bound leaves every component on its shipped literal', async ({ page }) => {
+  await page.goto(demoUrl('ui-button'));
+  await page.addStyleTag({ content: rolesCss() });
+  // --auk-button-bg now reads var(--auk-role-primary), which nobody set: invalid at
+  // computed-value time on :root, so the button's own fallback applies.
+  expect(await primaryBackground(page)).toBe('rgb(26, 86, 219)');
+});
+
+test('a bound role restyles the component, and an unlayered component property still beats it', async ({ page }) => {
+  await page.goto(demoUrl('ui-button'));
+  await page.addStyleTag({ content: rolesCss() + ':root { --auk-role-primary: #155e75; }' });
+  expect(await primaryBackground(page)).toBe('rgb(21, 94, 117)');
+  // The escape hatch: the roles file sits in @layer auk, so a plain :root rule written
+  // afterwards, outside any layer, outranks its chain for this one property.
+  await page.addStyleTag({ content: ':root { --auk-button-bg: rebeccapurple; }' });
+  expect(await primaryBackground(page)).toBe('rgb(102, 51, 153)');
+});
+
+test('a [data-brand] block that restates the chain themes one element without touching :root, and a bare one does not', async ({ page }) => {
+  await page.goto(demoUrl('ui-button'));
+  await page.addStyleTag({ content: rolesCss() + ':root { --auk-role-primary: #155e75; }' });
+  await page.locator('#primary').evaluate((el) => el.setAttribute('data-brand', 'acme'));
+
+  // A custom property resolves where it is declared: --auk-button-bg was chained on
+  // :root, so a role set on the element below never reaches it and nothing changes.
+  await page.addStyleTag({ content: '[data-brand="acme"] { --auk-role-primary: #9f1239; }' });
+  expect(await primaryBackground(page)).toBe('rgb(21, 94, 117)');
+
+  // The same block with the role's chain lines restated, copied from auk-roles.css.
+  await page.addStyleTag({
+    content:
+      '[data-brand="acme"] { --auk-role-primary: #9f1239; --auk-button-bg: var(--auk-role-primary); --auk-button-border-color: var(--auk-role-primary); }',
+  });
+  expect(await primaryBackground(page)).toBe('rgb(159, 18, 57)');
+  const rootPrimary = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue('--auk-role-primary').trim(),
+  );
+  expect(rootPrimary).toBe('#155e75');
 });
