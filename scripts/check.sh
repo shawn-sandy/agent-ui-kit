@@ -74,6 +74,19 @@ if [ "${1:-}" = "--prove" ]; then
     failed=1
   fi
 
+  # A workflow skill is exempt from the component gates only. The fixture declares
+  # the marker and ships no evals file, so the kept evals gate must still reject it.
+  # Same shape as the frontmatter proof above, for the same reason.
+  kind_out=$(npx vitest run tests/unit/skill-kind.spec.ts --reporter=verbose 2>&1)
+  kind_status=$?
+  if [ "$kind_status" -eq 0 ] \
+     && printf '%s' "$kind_out" | grep -q 'rejects tests/fixtures/workflow-skill'; then
+    printf '   ok: the workflow partition still rejects a workflow skill with no evals\n'
+  else
+    printf '   FAILED: the workflow partition let the broken workflow fixture through\n'
+    failed=1
+  fi
+
   # A component split across sibling files must trip the resource guard, and each of
   # the three ways it can happen has to be caught on its own - asserting only that the
   # guard failed would stay green with one arm dead. The src= arm is the fragile one:

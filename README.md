@@ -4,7 +4,7 @@
 
 Vendor-neutral UI component skills for AI coding agents.
 
-Each skill describes one UI component and ships a complete reference: semantic HTML
+Each component skill describes one UI component and ships a complete reference: semantic HTML
 with a real accessibility contract, plain CSS driven by custom properties, and
 dependency-free JavaScript. An agent reads the reference and builds the component
 into your project, in your stack.
@@ -17,12 +17,14 @@ demo is reference material, not production code.
 
 ## Status
 
-Version 0.2.0. Six components ship: **box**, **button**, **alert**, **dialog**,
-**tabs** and **popover**. They were chosen to stress different parts of the format
-rather than to be a useful catalog - a purely presentational primitive, no JavaScript,
-a live region, heavy focus management, keyboard navigation, and a non-modal layer in
-the browser's top layer. Their skill names are prefixed for discovery: `ui-box`,
-`ui-button`, `ui-alert`, `ui-dialog`, `ui-tabs` and `ui-popover`.
+Version 0.3.0. Seven skills ship: six components - **box**, **button**, **alert**,
+**dialog**, **tabs** and **popover** - and one workflow, **theme**, which binds a
+project's existing colours, radius and type to the components' custom properties.
+The components were chosen to stress different parts of the format rather than to be
+a useful catalog - a purely presentational primitive, no JavaScript, a live region,
+heavy focus management, keyboard navigation, and a non-modal layer in the browser's
+top layer. Their skill names are prefixed for discovery: `ui-box`, `ui-button`,
+`ui-alert`, `ui-dialog`, `ui-tabs`, `ui-popover` and `ui-theme`.
 
 Both vendors load the tree and use it: see [docs/vendor-support.md](docs/vendor-support.md)
 for what actually happened, including what did not work.
@@ -39,7 +41,7 @@ The repository is both a plugin and its own marketplace.
 npx skills add shawn-sandy/agent-ui-skills
 ```
 
-One command installs the six skills into Claude Code, Codex, Cursor, Copilot and the
+One command installs the seven skills into Claude Code, Codex, Cursor, Copilot and the
 other agents the CLI supports.
 
 **Claude Code**
@@ -68,7 +70,7 @@ agent-ui-skills/
 │   └── marketplace.json    # Claude Code marketplace, source "./"
 ├── .codex-plugin/
 │   └── plugin.json         # ChatGPT / Codex plugin manifest
-├── skills/                 # one directory per component skill
+├── skills/                 # one directory per skill
 │   └── ui-<component>/
 │       ├── SKILL.md        # what it is, when to use it, how to build it
 │       └── references/

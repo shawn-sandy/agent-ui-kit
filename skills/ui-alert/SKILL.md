@@ -37,6 +37,7 @@ any assumptions.
    `aria-atomic` values that go with it from the table in that file.
 3. Render the region into the page **empty**, at load. Fill it later.
 4. Copy the Styles block as-is. It needs no custom properties to be defined.
+   Override `--auk-alert-*` to theme it.
 5. Open `references/demo.html` to compare behaviour.
 
 ## Non-negotiable

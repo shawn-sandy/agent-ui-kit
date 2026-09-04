@@ -1,0 +1,36 @@
+{
+  "skill": "ui-theme",
+  "scenarios": [
+    {
+      "id": "ui-theme-obvious",
+      "kind": "obvious",
+      "expect": "ui-theme",
+      "prompt": "The buttons, the confirm dialog and the tabs in index.html were built from the ui- skills and still wear their default blue. styles/tokens.css declares our brand as --color-primary, --color-text, --color-bg, --color-border, --radius-md and --font-sans. Make these components match our brand.",
+      "baselineFailure": "edits the component CSS in place or redeclares the --auk-* properties with copied hex literals, so the components stop following the project's tokens, and drags size and spacing properties along with the colours",
+      "detect": {
+        "binds an auk property to a project token": "--auk-[a-z-]+:\\s*var\\(--(?!auk-)",
+        "copies a literal instead of binding a token": "--auk-[a-z-]+:\\s*#[0-9a-fA-F]{3,8}",
+        "touches a size or spacing property": "--auk-[a-z-]+-(?:width|size|gap|padding|offset|duration)[a-z-]*\\s*:"
+      }
+    },
+    {
+      "id": "ui-theme-oblique",
+      "kind": "oblique",
+      "expect": "ui-theme",
+      "prompt": "The buttons and the confirm dialog in index.html look off next to the rest of the page - wrong blue, wrong corners, wrong font. The rest of the site gets its look from styles/tokens.css. Make them fit in.",
+      "baselineFailure": "restyles the auk selectors directly with new literals, or rewrites the component markup, instead of binding the tokens the site already has to the properties the components already read",
+      "detect": {
+        "binds an auk property to a project token": "--auk-[a-z-]+:\\s*var\\(--(?!auk-)",
+        "restyles a component selector directly": "\\.auk-[a-z-]+[^{]*\\{[^}]*(?:background(?:-color)?|color|border-radius|font-family)\\s*:\\s*(?!var\\(--auk-)"
+      }
+    },
+    {
+      "id": "ui-theme-adjacent",
+      "kind": "adjacent",
+      "expect": null,
+      "prompt": "In index.html, the site header's navigation links should use our brand colour from styles/tokens.css and a slightly larger font. The header is plain markup, not one of the ui- components.",
+      "baselineFailure": "n/a - this scenario asserts the theme skill stays quiet",
+      "detect": {}
+    }
+  ]
+}

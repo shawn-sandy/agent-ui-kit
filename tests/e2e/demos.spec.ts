@@ -8,10 +8,16 @@ import AxeBuilder from '@axe-core/playwright';
 import { readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { demoUrl } from './support.js';
+import { skillKind } from '../../scripts/skill-kind.mjs';
 
-const skills = readdirSync(resolve(import.meta.dirname, '../../skills'), { withFileTypes: true })
+const SKILLS_DIR = resolve(import.meta.dirname, '../../skills');
+
+const skills = readdirSync(SKILLS_DIR, { withFileTypes: true })
   .filter((e) => e.isDirectory())
   .map((e) => e.name)
+  // A workflow skill has no demo to open. What it emits is measured by its own
+  // spec instead - tests/e2e/ui-theme.spec.ts for ui-theme.
+  .filter((name) => skillKind(resolve(SKILLS_DIR, name)) === 'component')
   .sort();
 
 test('the repository has components in it', () => {
