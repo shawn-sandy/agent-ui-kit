@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="proto-source" content="docs/plans/sync-ui-dialog-with-native-spec.md">
+<meta name="proto-created" content="2026-09-03">
+<title>Dialog dismissal checks</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f9fafb; --border:#e5e7eb; --border-mid:#d1d5db;
+    --text:#111827; --muted:#6b7280; --subtle:#9ca3af; --accent:#2563eb;
+    --accent-bg:#eff6ff; --green:#16a34a; --green-bg:#f0fdf4; --red:#dc2626;
+    --red-bg:#fef2f2; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  }
+  *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; font-size:15px;
+         line-height:1.6; color:var(--text); background:var(--bg); max-width:880px;
+         margin:0 auto; padding:32px 20px 64px; }
+  header { border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:24px; }
+  header::before { content:""; display:block; height:3px; background:var(--accent);
+                   border-radius:2px; margin-bottom:16px; }
+  h1 { font-size:22px; font-weight:700; letter-spacing:-.02em; margin-bottom:4px; }
+  h2 { font-size:16px; font-weight:700; margin-bottom:6px; }
+  .source { font-size:12px; color:var(--subtle); font-family:ui-monospace,Consolas,monospace; }
+  .summary-bar { display:flex; align-items:center; gap:10px; margin:20px 0; }
+  .summary-badge { display:inline-flex; align-items:center; gap:6px; font-size:13px;
+                   font-weight:700; padding:6px 14px; border-radius:999px;
+                   background:var(--green-bg); color:var(--green); border:1px solid #bbf7d0; }
+  form { display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; margin:16px 0;
+         padding:16px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); }
+  .field { display:flex; flex-direction:column; gap:4px; }
+  .field label { font-size:12px; font-weight:600; color:var(--muted); }
+  .field label .req { color:var(--red); }
+  .field input, .field select { padding:7px 10px; border:1px solid var(--border-mid); border-radius:var(--radius);
+                 font-size:14px; font-family:inherit; color:var(--text); background:var(--bg); }
+  .field.check label { display:flex; align-items:center; gap:6px; min-height:36px; font-size:13px; color:var(--text); }
+  .field.check input { width:auto; padding:0; }
+  button { font-family:inherit; cursor:pointer; }
+  .btn { padding:8px 16px; font-size:14px; font-weight:600; border-radius:var(--radius);
+         border:1px solid var(--accent); background:var(--accent); color:#fff; }
+  .btn:hover { filter:brightness(.92); }
+  .btn-secondary { background:var(--bg); color:var(--muted); border-color:var(--border-mid); }
+  .btn-danger { background:var(--bg); color:var(--red); border:1px solid var(--red); padding:4px 10px; font-size:12px; }
+  :focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .error { color:var(--red); font-size:12px; min-height:16px; width:100%; }
+  table { width:100%; border-collapse:collapse; margin-top:8px; font-size:14px; }
+  caption { text-align:left; font-size:12px; color:var(--subtle); margin-bottom:6px; }
+  th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  thead th { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted);
+             background:var(--surface); }
+  tr.mismatch td { background:var(--red-bg); }
+  .empty-state { color:var(--subtle); font-style:italic; padding:16px 10px; }
+  .status { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  .toolbar { display:flex; gap:10px; margin-top:16px; }
+
+  /* Live section: the proposed dialog from the plan. */
+  .live { padding:16px; border:1px solid var(--border); border-radius:var(--radius); background:var(--accent-bg); margin-bottom:8px; }
+  .live p { font-size:14px; color:var(--muted); margin-bottom:10px; }
+  .controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .controls label { font-size:13px; font-weight:600; color:var(--muted); }
+  .controls select { padding:7px 10px; border:1px solid var(--border-mid); border-radius:var(--radius); font:inherit; font-size:14px; background:var(--bg); }
+  .note { font-size:13px; color:var(--muted); margin:10px 0 0; }
+  .auk-button { display:inline-flex; align-items:center; justify-content:center; min-height:2.75rem; padding:0.625rem 1rem; border:1px solid transparent; border-radius:0.375rem; font:inherit; font-weight:600; color:#ffffff; background:#1a56db; cursor:pointer; }
+  .auk-button[data-variant="secondary"] { color:#1f2937; background:#ffffff; border-color:#6b7280; }
+  .auk-button[data-variant="destructive"] { background:#b91c1c; }
+  .auk-button:focus-visible { outline:3px solid #111827; outline-offset:2px; }
+
+  /* Component styles, as shipped in skills/ui-dialog/references/ui-dialog.md. The
+     skeleton reset above zeroes every margin, which un-centres a modal dialog; the
+     browser default being restored here is margin:auto. */
+  .auk-dialog { margin:auto; }
+  .auk-dialog { padding:0; border:var(--auk-dialog-border-width,1px) solid var(--auk-dialog-border-color,#d1d5db);
+    border-radius:var(--auk-dialog-radius,0.5rem); inline-size:var(--auk-dialog-inline-size,min(32rem,calc(100vw - 2rem)));
+    max-block-size:var(--auk-dialog-max-block-size,calc(100vh - 4rem)); font-family:var(--auk-dialog-font-family,inherit);
+    color:var(--auk-dialog-color,#111827); background-color:var(--auk-dialog-bg,#ffffff); }
+  .auk-dialog::backdrop { background-color:var(--auk-dialog-backdrop-bg,rgba(17,24,39,0.6)); }
+  .auk-dialog[open] { display:flex; flex-direction:column; }
+  .auk-dialog [data-part="header"] { display:flex; align-items:flex-start; justify-content:space-between; gap:var(--auk-dialog-gap,1rem);
+    padding:var(--auk-dialog-padding,1.25rem); border-block-end:var(--auk-dialog-divider-width,1px) solid var(--auk-dialog-divider-color,#e5e7eb); }
+  .auk-dialog [data-part="header"] h2 { margin:0; font-size:var(--auk-dialog-title-size,1.125rem); line-height:var(--auk-dialog-title-line-height,1.4); }
+  .auk-dialog [data-part="body"] { padding:var(--auk-dialog-padding,1.25rem); overflow-y:auto; color:var(--auk-dialog-body-color,#374151); line-height:var(--auk-dialog-line-height,1.5); }
+  .auk-dialog [data-part="footer"] { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:var(--auk-dialog-gap,1rem);
+    padding:var(--auk-dialog-padding,1.25rem); border-block-start:var(--auk-dialog-divider-width,1px) solid var(--auk-dialog-divider-color,#e5e7eb); }
+  .auk-dialog-close { flex:none; min-inline-size:var(--auk-dialog-close-size,2.75rem); min-block-size:var(--auk-dialog-close-size,2.75rem);
+    border:var(--auk-dialog-close-border-width,1px) solid var(--auk-dialog-close-border-color,transparent); border-radius:var(--auk-dialog-close-radius,0.375rem);
+    font-family:var(--auk-dialog-font-family,inherit); font-size:var(--auk-dialog-close-font-size,1.25rem); color:var(--auk-dialog-close-color,#1f2937);
+    background-color:var(--auk-dialog-close-bg,transparent); cursor:pointer; }
+  .auk-dialog-close:focus-visible, .auk-dialog [data-part="footer"] .auk-button:focus-visible { outline:var(--auk-dialog-focus-width,3px) solid var(--auk-dialog-focus-color,#111827); outline-offset:var(--auk-dialog-focus-offset,2px); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Dialog dismissal checks</h1>
+  <div class="source">Prototype &middot; source: docs/plans/sync-ui-dialog-with-native-spec.md</div>
+</header>
+
+<!-- Inline JSON seed. JSON-serialized with script-breakout escaping ONLY
+     (e.g. </script> -> <\/script>) — never HTML-escaped, or JSON.parse breaks. -->
+<script type="application/json" id="seed">[{"gesture":"Backdrop click","closedby":"any","expected":true,"observed":true},{"gesture":"Drag from dialog text, release on backdrop","closedby":"any","expected":false,"observed":false},{"gesture":"Backdrop click","closedby":"absent","expected":false,"observed":false}]</script>
+
+<!-- Derived data model — the durable copy of Step 3's model. Same
+     script-breakout escaping rule as #seed. The drift hook compares this
+     against the <th data-field> headers below and against the source plan's
+     proto-model: frontmatter. -->
+<script type="application/json" id="proto-model">{"entity":"Dismissal check","fields":[{"name":"gesture","type":"string"},{"name":"closedby","type":"string"},{"name":"expected","type":"bool"},{"name":"observed","type":"bool"}],"action":"Record check","successSignal":"checks matching the spec"}</script>
+
+<section class="live" aria-labelledby="live-title">
+  <h2 id="live-title">Try it: the proposed dialog</h2>
+  <p>Pick a closing policy, open the dialog, then try a gesture: click the dark backdrop, press on the body text and release on the backdrop, press Escape, or use a button. Each gesture is recorded below against what the native dialog spec says should happen.</p>
+  <div class="controls">
+    <label for="policy">closedby</label>
+    <select id="policy">
+      <option value="any" selected>any: backdrop click and Escape both close it</option>
+      <option value="closerequest">closerequest: Escape only, the platform default for a modal</option>
+      <option value="none">none: only the buttons close it</option>
+      <option value="absent">absent: behaves as closerequest</option>
+    </select>
+    <button type="button" class="btn" data-dialog-open="confirm-delete" id="open-top">Delete account</button>
+    <button type="button" class="btn btn-secondary" id="force-fallback">Hide native closedby and use the JavaScript fallback</button>
+  </div>
+  <p class="note" id="support-note"></p>
+</section>
+
+<dialog class="auk-dialog" id="confirm-delete" role="alertdialog" closedby="any"
+        aria-labelledby="confirm-delete-title" aria-describedby="confirm-delete-body">
+  <div data-part="header">
+    <h2 id="confirm-delete-title">Delete this account?</h2>
+    <button class="auk-dialog-close" type="button" data-dialog-close aria-label="Close dialog">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div data-part="body" id="confirm-delete-body">
+    <p>This removes the account and everything in it. It cannot be undone.</p>
+  </div>
+  <div data-part="footer">
+    <button class="auk-button" type="button" data-variant="secondary" data-dialog-close autofocus id="keep">Keep account</button>
+    <button class="auk-button" type="button" data-variant="destructive" id="confirm-delete-confirm">Delete permanently</button>
+  </div>
+</dialog>
+
+<div class="summary-bar">
+  <span class="summary-badge" id="summary" data-label="Checks matching the spec">Checks matching the spec: 0</span>
+</div>
+
+<form id="add-form" novalidate>
+  <div class="field">
+    <label for="f-gesture">Gesture <span class="req">*</span></label>
+    <input id="f-gesture" name="gesture" type="text" data-required>
+  </div>
+  <div class="field">
+    <label for="f-closedby">closedby <span class="req">*</span></label>
+    <select id="f-closedby" name="closedby">
+      <option value="any">any</option>
+      <option value="closerequest">closerequest</option>
+      <option value="none">none</option>
+      <option value="absent">absent</option>
+    </select>
+  </div>
+  <div class="field check">
+    <label><input type="checkbox" name="expected"> Expected to close</label>
+  </div>
+  <div class="field check">
+    <label><input type="checkbox" name="observed"> Observed closed</label>
+  </div>
+  <button type="submit" class="btn">Record check</button>
+  <p class="error" id="form-error" role="alert"></p>
+</form>
+
+<table id="grid">
+  <caption>Dialog dismissal checks records — edits persist in this browser only.</caption>
+  <thead>
+    <tr>
+      <th scope="col" data-field="gesture" data-type="string">Gesture</th>
+      <th scope="col" data-field="closedby" data-type="string">closedby</th>
+      <th scope="col" data-field="expected" data-type="bool">Expected</th>
+      <th scope="col" data-field="observed" data-type="bool">Observed</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<div class="toolbar">
+  <button type="button" class="btn btn-secondary" id="reset-btn">Reset to sample data</button>
+</div>
+
+<p class="status" id="status" role="status" aria-live="polite" aria-atomic="true"></p>
+
+<script>
+/* === STORE (extractable: depends only on STORE_KEY, document#seed, localStorage, confirm) === */
+var STORE_KEY = "proto:check-dialog-dismissal";
+function readSeed() {
+  try { return JSON.parse(document.getElementById('seed').textContent); }
+  catch (e) { return []; }
+}
+function load() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    return raw ? JSON.parse(raw) : readSeed();
+  } catch (e) { return readSeed(); }
+}
+function save(records) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(records)); } catch (e) {}
+}
+function resetStore() {
+  if (!confirm('Reset to the sample data? This clears your local changes.')) return null;
+  try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+  return readSeed();
+}
+/* === END STORE === */
+
+var protoRecord; // set inside the records module; the live dialog calls it
+
+(function () {
+  var rowsEl    = document.getElementById('rows');
+  var summaryEl = document.getElementById('summary');
+  var statusEl  = document.getElementById('status');
+  var errorEl   = document.getElementById('form-error');
+  var form      = document.getElementById('add-form');
+  var resetBtn  = document.getElementById('reset-btn');
+  var summaryLabel = summaryEl.getAttribute('data-label') || '';
+
+  var fields = [];
+  document.querySelectorAll('#grid thead th[data-field]').forEach(function (th) {
+    fields.push({ key: th.getAttribute('data-field'), type: th.getAttribute('data-type') || 'string' });
+  });
+
+  var records = load();
+
+  function announce(msg) { statusEl.textContent = msg; }
+  function setText(cell, value) { cell.appendChild(document.createTextNode(value == null ? '' : String(value))); }
+  function boolText(value) { return value ? 'closes' : 'stays open'; }
+
+  function render() {
+    while (rowsEl.firstChild) rowsEl.removeChild(rowsEl.firstChild);
+
+    if (!records.length) {
+      var tr = document.createElement('tr');
+      var td = document.createElement('td');
+      td.className = 'empty-state';
+      td.setAttribute('colspan', String(fields.length + 1));
+      setText(td, 'No checks yet. Try a gesture on the dialog above, or record one by hand.');
+      tr.appendChild(td);
+      rowsEl.appendChild(tr);
+    } else {
+      records.forEach(function (rec, idx) {
+        var tr = document.createElement('tr');
+        if (!!rec.expected !== !!rec.observed) tr.className = 'mismatch';
+        fields.forEach(function (f) {
+          var td = document.createElement('td');
+          setText(td, f.type === 'bool' ? boolText(rec[f.key]) : rec[f.key]);
+          tr.appendChild(td);
+        });
+        var actions = document.createElement('td');
+        var del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'btn-danger';
+        del.textContent = 'Delete';
+        del.addEventListener('click', function () { remove(idx); });
+        actions.appendChild(del);
+        tr.appendChild(actions);
+        rowsEl.appendChild(tr);
+      });
+    }
+    // Success signal: how many checks did what the spec says.
+    var matches = records.filter(function (r) { return !!r.expected === !!r.observed; }).length;
+    summaryEl.textContent = summaryLabel + ': ' + matches + '/' + records.length;
+  }
+
+  function remove(idx) {
+    records.splice(idx, 1);
+    save(records);
+    render();
+    announce('Check deleted. ' + records.length + ' remaining.');
+  }
+
+  protoRecord = function (rec) {
+    records.push(rec);
+    save(records);
+    render();
+    announce('Recorded: ' + rec.gesture + ' with closedby ' + rec.closedby + ', ' +
+      (rec.expected === rec.observed ? 'matches the spec.' : 'does not match the spec.'));
+  };
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    errorEl.textContent = '';
+    var rec = {};
+    var firstInvalid = null;
+    for (var i = 0; i < fields.length; i++) {
+      var input = form.elements[fields[i].key];
+      if (!input) continue;
+      if (fields[i].type === 'bool') {
+        rec[fields[i].key] = !!input.checked;
+        continue;
+      }
+      var val = input.value.trim();
+      if (input.hasAttribute('data-required') && !val) {
+        if (!firstInvalid) firstInvalid = input;
+        continue;
+      }
+      rec[fields[i].key] = (fields[i].type === 'number' && val !== '') ? Number(val) : val;
+    }
+    if (firstInvalid) {
+      errorEl.textContent = 'Please fill in the required fields.';
+      firstInvalid.focus();
+      return;
+    }
+    records.push(rec);
+    save(records);
+    render();
+    form.reset();
+    var first = form.querySelector('input');
+    if (first) first.focus();
+    announce('Check recorded. ' + records.length + ' total.');
+  });
+
+  resetBtn.addEventListener('click', function () {
+    var seeded = resetStore();
+    if (seeded === null) return;
+    records = seeded;
+    render();
+    resetBtn.focus();
+    announce('Reset to sample data. ' + records.length + ' checks.');
+  });
+
+  render();
+})();
+</script>
+
+<script>
+/* The module as the plan proposes it: openers, closers, focus restoration, and a
+   backdrop fallback that attaches only where the browser has no native closedby.
+   The fallback mirrors native light dismiss: press and release must both land on
+   the dialog element itself, which is what the backdrop retargets to. */
+function initDialog(dialog) {
+  if (!dialog || !dialog.id) throw new Error('initDialog needs a <dialog> with an id');
+
+  var openers = Array.prototype.slice.call(document.querySelectorAll('[data-dialog-open="' + dialog.id + '"]'));
+  var closers = Array.prototype.slice.call(dialog.querySelectorAll('[data-dialog-close]'));
+  var opener = null;
+  var pressedOnDialog = false;
+  var nativeClosedBy = 'closedBy' in HTMLDialogElement.prototype;
+
+  function open(event) {
+    event.preventDefault();
+    opener = event.currentTarget;
+    dialog.showModal();
+  }
+  function close(event) {
+    if (event) event.preventDefault();
+    dialog.close();
+  }
+  function onPointerDown(event) { pressedOnDialog = event.target === dialog; }
+  function onDialogClick(event) {
+    var hit = pressedOnDialog && event.target === dialog;
+    pressedOnDialog = false;
+    if (hit && dialog.getAttribute('closedby') === 'any') dialog.close();
+  }
+  function onClose() {
+    var fallbackId = dialog.getAttribute('data-dialog-fallback');
+    var target = opener && opener.isConnected ? opener : (fallbackId ? document.getElementById(fallbackId) : null);
+    opener = null;
+    setTimeout(function () {
+      if (target && target.isConnected) { target.focus(); return; }
+      var active = document.activeElement;
+      if (active instanceof HTMLElement && dialog.contains(active)) active.blur();
+    }, 0);
+  }
+
+  openers.forEach(function (el) { el.addEventListener('click', open); });
+  closers.forEach(function (el) { el.addEventListener('click', close); });
+  if (!nativeClosedBy) {
+    dialog.addEventListener('pointerdown', onPointerDown);
+    dialog.addEventListener('click', onDialogClick);
+  }
+  dialog.addEventListener('close', onClose);
+
+  return function teardown() {
+    openers.forEach(function (el) { el.removeEventListener('click', open); });
+    closers.forEach(function (el) { el.removeEventListener('click', close); });
+    dialog.removeEventListener('pointerdown', onPointerDown);
+    dialog.removeEventListener('click', onDialogClick);
+    dialog.removeEventListener('close', onClose);
+  };
+}
+
+/* Gesture recorder: watches the dialog independently of the module and writes one
+   check per gesture, with the expectation taken from the native dialog spec. */
+(function () {
+  var dialog   = document.getElementById('confirm-delete');
+  var policy   = document.getElementById('policy');
+  var note     = document.getElementById('support-note');
+  var forceBtn = document.getElementById('force-fallback');
+  var teardown = initDialog(dialog);
+  var downOnBackdrop = false;
+
+  function currentPolicy() {
+    return dialog.hasAttribute('closedby') ? dialog.getAttribute('closedby') : 'absent';
+  }
+  function applyPolicy() {
+    if (policy.value === 'absent') dialog.removeAttribute('closedby');
+    else dialog.setAttribute('closedby', policy.value);
+  }
+  function describeSupport() {
+    var native = 'closedBy' in HTMLDialogElement.prototype;
+    note.textContent = native
+      ? 'This browser supports closedby natively, so the JavaScript fallback is not attached.'
+      : 'No native closedby here, so the JavaScript fallback is attached and doing the work.';
+  }
+  // Read the result one task later, after both the browser and the fallback have acted.
+  function settle(gesture, expected) {
+    var p = currentPolicy();
+    setTimeout(function () {
+      protoRecord({ gesture: gesture, closedby: p, expected: expected, observed: !dialog.open });
+    }, 0);
+  }
+
+  dialog.addEventListener('pointerdown', function (e) { downOnBackdrop = e.target === dialog; }, true);
+  dialog.addEventListener('click', function (e) {
+    if (e.target !== dialog) return;
+    if (downOnBackdrop) settle('Backdrop click', currentPolicy() === 'any');
+    else settle('Drag from dialog text, release on backdrop', false);
+    downOnBackdrop = false;
+  }, true);
+  dialog.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') settle('Escape', currentPolicy() !== 'none');
+  });
+  dialog.querySelector('.auk-dialog-close').addEventListener('click', function () { settle('Close button', true); });
+  document.getElementById('keep').addEventListener('click', function () { settle('Keep account button', true); });
+  document.getElementById('confirm-delete-confirm').addEventListener('click', function () {
+    dialog.close();
+    settle('Delete permanently button', true);
+  });
+
+  policy.addEventListener('change', applyPolicy);
+  forceBtn.addEventListener('click', function () {
+    // The same trick the plan's tests use: hide the accessor so feature detection
+    // reports no support. The browser itself still honours the attribute.
+    delete HTMLDialogElement.prototype.closedBy;
+    teardown();
+    teardown = initDialog(dialog);
+    describeSupport();
+    forceBtn.disabled = true;
+    forceBtn.textContent = 'JavaScript fallback attached';
+  });
+
+  applyPolicy();
+  describeSupport();
+})();
+</script>
+</body>
+</html>
