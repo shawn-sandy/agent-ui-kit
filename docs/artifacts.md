@@ -67,3 +67,4 @@ Rows the hook appended. Keep this table last in the file: the hook appends to th
 | Artifact | Date |
 | --- | --- |
 | [Plan: Make restyling an auk component a one-line job, whichever door a user picks](https://claude.ai/code/artifact/40ddb8f5-3d38-4923-b9c8-c49a0060b12f) | 2026-09-04 |
+| [Plan: Add the ui-compose workflow skill so agent-built components follow Component Driven Design](https://claude.ai/code/artifact/5acfc646-e9c4-42b5-a36e-48efc40ffe5a) | 2026-09-04 |
