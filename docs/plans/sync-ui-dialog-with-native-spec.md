@@ -9,7 +9,7 @@ artifact-url: https://claude.ai/code/artifact/f56741f9-bfb0-4616-bc12-78e829d5d9
 issue: https://github.com/shawn-sandy/agent-ui-skills/issues/25
 prototype: docs/prototypes/check-dialog-dismissal.html
 proto-model: {"entity":"Dismissal check","fields":[{"name":"gesture","type":"string"},{"name":"closedby","type":"string"},{"name":"expected","type":"bool"},{"name":"observed","type":"bool"}],"action":"Record check","successSignal":"checks matching the spec"}
-glance: The ui-dialog skill already leans on the native dialog element for almost everything, but a review against web.dev and MDN found four places where it drifts: the React projection silently loses its initial focus, backdrop dismissal is hard-wired instead of following the platform's closedby attribute, the confirmation example never mentions role="alertdialog", and the reason given for using native autofocus is one Chromium contradicts. Done means two new Playwright tests go from red to green, the docs say only what was measured, and scripts/check.sh exits zero.
+glance: "The ui-dialog skill already leans on the native dialog element for almost everything, but a review against web.dev and MDN found four places where it drifts: the React projection silently loses its initial focus, backdrop dismissal is hard-wired instead of following the platform's closedby attribute, the confirmation example never mentions role=\"alertdialog\", and the reason given for using native autofocus is one Chromium contradicts. Done means two new Playwright tests go from red to green, the docs say only what was measured, and scripts/check.sh exits zero."
 ---
 
 # Plan: Bring ui-dialog back in line with the native dialog element
