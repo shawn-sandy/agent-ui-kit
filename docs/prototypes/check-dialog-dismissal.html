@@ -424,11 +424,13 @@ function initDialog(dialog) {
     if (policy.value === 'absent') dialog.removeAttribute('closedby');
     else dialog.setAttribute('closedby', policy.value);
   }
-  function describeSupport() {
+  function describeSupport(forced) {
     var native = 'closedBy' in HTMLDialogElement.prototype;
-    note.textContent = native
-      ? 'This browser supports closedby natively, so the JavaScript fallback is not attached.'
-      : 'No native closedby here, so the JavaScript fallback is attached and doing the work.';
+    note.textContent = forced
+      ? 'Feature detection now reports no native closedby, so the JavaScript fallback is attached. A browser with real native support still honours the attribute itself, so the fallback only has to agree with it.'
+      : native
+        ? 'This browser supports closedby natively, so the JavaScript fallback is not attached.'
+        : 'No native closedby here, so the JavaScript fallback is attached.';
   }
   // Read the result one task later, after both the browser and the fallback have acted.
   function settle(gesture, expected) {
@@ -469,7 +471,9 @@ function initDialog(dialog) {
     delete HTMLDialogElement.prototype.closedBy;
     teardown();
     teardown = initDialog(dialog);
-    describeSupport();
+    describeSupport(true);
+    // Disabling the button removes it from the focus order, so move focus first.
+    policy.focus();
     forceBtn.disabled = true;
     forceBtn.textContent = 'JavaScript fallback attached';
   });
