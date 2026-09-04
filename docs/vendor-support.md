@@ -7,6 +7,12 @@ only one that tests the README's claim that one `skills/` tree serves two vendor
 
 Failures are recorded here rather than fixed silently.
 
+Scope: the runs below were made when four skills existed - `ui-button`, `ui-alert`,
+`ui-dialog` and `ui-tabs`. Every "all four" below means those four and is not a claim
+about the four skills added since: `ui-box`, `ui-popover`, `ui-theme` and `ui-compose`
+have not been through a vendor run. Nothing here is restated from memory, so the
+counts stay as measured until a fresh run replaces them.
+
 ## Claude Code
 
 Version: the `claude` CLI on the author's machine at the time of writing.
