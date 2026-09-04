@@ -89,22 +89,31 @@ There is no `height` and no `block-size`. A box is sized by what it holds.
 `min-block-size` is the one dimension hook, and its default of `auto` is a no-op —
 it exists so a theme can suggest a floor without this component prescribing one.
 
-```css
-.auk-box {
-  box-sizing: border-box;
-  display: block;
-  padding: var(--auk-box-padding, 1rem);
-  border: var(--auk-box-border-width, 1px) solid var(--auk-box-border-color, transparent);
-  border-radius: var(--auk-box-radius, 0.375rem);
-  min-block-size: var(--auk-box-min-block-size, auto);
-  color: var(--auk-box-color, #1f2937);
-  background-color: var(--auk-box-bg, #ffffff);
-}
+The block declares the `auk` cascade layer, so a rule written outside any layer wins
+over it whatever its order or specificity. A project's own reset and base rules must
+therefore sit in a layer declared before `auk`, for example `@layer reset, auk;`, with
+`auk` ahead of the project's utility layers; an unlayered reset outranks the component
+and strips its padding. Set a `--auk-box-*` property on `:root` for every instance,
+on an ancestor for one region, or on the element itself for one instance.
 
-.auk-box[data-variant="invert"] {
-  color: var(--auk-box-invert-color, #f9fafb);
-  background-color: var(--auk-box-invert-bg, #1f2937);
-  border-color: var(--auk-box-invert-border-color, transparent);
+```css
+@layer auk {
+  .auk-box {
+    box-sizing: border-box;
+    display: block;
+    padding: var(--auk-box-padding, 1rem);
+    border: var(--auk-box-border-width, 1px) solid var(--auk-box-border-color, transparent);
+    border-radius: var(--auk-box-radius, 0.375rem);
+    min-block-size: var(--auk-box-min-block-size, auto);
+    color: var(--auk-box-color, #1f2937);
+    background-color: var(--auk-box-bg, #ffffff);
+  }
+
+  .auk-box[data-variant="invert"] {
+    color: var(--auk-box-invert-color, #f9fafb);
+    background-color: var(--auk-box-invert-bg, #1f2937);
+    border-color: var(--auk-box-invert-border-color, transparent);
+  }
 }
 ```
 

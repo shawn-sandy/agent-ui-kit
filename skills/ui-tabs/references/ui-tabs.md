@@ -51,56 +51,65 @@ Qualifiers: parts `tab`, `panel`; variants none; states `selected`, `focus`.
 Selection is styled from `[aria-selected="true"]`, so the visual state cannot
 disagree with the announced state - there is only one source of truth.
 
+The block declares the `auk` cascade layer, so a rule written outside any layer wins
+over it whatever its order or specificity. A project's own reset and base rules must
+therefore sit in a layer declared before `auk`, for example `@layer reset, auk;`, with
+`auk` ahead of the project's utility layers; an unlayered reset outranks the component
+and strips its padding. Set a `--auk-tabs-*` property on `:root` for every instance,
+on an ancestor for one region, or on the element itself for one instance.
+
 ```css
-.auk-tabs {
-  font-family: var(--auk-tabs-font-family, inherit);
-  color: var(--auk-tabs-color, #111827);
-}
+@layer auk {
+  .auk-tabs {
+    font-family: var(--auk-tabs-font-family, inherit);
+    color: var(--auk-tabs-color, #111827);
+  }
 
-.auk-tabs-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--auk-tabs-gap, 0.25rem);
-  border-block-end: var(--auk-tabs-border-width, 1px) solid var(--auk-tabs-border-color, #d1d5db);
-}
+  .auk-tabs-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--auk-tabs-gap, 0.25rem);
+    border-block-end: var(--auk-tabs-border-width, 1px) solid var(--auk-tabs-border-color, #d1d5db);
+  }
 
-.auk-tab {
-  min-block-size: var(--auk-tabs-tab-min-size, 2.75rem);
-  padding-block: var(--auk-tabs-tab-padding-block, 0.625rem);
-  padding-inline: var(--auk-tabs-tab-padding-inline, 1rem);
-  border: 0;
-  border-block-end: var(--auk-tabs-tab-border-block-end-width, 3px) solid transparent;
-  font-family: var(--auk-tabs-font-family, inherit);
-  font-size: var(--auk-tabs-tab-font-size, 1rem);
-  font-weight: var(--auk-tabs-tab-font-weight, 600);
-  color: var(--auk-tabs-tab-color, #374151);
-  background-color: var(--auk-tabs-tab-bg, transparent);
-  cursor: pointer;
-}
+  .auk-tab {
+    min-block-size: var(--auk-tabs-tab-min-size, 2.75rem);
+    padding-block: var(--auk-tabs-tab-padding-block, 0.625rem);
+    padding-inline: var(--auk-tabs-tab-padding-inline, 1rem);
+    border: 0;
+    border-block-end: var(--auk-tabs-tab-border-block-end-width, 3px) solid transparent;
+    font-family: var(--auk-tabs-font-family, inherit);
+    font-size: var(--auk-tabs-tab-font-size, 1rem);
+    font-weight: var(--auk-tabs-tab-font-weight, 600);
+    color: var(--auk-tabs-tab-color, #374151);
+    background-color: var(--auk-tabs-tab-bg, transparent);
+    cursor: pointer;
+  }
 
-.auk-tab[aria-selected="true"] {
-  color: var(--auk-tabs-selected-tab-color, #1a56db);
-  border-block-end-color: var(--auk-tabs-selected-tab-border-block-end-color, #1a56db);
-}
+  .auk-tab[aria-selected="true"] {
+    color: var(--auk-tabs-selected-tab-color, #1a56db);
+    border-block-end-color: var(--auk-tabs-selected-tab-border-block-end-color, #1a56db);
+  }
 
-.auk-tab:focus-visible {
-  outline: var(--auk-tabs-focus-width, 3px) solid var(--auk-tabs-focus-color, #111827);
-  outline-offset: var(--auk-tabs-focus-offset, -3px);
-}
+  .auk-tab:focus-visible {
+    outline: var(--auk-tabs-focus-width, 3px) solid var(--auk-tabs-focus-color, #111827);
+    outline-offset: var(--auk-tabs-focus-offset, -3px);
+  }
 
-.auk-tabpanel {
-  padding-block: var(--auk-tabs-panel-padding-block, 1rem);
-  padding-inline: var(--auk-tabs-panel-padding-inline, 0.25rem);
-  line-height: var(--auk-tabs-panel-line-height, 1.5);
-}
+  .auk-tabpanel {
+    padding-block: var(--auk-tabs-panel-padding-block, 1rem);
+    padding-inline: var(--auk-tabs-panel-padding-inline, 0.25rem);
+    line-height: var(--auk-tabs-panel-line-height, 1.5);
+  }
 
-.auk-tabpanel:focus-visible {
-  outline: var(--auk-tabs-focus-width, 3px) solid var(--auk-tabs-focus-color, #111827);
-  outline-offset: var(--auk-tabs-focus-offset, -3px);
-}
+  .auk-tabpanel:focus-visible {
+    outline: var(--auk-tabs-focus-width, 3px) solid var(--auk-tabs-focus-color, #111827);
+    outline-offset: var(--auk-tabs-focus-offset, -3px);
+  }
 
-.auk-tabpanel[hidden] {
-  display: none;
+  .auk-tabpanel[hidden] {
+    display: none;
+  }
 }
 ```
 

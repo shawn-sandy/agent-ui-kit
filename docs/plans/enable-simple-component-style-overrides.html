@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-status="todo" data-effort="high">
+<html lang="en" data-status="completed" data-effort="high">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,7 @@ try {
   if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
 } catch (e) { /* no storage — prefers-color-scheme decides */ }
 </script>
-<meta name="plan-status" content="todo">
+<meta name="plan-status" content="completed">
 <meta name="plan-effort" content="high">
 <meta name="plan-type" content="feature">
 <meta name="plan-created" content="2026-09-04">
@@ -1685,7 +1685,7 @@ img, video { max-width: 100%; height: auto; }
            aria-label="View the interactive prototype for this plan">View prototype</a>
         <a class="issue-link" href="https://github.com/shawn-sandy/agent-ui-skills/issues/27"
            aria-label="View the tracking issue for this plan">Issue #27</a>
-        <span class="status-badge">todo</span>
+        <span class="status-badge">completed</span>
       </div>
     </div>
     <div class="plan-meta">
@@ -1719,21 +1719,21 @@ img, video { max-width: 100%; height: auto; }
       <summary>15 steps</summary>
       <div class="rail-heading">Steps</div>
       <ul class="rail-steps">
-        <li><a class="rail-step" href="#step-1"><span class="rail-no">1</span><span class="rail-text">Write tests/e2e/overrides.spec.ts: for each of the six components, open the demo with <code class="md">demoUrl()</code> from tests/e2e/support.ts, prepend a <code class="md">&lt;style&gt;</code> element to <code class="md">&lt;head&gt;</code> holding an unlayered <code class="md">.auk-&lt;slug&gt; { background-color: rgb(1, 2, 3) }</code> rule (use <code class="md">color</code> for tabs, whose root declares no background) so the rule sits before the component styles, and assert the root element&#39;s computed value is <code class="md">rgb(1, 2, 3)</code>.</span><span class="rail-state">step 1 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-2"><span class="rail-no">2</span><span class="rail-text">Add a component assertion to tests/objective.spec.ts that the reference css block&#39;s first non-blank line is <code class="md">@layer auk {</code> and its last non-blank line is <code class="md">}</code>.</span><span class="rail-state">step 2 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-3"><span class="rail-no">3</span><span class="rail-text">Write tests/integration/properties-doc.spec.ts with two cases: the first asserts docs/properties.md exists, the second dynamically imports <code class="md">render</code> from scripts/build-properties.mjs and asserts the file&#39;s content equals its return value byte for byte.</span><span class="rail-state">step 3 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-4"><span class="rail-no">4</span><span class="rail-text">Wrap the fenced css block of each of the six references, skills/ui-alert/references/ui-alert.md, ui-box, ui-button, ui-dialog, ui-popover and ui-tabs, in <code class="md">@layer auk {</code> and <code class="md">}</code> with the body indented two spaces.</span><span class="rail-state">step 4 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-5"><span class="rail-no">5</span><span class="rail-text">Add one short paragraph to the Styles prose of each of the six references, above the fenced block and wrapped at 88 columns: the block declares the <code class="md">auk</code> cascade layer, so a rule written outside any layer wins over it whatever its order or specificity; a project&#39;s reset and base rules must therefore sit in a layer declared before <code class="md">auk</code>, for example <code class="md">@layer reset, auk;</code>, and <code class="md">auk</code> goes before the project&#39;s utility layers, because an unlayered reset outranks the component and strips its padding; a <code class="md">--auk-&lt;slug&gt;-*</code> property is set on <code class="md">:root</code> for every instance, on an ancestor for one region, or on the element for one instance.</span><span class="rail-state">step 5 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-6"><span class="rail-no">6</span><span class="rail-text">Run <code class="md">node scripts/build-demos.mjs</code> to regenerate the six demo.html files from the wrapped references.</span><span class="rail-state">step 6 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-7"><span class="rail-no">7</span><span class="rail-text">In skills/ui-dialog/references/demo.html and skills/ui-popover/references/demo.html, wrap the hand-written <code class="md">.auk-button</code> rules in the page chrome in <code class="md">@layer auk { }</code>.</span><span class="rail-state">step 7 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-8"><span class="rail-no">8</span><span class="rail-text">Update docs/component-spec.md: add to Styles rule 2 that the fenced css block is wrapped in <code class="md">@layer auk { }</code>, add a settled-question row explaining why, and add a checklist item.</span><span class="rail-state">step 8 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-9"><span class="rail-no">9</span><span class="rail-text">Create scripts/auk-properties.mjs exporting <code class="md">parseVars(css)</code> and <code class="md">readProperties(skillsDir)</code>: the reader walks component skills with <code class="md">skillKind</code> from scripts/skill-kind.mjs, takes the fenced css block from each reference, and the parser scans every <code class="md">var(--auk-…, fallback)</code> with a balanced-parenthesis walk so a fallback such as <code class="md">rgba(17, 24, 39, 0.6)</code> survives whole, returning <code class="md">{ property, fallback, component, brand }</code> per unique name with the same brand test the mapping spec uses, and throwing when one name carries two different fallbacks; write tests/unit/auk-properties.spec.ts for the nested-parenthesis and duplicate-fallback cases, and switch tests/unit/ui-theme-mapping.spec.ts to build its <code class="md">shipped</code> set from <code class="md">readProperties</code>.</span><span class="rail-state">step 9 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-10"><span class="rail-no">10</span><span class="rail-text">Create scripts/build-properties.mjs exporting <code class="md">render()</code> and, when run directly, writing docs/properties.md: a one-line intro pointing at docs/theming.md, then one section per component with a table of Property, Fallback and Kind, where Kind is brand or measured. Run it once.</span><span class="rail-state">step 10 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-11"><span class="rail-no">11</span><span class="rail-text">Write docs/theming.md: the three doors as a table with one small example each, the reset condition with its one-line recipe <code class="md">@layer reset, auk, utilities;</code> and the measured consequence of skipping it (padding-inline 16px to 0px), where <code class="md">auk</code> slots into a project that already orders layers, dark mode as &quot;redeclare under the project&#39;s own dark selector or let ui-theme mirror it&quot;, a short list of what not to override because tests/e2e/ measures it (focus ring width and offset, minimum target size, reduced-motion timing), and links to docs/properties.md and skills/ui-theme.</span><span class="rail-state">step 11 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-12"><span class="rail-no">12</span><span class="rail-text">Add a Documentation bullet to README.md for docs/theming.md and docs/properties.md, and add <code class="md">node scripts/build-properties.mjs</code> to the CLAUDE.md commands block with one sentence saying docs/properties.md is generated and never hand-edited.</span><span class="rail-state">step 12 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-13"><span class="rail-no">13</span><span class="rail-text">Run <code class="md">npm run check</code>.</span><span class="rail-state">step 13 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-14"><span class="rail-no">14</span><span class="rail-text">Run <code class="md">bash scripts/check.sh --prove</code>.</span><span class="rail-state">step 14 of 15</span></a></li>
-        <li><a class="rail-step" href="#step-15"><span class="rail-no">15</span><span class="rail-text">Open each regenerated demo over <code class="md">file://</code> in the browser pane and, with <code class="md">mcp__Claude_Browser__javascript_tool</code>, read the root element&#39;s computed <code class="md">background-color</code> (<code class="md">color</code> for tabs) and then read the console with <code class="md">mcp__Claude_Browser__read_console_messages</code>.</span><span class="rail-state">step 15 of 15</span></a></li>
+        <li><a class="rail-step done" href="#step-1"><span class="rail-no">✓</span><span class="rail-text">Write tests/e2e/overrides.spec.ts: for each of the six components, open the demo with <code class="md">demoUrl()</code> from tests/e2e/support.ts, prepend a <code class="md">&lt;style&gt;</code> element to <code class="md">&lt;head&gt;</code> holding an unlayered <code class="md">.auk-&lt;slug&gt; { background-color: rgb(1, 2, 3) }</code> rule (use <code class="md">color</code> for tabs, whose root declares no background) so the rule sits before the component styles, and assert the root element&#39;s computed value is <code class="md">rgb(1, 2, 3)</code>.</span><span class="rail-state">step 1 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-2"><span class="rail-no">✓</span><span class="rail-text">Add a component assertion to tests/objective.spec.ts that the reference css block&#39;s first non-blank line is <code class="md">@layer auk {</code> and its last non-blank line is <code class="md">}</code>.</span><span class="rail-state">step 2 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-3"><span class="rail-no">✓</span><span class="rail-text">Write tests/integration/properties-doc.spec.ts with two cases: the first asserts docs/properties.md exists, the second dynamically imports <code class="md">render</code> from scripts/build-properties.mjs and asserts the file&#39;s content equals its return value byte for byte.</span><span class="rail-state">step 3 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-4"><span class="rail-no">✓</span><span class="rail-text">Wrap the fenced css block of each of the six references, skills/ui-alert/references/ui-alert.md, ui-box, ui-button, ui-dialog, ui-popover and ui-tabs, in <code class="md">@layer auk {</code> and <code class="md">}</code> with the body indented two spaces.</span><span class="rail-state">step 4 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-5"><span class="rail-no">✓</span><span class="rail-text">Add one short paragraph to the Styles prose of each of the six references, above the fenced block and wrapped at 88 columns: the block declares the <code class="md">auk</code> cascade layer, so a rule written outside any layer wins over it whatever its order or specificity; a project&#39;s reset and base rules must therefore sit in a layer declared before <code class="md">auk</code>, for example <code class="md">@layer reset, auk;</code>, and <code class="md">auk</code> goes before the project&#39;s utility layers, because an unlayered reset outranks the component and strips its padding; a <code class="md">--auk-&lt;slug&gt;-*</code> property is set on <code class="md">:root</code> for every instance, on an ancestor for one region, or on the element for one instance.</span><span class="rail-state">step 5 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-6"><span class="rail-no">✓</span><span class="rail-text">Run <code class="md">node scripts/build-demos.mjs</code> to regenerate the six demo.html files from the wrapped references.</span><span class="rail-state">step 6 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-7"><span class="rail-no">✓</span><span class="rail-text">In skills/ui-dialog/references/demo.html and skills/ui-popover/references/demo.html, wrap the hand-written <code class="md">.auk-button</code> rules in the page chrome in <code class="md">@layer auk { }</code>.</span><span class="rail-state">step 7 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-8"><span class="rail-no">✓</span><span class="rail-text">Update docs/component-spec.md: add to Styles rule 2 that the fenced css block is wrapped in <code class="md">@layer auk { }</code>, add a settled-question row explaining why, and add a checklist item.</span><span class="rail-state">step 8 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-9"><span class="rail-no">✓</span><span class="rail-text">Create scripts/auk-properties.mjs exporting <code class="md">parseVars(css)</code> and <code class="md">readProperties(skillsDir)</code>: the reader walks component skills with <code class="md">skillKind</code> from scripts/skill-kind.mjs, takes the fenced css block from each reference, and the parser scans every <code class="md">var(--auk-…, fallback)</code> with a balanced-parenthesis walk so a fallback such as <code class="md">rgba(17, 24, 39, 0.6)</code> survives whole, returning <code class="md">{ property, fallback, component, brand }</code> per unique name with the same brand test the mapping spec uses, and throwing when one name carries two different fallbacks; write tests/unit/auk-properties.spec.ts for the nested-parenthesis and duplicate-fallback cases, and switch tests/unit/ui-theme-mapping.spec.ts to build its <code class="md">shipped</code> set from <code class="md">readProperties</code>.</span><span class="rail-state">step 9 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-10"><span class="rail-no">✓</span><span class="rail-text">Create scripts/build-properties.mjs exporting <code class="md">render()</code> and, when run directly, writing docs/properties.md: a one-line intro pointing at docs/theming.md, then one section per component with a table of Property, Fallback and Kind, where Kind is brand or measured. Run it once.</span><span class="rail-state">step 10 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-11"><span class="rail-no">✓</span><span class="rail-text">Write docs/theming.md: the three doors as a table with one small example each, the reset condition with its one-line recipe <code class="md">@layer reset, auk, utilities;</code> and the measured consequence of skipping it (padding-inline 16px to 0px), where <code class="md">auk</code> slots into a project that already orders layers, dark mode as &quot;redeclare under the project&#39;s own dark selector or let ui-theme mirror it&quot;, a short list of what not to override because tests/e2e/ measures it (focus ring width and offset, minimum target size, reduced-motion timing), and links to docs/properties.md and skills/ui-theme.</span><span class="rail-state">step 11 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-12"><span class="rail-no">✓</span><span class="rail-text">Add a Documentation bullet to README.md for docs/theming.md and docs/properties.md, and add <code class="md">node scripts/build-properties.mjs</code> to the CLAUDE.md commands block with one sentence saying docs/properties.md is generated and never hand-edited.</span><span class="rail-state">step 12 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-13"><span class="rail-no">✓</span><span class="rail-text">Run <code class="md">npm run check</code>.</span><span class="rail-state">step 13 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-14"><span class="rail-no">✓</span><span class="rail-text">Run <code class="md">bash scripts/check.sh --prove</code>.</span><span class="rail-state">step 14 of 15, done</span></a></li>
+        <li><a class="rail-step done" href="#step-15"><span class="rail-no">✓</span><span class="rail-text">Open each regenerated demo over <code class="md">file://</code> in the browser pane and, with <code class="md">mcp__Claude_Browser__javascript_tool</code>, read the root element&#39;s computed <code class="md">background-color</code> (<code class="md">color</code> for tabs) and then read the console with <code class="md">mcp__Claude_Browser__read_console_messages</code>.</span><span class="rail-state">step 15 of 15, done</span></a></li>
       </ul>
     </details>
   </nav>
@@ -1796,12 +1796,12 @@ img, video { max-width: 100%; height: auto; }
     <div class="progress-wrap" id="progress">
       <div class="progress-header">
         <span>Definition of done</span>
-        <span id="progress-label">0 / 9 done</span>
+        <span id="progress-label">9 / 9 done</span>
       </div>
       <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progress-bar"
-             role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-             aria-label="Plan progress" style="width:0%"></div>
+        <div class="progress-bar-fill has-progress" id="progress-bar"
+             role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+             aria-label="Plan progress" style="width:100%"></div>
       </div>
     </div>
 
@@ -1898,12 +1898,12 @@ img, video { max-width: 100%; height: auto; }
 
         <div class="phase-group" data-phase="RED" style="margin-top:1.5rem;">
           <h3 class="phase-name" style="font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:0 0 .75rem;">RED</h3>
-        <div class="step-card" id="step-1">
+        <div class="step-card completed" id="step-1">
           <div class="step-card-header">
             <div class="step-number">1</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Write tests/e2e/overrides.spec.ts: for each of the six components, open the demo with <code class="md">demoUrl()</code> from tests/e2e/support.ts, prepend a <code class="md">&lt;style&gt;</code> element to <code class="md">&lt;head&gt;</code> holding an unlayered <code class="md">.auk-&lt;slug&gt; { background-color: rgb(1, 2, 3) }</code> rule (use <code class="md">color</code> for tabs, whose root declares no background) so the rule sits before the component styles, and assert the root element&#39;s computed value is <code class="md">rgb(1, 2, 3)</code>.</span>
               </div>
               <div class="step-note step-why-note">
@@ -1918,12 +1918,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-2">
+        <div class="step-card completed" id="step-2">
           <div class="step-card-header">
             <div class="step-number">2</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Add a component assertion to tests/objective.spec.ts that the reference css block&#39;s first non-blank line is <code class="md">@layer auk {</code> and its last non-blank line is <code class="md">}</code>.</span>
               </div>
               <div class="step-note step-why-note">
@@ -1938,12 +1938,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-3">
+        <div class="step-card completed" id="step-3">
           <div class="step-card-header">
             <div class="step-number">3</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Write tests/integration/properties-doc.spec.ts with two cases: the first asserts docs/properties.md exists, the second dynamically imports <code class="md">render</code> from scripts/build-properties.mjs and asserts the file&#39;s content equals its return value byte for byte.</span>
               </div>
               <div class="step-note step-why-note">
@@ -1961,12 +1961,12 @@ img, video { max-width: 100%; height: auto; }
 
         <div class="phase-group" data-phase="GREEN" style="margin-top:1.5rem;">
           <h3 class="phase-name" style="font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:0 0 .75rem;">GREEN</h3>
-        <div class="step-card" id="step-4">
+        <div class="step-card completed" id="step-4">
           <div class="step-card-header">
             <div class="step-number">4</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Wrap the fenced css block of each of the six references, skills/ui-alert/references/ui-alert.md, ui-box, ui-button, ui-dialog, ui-popover and ui-tabs, in <code class="md">@layer auk {</code> and <code class="md">}</code> with the body indented two spaces.</span>
               </div>
               <div class="step-note step-why-note">
@@ -1981,12 +1981,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-5">
+        <div class="step-card completed" id="step-5">
           <div class="step-card-header">
             <div class="step-number">5</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Add one short paragraph to the Styles prose of each of the six references, above the fenced block and wrapped at 88 columns: the block declares the <code class="md">auk</code> cascade layer, so a rule written outside any layer wins over it whatever its order or specificity; a project&#39;s reset and base rules must therefore sit in a layer declared before <code class="md">auk</code>, for example <code class="md">@layer reset, auk;</code>, and <code class="md">auk</code> goes before the project&#39;s utility layers, because an unlayered reset outranks the component and strips its padding; a <code class="md">--auk-&lt;slug&gt;-*</code> property is set on <code class="md">:root</code> for every instance, on an ancestor for one region, or on the element for one instance.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2001,12 +2001,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-6">
+        <div class="step-card completed" id="step-6">
           <div class="step-card-header">
             <div class="step-number">6</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Run <code class="md">node scripts/build-demos.mjs</code> to regenerate the six demo.html files from the wrapped references.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2021,12 +2021,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-7">
+        <div class="step-card completed" id="step-7">
           <div class="step-card-header">
             <div class="step-number">7</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">In skills/ui-dialog/references/demo.html and skills/ui-popover/references/demo.html, wrap the hand-written <code class="md">.auk-button</code> rules in the page chrome in <code class="md">@layer auk { }</code>.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2041,12 +2041,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-8">
+        <div class="step-card completed" id="step-8">
           <div class="step-card-header">
             <div class="step-number">8</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Update docs/component-spec.md: add to Styles rule 2 that the fenced css block is wrapped in <code class="md">@layer auk { }</code>, add a settled-question row explaining why, and add a checklist item.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2061,12 +2061,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-9">
+        <div class="step-card completed" id="step-9">
           <div class="step-card-header">
             <div class="step-number">9</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Create scripts/auk-properties.mjs exporting <code class="md">parseVars(css)</code> and <code class="md">readProperties(skillsDir)</code>: the reader walks component skills with <code class="md">skillKind</code> from scripts/skill-kind.mjs, takes the fenced css block from each reference, and the parser scans every <code class="md">var(--auk-…, fallback)</code> with a balanced-parenthesis walk so a fallback such as <code class="md">rgba(17, 24, 39, 0.6)</code> survives whole, returning <code class="md">{ property, fallback, component, brand }</code> per unique name with the same brand test the mapping spec uses, and throwing when one name carries two different fallbacks; write tests/unit/auk-properties.spec.ts for the nested-parenthesis and duplicate-fallback cases, and switch tests/unit/ui-theme-mapping.spec.ts to build its <code class="md">shipped</code> set from <code class="md">readProperties</code>.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2081,12 +2081,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-10">
+        <div class="step-card completed" id="step-10">
           <div class="step-card-header">
             <div class="step-number">10</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Create scripts/build-properties.mjs exporting <code class="md">render()</code> and, when run directly, writing docs/properties.md: a one-line intro pointing at docs/theming.md, then one section per component with a table of Property, Fallback and Kind, where Kind is brand or measured. Run it once.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2101,12 +2101,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-11">
+        <div class="step-card completed" id="step-11">
           <div class="step-card-header">
             <div class="step-number">11</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Write docs/theming.md: the three doors as a table with one small example each, the reset condition with its one-line recipe <code class="md">@layer reset, auk, utilities;</code> and the measured consequence of skipping it (padding-inline 16px to 0px), where <code class="md">auk</code> slots into a project that already orders layers, dark mode as &quot;redeclare under the project&#39;s own dark selector or let ui-theme mirror it&quot;, a short list of what not to override because tests/e2e/ measures it (focus ring width and offset, minimum target size, reduced-motion timing), and links to docs/properties.md and skills/ui-theme.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2121,12 +2121,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-12">
+        <div class="step-card completed" id="step-12">
           <div class="step-card-header">
             <div class="step-number">12</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Add a Documentation bullet to README.md for docs/theming.md and docs/properties.md, and add <code class="md">node scripts/build-properties.mjs</code> to the CLAUDE.md commands block with one sentence saying docs/properties.md is generated and never hand-edited.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2144,12 +2144,12 @@ img, video { max-width: 100%; height: auto; }
 
         <div class="phase-group" data-phase="VERIFY" style="margin-top:1.5rem;">
           <h3 class="phase-name" style="font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:0 0 .75rem;">VERIFY</h3>
-        <div class="step-card" id="step-13">
+        <div class="step-card completed" id="step-13">
           <div class="step-card-header">
             <div class="step-number">13</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Run <code class="md">npm run check</code>.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2164,12 +2164,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-14">
+        <div class="step-card completed" id="step-14">
           <div class="step-card-header">
             <div class="step-number">14</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Run <code class="md">bash scripts/check.sh --prove</code>.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2184,12 +2184,12 @@ img, video { max-width: 100%; height: auto; }
           </div>
         </div>
 
-        <div class="step-card" id="step-15">
+        <div class="step-card completed" id="step-15">
           <div class="step-card-header">
             <div class="step-number">15</div>
             <div class="step-body">
               <div class="step-action">
-                <span class="step-chip">todo</span>
+                <span class="step-chip">done</span>
                 <span class="step-chip-text">Open each regenerated demo over <code class="md">file://</code> in the browser pane and, with <code class="md">mcp__Claude_Browser__javascript_tool</code>, read the root element&#39;s computed <code class="md">background-color</code> (<code class="md">color</code> for tabs) and then read the console with <code class="md">mcp__Claude_Browser__read_console_messages</code>.</span>
               </div>
               <div class="step-note step-why-note">
@@ -2233,39 +2233,39 @@ img, video { max-width: 100%; height: auto; }
       <p class="section-intro">The plan counts as done when every statement below is true — check each one off as you verify it.</p>
       <ul class="criteria-list" id="criteria-list">
         <li>
-          <input type="checkbox" id="ac1">
+          <input type="checkbox" id="ac1" checked>
           <label for="ac1"><code class="md">npx playwright test tests/e2e/overrides.spec.ts</code> fails on the unlayered references and passes once they are wrapped, with the failure output recorded in the session notes or pull request.</label>
         </li>
         <li>
-          <input type="checkbox" id="ac2">
+          <input type="checkbox" id="ac2" checked>
           <label for="ac2">Every <code class="md">skills/ui-*/references/ui-*.md</code> css block opens with <code class="md">@layer auk {</code> and <code class="md">npx vitest run tests/objective.spec.ts</code> enforces it.</label>
         </li>
         <li>
-          <input type="checkbox" id="ac3">
+          <input type="checkbox" id="ac3" checked>
           <label for="ac3"><code class="md">node scripts/build-demos.mjs --check</code> exits 0 and each demo&#39;s <code class="md">&lt;style&gt;</code> ends with its reference css byte for byte.</label>
         </li>
         <li>
-          <input type="checkbox" id="ac4">
+          <input type="checkbox" id="ac4" checked>
           <label for="ac4">docs/properties.md lists every <code class="md">--auk-*</code> property with its fallback and kind, and <code class="md">npx vitest run tests/integration/properties-doc.spec.ts</code> fails when the file is edited by hand.</label>
         </li>
         <li>
-          <input type="checkbox" id="ac5">
+          <input type="checkbox" id="ac5" checked>
           <label for="ac5"><code class="md">npx vitest run tests/unit/ui-theme-mapping.spec.ts</code> passes with its counts unchanged while reading through scripts/auk-properties.mjs.</label>
         </li>
         <li>
-          <input type="checkbox" id="ac6">
+          <input type="checkbox" id="ac6" checked>
           <label for="ac6">Each of the six references&#39; Styles prose names the layer, the reset-before-<code class="md">auk</code> condition, and the three places to set a property, wrapped at 88 columns.</label>
         </li>
         <li>
-          <input type="checkbox" id="ac7">
+          <input type="checkbox" id="ac7" checked>
           <label for="ac7">docs/theming.md exists and README.md links both it and docs/properties.md.</label>
         </li>
         <li>
-          <input type="checkbox" id="ac8">
+          <input type="checkbox" id="ac8" checked>
           <label for="ac8">No SKILL.md changes, and every SKILL.md body stays under 60 lines.</label>
         </li>
         <li>
-          <input type="checkbox" id="ac9">
+          <input type="checkbox" id="ac9" checked>
           <label for="ac9"><code class="md">npm run check</code> and <code class="md">bash scripts/check.sh --prove</code> both exit 0.</label>
         </li>
       </ul>
@@ -2289,21 +2289,21 @@ img, video { max-width: 100%; height: auto; }
         Wrapping up
       </h2>
       <p class="section-intro">Three gates that must all pass before this plan is marked completed.</p>
-      <div class="completion-checklist" id="completion-checklist">
+      <div class="completion-checklist all-complete" id="completion-checklist">
         <div class="completion-header">
           <span class="completion-badge" id="completion-badge">Required</span>
         </div>
         <ul class="completion-list" id="completion-list">
           <li>
-            <input type="checkbox" id="cc1" disabled>
+            <input type="checkbox" id="cc1" disabled checked>
             <label for="cc1">All step TODOs marked as done</label>
           </li>
           <li>
-            <input type="checkbox" id="cc2" disabled>
+            <input type="checkbox" id="cc2" disabled checked>
             <label for="cc2">All acceptance criteria verified and checked off</label>
           </li>
           <li>
-            <input type="checkbox" id="cc3" disabled>
+            <input type="checkbox" id="cc3" disabled checked>
             <label for="cc3">Plan status updated to completed</label>
           </li>
         </ul>
