@@ -1,6 +1,6 @@
 ---
 name: ui-popover
-description: Accessible non-modal popover on the native HTML popover attribute - a panel that opens above the page without blocking it. Use when adding a filter panel, a disclosure card, a settings flyout, an inline notice, a dropdown surface, or any layer that closes on Escape or an outside click while the page behind stays clickable and tabbable. Covers auto and manual modes, trigger-adjacent and viewport placements, top-layer placement that no overflow or z-index can clip, and trigger state. Not a modal.
+description: Accessible non-modal popover built on the native HTML popover attribute. Use when adding a filter panel, settings flyout or dropdown, or a layer closing on Escape or an outside click. Not a modal.
 license: MIT
 ---
 

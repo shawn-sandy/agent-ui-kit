@@ -1,6 +1,6 @@
 ---
 name: ui-compose
-description: Composition workflow - shapes auk components for a component-based project, with typed props derived from the contract table, explicit variant components instead of layout-switching flags, sibling auk components composed rather than re-typed, and each component renderable alone. Use when the target project is built from components, when a request asks to wrap, port or adapt an auk component into the project's component model, or when a screen must be assembled from auk parts. Not for a plain HTML page and not for theming.
+description: Composition workflow - shapes auk components for a component-based project. Typed props from the contract table, siblings compose. Use when porting auk components into that model. Not for plain HTML.
 license: MIT
 metadata:
   kind: workflow

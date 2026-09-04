@@ -1,6 +1,6 @@
 ---
 name: ui-alert
-description: Accessible alert - a live region that announces text appearing after page load. Use when adding an error banner, validation summary, success message, toast, notification or snackbar, or when a screen reader user must hear that something failed or finished. Not a blocking dialog.
+description: Accessible alert - a live region that announces text added after page load. Use when adding an error banner, toast or status message, or when a screen reader must hear it. Not a blocking dialog.
 license: MIT
 ---
 
