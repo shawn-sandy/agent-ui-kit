@@ -289,14 +289,19 @@ Ordered. For each role, stop at the first step that yields a value.
 4. Repeat frequency ranking for `border-radius` (radius) and `font-family` (font).
 5. Detect a dark scheme: a `prefers-color-scheme: dark` media query, or a `.dark`,
    `[data-theme="dark"]` or `[data-mode="dark"]` selector that redeclares the same custom
-   properties. Record the selector shape verbatim.
-6. Roles still unbound go to the "Clarify when needed" interview, one question per role, with
-   the shipped fallback offered as the default answer.
+   properties. Record the form verbatim: a class or attribute selector is repeated as-is,
+   and a media query is mirrored as `@media (prefers-color-scheme: dark) { :root { … } }`
+   because a media query is not a selector and cannot head a rule block.
+6. Roles still unbound go to the "Clarify when needed" interview, capped at the six core
+   roles (primary, text, surface, border, radius, font) with the shipped fallback offered as
+   the default answer; every other unbound role keeps its shipped fallback silently. (Revised
+   2026-09-03 in the plan interview from one question per role, which over-asked.)
 
 Appendix C — Output contract (worked example)
 
 A project with `--color-primary`, `--color-text`, `--color-bg`, `--color-border`,
-`--radius-md`, `--font-sans` and a `[data-theme="dark"]` toggle.
+`--radius-md`, `--font-sans` and a `[data-theme="dark"]` toggle that redeclares `--color-bg`
+and defines `--overlay-strong` and `--shadow-elevated` only under dark.
 
 ```css
 /* auk theme: binds project tokens to component properties */
@@ -315,9 +320,10 @@ A project with `--color-primary`, `--color-text`, `--color-bg`, `--color-border`
 }
 
 [data-theme="dark"] {
-  --auk-dialog-backdrop-bg: rgba(0, 0, 0, 0.7);
-  --auk-popover-box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  /* only properties whose project token changes under the dark selector */
+  --auk-dialog-backdrop-bg: var(--overlay-strong);
+  --auk-popover-box-shadow: var(--shadow-elevated);
+  /* only roles the dark selector binds to a different token; a token the project
+     redeclares under dark (here --color-bg) needs no line, var() follows it */
 }
 ```
 
@@ -331,8 +337,9 @@ Rules the block obeys:
 - The no-nested-`var()` rule binds references only (`tests/objective.spec.ts:156`); a project
   stylesheet may nest freely.
 - Contains no `forced-colors` query, no `url(`, no `@import`.
-- The dark block exists only when Appendix B step 5 found a selector, and repeats that
-  selector verbatim.
+- The dark block exists only when Appendix B step 5 found a dark form, mirrors that form
+  (selector repeated, media query wrapping `:root`), and binds only the roles the project
+  maps to a different token under dark — never a literal the project does not declare.
 
 Appendix D — Gate partition: what a workflow skill keeps and skips
 
