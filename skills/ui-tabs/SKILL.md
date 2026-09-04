@@ -39,7 +39,7 @@ request already maps cleanly to the contract, proceed and state any assumptions.
    panel needs an `id` and an `aria-labelledby` pointing back. The pairing is what
    makes the panel announce its own name.
 3. Copy the Behaviour module and call `initTabs(root)` once per tab set.
-4. Copy the Styles block as-is.
+4. Copy the Styles block as-is. Override `--auk-tabs-*` to theme it.
 5. Open `references/demo.html` and drive it with the keyboard only.
 
 ## Non-negotiable

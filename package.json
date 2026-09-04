@@ -1,6 +1,6 @@
 {
   "name": "agent-ui-skills",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Vendor-neutral UI component skills for AI coding agents.",
   "license": "MIT",
