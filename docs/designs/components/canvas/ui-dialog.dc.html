@@ -1,0 +1,296 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+  :root { color-scheme: light; }
+  body { margin: 0; padding: 2rem 2.5rem 4rem; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #111827; background: #ffffff; line-height: 1.5; }
+  .sheet-header { border-block-end: 1px solid #e5e7eb; padding-block-end: 1rem; margin-block-end: 2rem; }
+  .sheet-header h1 { margin: 0 0 .25rem; font-size: 1.75rem; }
+  .sheet-header p, .sheet-meta { margin: .25rem 0; color: #4b5563; max-width: 72ch; font-size: .9375rem; }
+  .sheet-section { margin-block: 2.5rem; }
+  .sheet-section > h2 { font-size: 1.25rem; margin: 0 0 .25rem; }
+  .chips { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: .75rem; }
+  .chip { display: flex; gap: .75rem; align-items: flex-start; border: 1px solid #e5e7eb; border-radius: .375rem; padding: .625rem; font-size: .8125rem; }
+  .swatch { flex: none; inline-size: 2.5rem; block-size: 2.5rem; border-radius: .25rem; border: 1px solid #e5e7eb; background: #ffffff; }
+  .swatch-radius { border: 2px solid #111827; }
+  .swatch-font { text-align: center; line-height: 2.5rem; font-weight: 600; }
+  .chip-body { display: grid; gap: .1rem; min-inline-size: 0; }
+  .chip-name { font-weight: 600; }
+  .chip code, .sheet-table code, .sheet-meta code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8125em; }
+  .chip-value { color: #4b5563; overflow-wrap: anywhere; }
+  .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1.25rem; align-items: start; margin-block-start: 1rem; }
+  .panel { border: 1px solid #e5e7eb; border-radius: .375rem; padding: 1rem; min-inline-size: 0; }
+  .panel > h3 { margin: 0 0 .5rem; font-size: .9375rem; }
+  .panel > p { margin: 0 0 .75rem; color: #4b5563; font-size: .875rem; }
+  .stage { display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-start; padding: 1rem; background: #f9fafb; border-radius: .25rem; }
+  .stage .auk-tabs, .stage .auk-dialog[open] { flex: 1 1 100%; }
+  .stage .auk-dialog[open] { position: static; margin: 0; max-inline-size: 100%; }
+  .sheet-table { border-collapse: collapse; inline-size: 100%; font-size: .8125rem; }
+  .sheet-table th, .sheet-table td { text-align: start; padding: .3rem .5rem; border-block-end: 1px solid #e5e7eb; vertical-align: top; }
+  .sheet-table th { color: #4b5563; font-weight: 600; }
+  @media print { body { padding: 0; } .panel, .stage, .chip { break-inside: avoid; } }
+@layer auk {
+  .auk-dialog {
+    padding: 0;
+    border: var(--auk-dialog-border-width, 1px) solid var(--auk-dialog-border-color, #d1d5db);
+    border-radius: var(--auk-dialog-radius, 0.5rem);
+    inline-size: var(--auk-dialog-inline-size, min(32rem, calc(100vw - 2rem)));
+    max-block-size: var(--auk-dialog-max-block-size, calc(100vh - 4rem));
+    font-family: var(--auk-dialog-font-family, inherit);
+    color: var(--auk-dialog-color, #111827);
+    background-color: var(--auk-dialog-bg, #ffffff);
+  }
+
+  .auk-dialog::backdrop {
+    background-color: var(--auk-dialog-backdrop-bg, rgba(17, 24, 39, 0.6));
+  }
+
+  .auk-dialog[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .auk-dialog [data-part="header"] {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--auk-dialog-gap, 1rem);
+    padding: var(--auk-dialog-padding, 1.25rem);
+    border-block-end: var(--auk-dialog-divider-width, 1px) solid var(--auk-dialog-divider-color, #e5e7eb);
+  }
+
+  .auk-dialog [data-part="header"] h2 {
+    margin: 0;
+    font-size: var(--auk-dialog-title-size, 1.125rem);
+    line-height: var(--auk-dialog-title-line-height, 1.4);
+  }
+
+  .auk-dialog [data-part="body"] {
+    padding: var(--auk-dialog-padding, 1.25rem);
+    overflow-y: auto;
+    color: var(--auk-dialog-body-color, #374151);
+    line-height: var(--auk-dialog-line-height, 1.5);
+  }
+
+  .auk-dialog [data-part="footer"] {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--auk-dialog-gap, 1rem);
+    padding: var(--auk-dialog-padding, 1.25rem);
+    border-block-start: var(--auk-dialog-divider-width, 1px) solid var(--auk-dialog-divider-color, #e5e7eb);
+  }
+
+  .auk-dialog-close {
+    flex: none;
+    min-inline-size: var(--auk-dialog-close-size, 2.75rem);
+    min-block-size: var(--auk-dialog-close-size, 2.75rem);
+    border: var(--auk-dialog-close-border-width, 1px) solid var(--auk-dialog-close-border-color, transparent);
+    border-radius: var(--auk-dialog-close-radius, 0.375rem);
+    font-family: var(--auk-dialog-font-family, inherit);
+    font-size: var(--auk-dialog-close-font-size, 1.25rem);
+    color: var(--auk-dialog-close-color, #1f2937);
+    background-color: var(--auk-dialog-close-bg, transparent);
+    cursor: pointer;
+  }
+
+  .auk-dialog-close:focus-visible,
+  .auk-dialog [data-part="footer"] .auk-button:focus-visible {
+    outline: var(--auk-dialog-focus-width, 3px) solid var(--auk-dialog-focus-color, #111827);
+    outline-offset: var(--auk-dialog-focus-offset, 2px);
+  }
+}
+  </style>
+</helmet>
+<div style="width: 1200px; height: 760px; box-sizing: border-box; overflow: auto; background: #ffffff; padding: 32px 36px; color: #111827;">
+  <h2 id="h-ui-dialog">Dialog</h2>
+  <p class="sheet-meta">Skill <code>ui-dialog</code>, root class <code>auk-dialog</code>, 27 properties of which 13 carry brand.</p>
+  <div class="panels">
+    <div class="panel" id="specimen-ui-dialog">
+      <h3>Specimen</h3>
+      <p>The reference's Structure block, painted by its own Styles block: every variant and state the contract names.</p>
+      <div class="stage">
+<button class="auk-button" type="button" data-dialog-open="confirm-delete">
+  Delete account
+</button>
+
+<dialog open class="auk-dialog" id="confirm-delete" aria-labelledby="confirm-delete-title"
+        aria-describedby="confirm-delete-body">
+  <div data-part="header">
+    <h2 id="confirm-delete-title">Delete this account?</h2>
+    <button class="auk-dialog-close" type="button" data-dialog-close aria-label="Close dialog">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div data-part="body" id="confirm-delete-body">
+    <p>This removes the account and everything in it. It cannot be undone.</p>
+  </div>
+
+  <div data-part="footer">
+    <button class="auk-button" type="button" data-variant="secondary" data-dialog-close autofocus>
+      Keep account
+    </button>
+    <button class="auk-button" type="button" data-variant="destructive" id="confirm-delete-confirm">
+      Delete permanently
+    </button>
+  </div>
+</dialog>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Anatomy</h3>
+      <p>The same names in code and in a design tool, by rule.</p>
+      <table class="sheet-table">
+        <thead><tr><th>Kind</th><th>Name</th><th>In code</th><th>Figma name</th></tr></thead>
+        <tbody>
+        <tr><td>part</td><td>header</td><td><code>data-part=&quot;header&quot;</code></td><td><code>Header</code></td></tr>
+        <tr><td>part</td><td>title</td><td>no data-part attribute</td><td><code>Title</code></td></tr>
+        <tr><td>part</td><td>body</td><td><code>data-part=&quot;body&quot;</code></td><td><code>Body</code></td></tr>
+        <tr><td>part</td><td>footer</td><td><code>data-part=&quot;footer&quot;</code></td><td><code>Footer</code></td></tr>
+        <tr><td>part</td><td>close</td><td>no data-part attribute</td><td><code>Close</code></td></tr>
+        <tr><td>part</td><td>backdrop</td><td>no data-part attribute</td><td><code>Backdrop</code></td></tr>
+        <tr><td>state</td><td>default</td><td>no attribute</td><td><code>State=Default</code></td></tr>
+        <tr><td>state</td><td>focus</td><td><code>:focus-visible</code></td><td><code>State=Focus</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <h3>Tokens</h3>
+      <p>Roles read: <code>var(--auk-role-text)</code>, <code>var(--auk-role-surface)</code>, <code>var(--auk-role-border)</code>, <code>var(--auk-role-divider)</code>, <code>var(--auk-role-focus)</code>, <code>var(--auk-role-overlay)</code>, <code>var(--auk-role-radius)</code>, <code>var(--auk-role-font)</code>.</p>
+      <table class="sheet-table">
+        <thead><tr><th>Property</th><th>Shipped fallback</th><th>Kind</th><th>Role</th></tr></thead>
+        <tbody>
+        <tr><td><code>--auk-dialog-border-width</code></td><td><code>1px</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-border-color</code></td><td><code>#d1d5db</code></td><td>brand</td><td>border</td></tr>
+        <tr><td><code>--auk-dialog-radius</code></td><td><code>0.5rem</code></td><td>brand</td><td>radius</td></tr>
+        <tr><td><code>--auk-dialog-inline-size</code></td><td><code>min(32rem, calc(100vw - 2rem))</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-max-block-size</code></td><td><code>calc(100vh - 4rem)</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-font-family</code></td><td><code>inherit</code></td><td>brand</td><td>font</td></tr>
+        <tr><td><code>--auk-dialog-color</code></td><td><code>#111827</code></td><td>brand</td><td>text</td></tr>
+        <tr><td><code>--auk-dialog-bg</code></td><td><code>#ffffff</code></td><td>brand</td><td>surface</td></tr>
+        <tr><td><code>--auk-dialog-backdrop-bg</code></td><td><code>rgba(17, 24, 39, 0.6)</code></td><td>brand</td><td>overlay</td></tr>
+        <tr><td><code>--auk-dialog-gap</code></td><td><code>1rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-padding</code></td><td><code>1.25rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-divider-width</code></td><td><code>1px</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-divider-color</code></td><td><code>#e5e7eb</code></td><td>brand</td><td>divider</td></tr>
+        <tr><td><code>--auk-dialog-title-size</code></td><td><code>1.125rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-title-line-height</code></td><td><code>1.4</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-body-color</code></td><td><code>#374151</code></td><td>brand</td><td>text</td></tr>
+        <tr><td><code>--auk-dialog-line-height</code></td><td><code>1.5</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-close-size</code></td><td><code>2.75rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-close-border-width</code></td><td><code>1px</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-close-border-color</code></td><td><code>transparent</code></td><td>brand</td><td>border</td></tr>
+        <tr><td><code>--auk-dialog-close-radius</code></td><td><code>0.375rem</code></td><td>brand</td><td>radius</td></tr>
+        <tr><td><code>--auk-dialog-close-font-size</code></td><td><code>1.25rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-close-color</code></td><td><code>#1f2937</code></td><td>brand</td><td>text</td></tr>
+        <tr><td><code>--auk-dialog-close-bg</code></td><td><code>transparent</code></td><td>brand</td><td>surface</td></tr>
+        <tr><td><code>--auk-dialog-focus-width</code></td><td><code>3px</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-dialog-focus-color</code></td><td><code>#111827</code></td><td>brand</td><td>focus</td></tr>
+        <tr><td><code>--auk-dialog-focus-offset</code></td><td><code>2px</code></td><td>measured</td><td>-</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+/**
+ * Wire a native <dialog> for modal use.
+ *
+ * Openers are any element carrying `data-dialog-open="<dialog id>"`. Closers are any
+ * descendant carrying `data-dialog-close`. Initial focus is left to the browser,
+ * which honours the native `autofocus` attribute and draws a focus ring for it.
+ *
+ * On close, focus returns to the opener. If the opener has been removed from the
+ * document meanwhile, it goes to `data-dialog-fallback` instead - declare that
+ * whenever an opener can disappear, because nothing else can place focus for you.
+ *
+ * @param {HTMLDialogElement} dialog - the dialog element, which must have an id
+ * @returns {() => void} teardown that removes every listener this added
+ */
+function initDialog(dialog) {
+  if (!dialog || !dialog.id) throw new Error('initDialog needs a <dialog> with an id');
+
+  const openers = Array.from(document.querySelectorAll('[data-dialog-open="' + dialog.id + '"]'));
+  const closers = Array.from(dialog.querySelectorAll('[data-dialog-close]'));
+  let opener = null;
+
+  function open(event) {
+    // Openers are any element, so an anchor would navigate and a submit button
+    // would submit its form the moment after the dialog opened.
+    event.preventDefault();
+    opener = event.currentTarget;
+    dialog.showModal();
+  }
+
+  function close(event) {
+    if (event) event.preventDefault();
+    dialog.close();
+  }
+
+  // Clicks land on the dialog itself only when they hit the backdrop: the top layer
+  // gives the backdrop the dialog's own box, and any click on real content is
+  // retargeted to that content.
+  function onDialogClick(event) {
+    if (event.target === dialog) dialog.close();
+  }
+
+  // Fires for every close path, including Escape, which the browser routes through
+  // `cancel` and then `close`.
+  function onClose() {
+    // The opener can be removed while the dialog is open - a deleted row, a
+    // re-rendered list - so it is not always there to receive focus back.
+    const fallbackId = dialog.getAttribute('data-dialog-fallback');
+    const target = opener && opener.isConnected
+      ? opener
+      : (fallbackId ? document.getElementById(fallbackId) : null);
+    opener = null;
+
+    // Deferred by one task on purpose. Chromium finishes its own focus handling for
+    // a closing modal after this handler returns, and on some platforms that leaves
+    // focus on the control inside the dialog that had it - now hidden, and a dead
+    // end for a keyboard user. Placing focus afterwards is what makes this stick.
+    setTimeout(() => {
+      if (target && target.isConnected) {
+        target.focus();
+        return;
+      }
+      // Nothing was declared to catch it. Getting focus out of the closed dialog is
+      // still mandatory; where it lands next is then the browser's business.
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && dialog.contains(active)) active.blur();
+    }, 0);
+  }
+
+  openers.forEach((el) => el.addEventListener('click', open));
+  closers.forEach((el) => el.addEventListener('click', close));
+  dialog.addEventListener('click', onDialogClick);
+  dialog.addEventListener('close', onClose);
+
+  return function teardown() {
+    openers.forEach((el) => el.removeEventListener('click', open));
+    closers.forEach((el) => el.removeEventListener('click', close));
+    dialog.removeEventListener('click', onDialogClick);
+    dialog.removeEventListener('close', onClose);
+  };
+}
+// Bring each specimen to the state where its surfaces are painted: modules wired, the
+// auto popover shown against its trigger, a message written into every alert region.
+document.querySelectorAll('.auk-dialog').forEach(initDialog);
+document.querySelectorAll('.auk-popover[popover="auto"]').forEach((el) => {
+  const trigger = document.querySelector('[popovertarget="' + el.id + '"]');
+  try { el.showPopover(trigger ? { source: trigger } : undefined); } catch (e) { el.showPopover(); }
+});
+document.querySelectorAll('.auk-alert [data-part="message"]').forEach((el) => {
+  el.textContent = 'Written into the region after load, the way a page would.';
+});
+</script>
+</x-dc>
+</body>
+</html>

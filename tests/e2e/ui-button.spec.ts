@@ -41,13 +41,27 @@ test('2.4.7 Focus Visible: every variant draws a focus ring', async ({ page }) =
   }
 });
 
-test('2.5.8 Target Size (Minimum): the default size clears 44 by 44', async ({ page }) => {
+// The bound is the criterion's own 24 by 24 CSS pixels, not the shipped 2.75rem: this
+// is the floor auk.tokens.json records for --auk-button-min-size, and a floor in that
+// file has to be a number a test proves.
+test('2.5.8 Target Size (Minimum): the default size clears 24 by 24', async ({ page }) => {
   for (const id of ['primary', 'secondary', 'destructive', 'iconOnly']) {
     const box = await page.locator(`#${id}`).boundingBox();
     expect(box, `${id} has no box`).not.toBeNull();
-    expect(box!.width, `${id} width`).toBeGreaterThanOrEqual(44);
-    expect(box!.height, `${id} height`).toBeGreaterThanOrEqual(44);
+    expect(box!.width, `${id} width`).toBeGreaterThanOrEqual(24);
+    expect(box!.height, `${id} height`).toBeGreaterThanOrEqual(24);
   }
+});
+
+// The floor auk.tokens.json records for --auk-button-transition-duration: the hover
+// transition runs only inside the no-preference guard, so a reader who asked for less
+// motion gets none however the duration is themed.
+test('2.3.3 Animation from Interactions: the hover transition is off when a reader asks for less motion', async ({ page }) => {
+  const duration = () => page.locator('#primary').evaluate((el) => getComputedStyle(el).transitionDuration);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  expect(await duration()).toBe('0.12s');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  expect(await duration()).toBe('0s');
 });
 
 test('4.1.2 Name, Role, Value: an icon-only button still has a name', async ({ page }) => {

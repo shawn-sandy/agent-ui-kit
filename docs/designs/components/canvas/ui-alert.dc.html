@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+  :root { color-scheme: light; }
+  body { margin: 0; padding: 2rem 2.5rem 4rem; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #111827; background: #ffffff; line-height: 1.5; }
+  .sheet-header { border-block-end: 1px solid #e5e7eb; padding-block-end: 1rem; margin-block-end: 2rem; }
+  .sheet-header h1 { margin: 0 0 .25rem; font-size: 1.75rem; }
+  .sheet-header p, .sheet-meta { margin: .25rem 0; color: #4b5563; max-width: 72ch; font-size: .9375rem; }
+  .sheet-section { margin-block: 2.5rem; }
+  .sheet-section > h2 { font-size: 1.25rem; margin: 0 0 .25rem; }
+  .chips { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: .75rem; }
+  .chip { display: flex; gap: .75rem; align-items: flex-start; border: 1px solid #e5e7eb; border-radius: .375rem; padding: .625rem; font-size: .8125rem; }
+  .swatch { flex: none; inline-size: 2.5rem; block-size: 2.5rem; border-radius: .25rem; border: 1px solid #e5e7eb; background: #ffffff; }
+  .swatch-radius { border: 2px solid #111827; }
+  .swatch-font { text-align: center; line-height: 2.5rem; font-weight: 600; }
+  .chip-body { display: grid; gap: .1rem; min-inline-size: 0; }
+  .chip-name { font-weight: 600; }
+  .chip code, .sheet-table code, .sheet-meta code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8125em; }
+  .chip-value { color: #4b5563; overflow-wrap: anywhere; }
+  .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1.25rem; align-items: start; margin-block-start: 1rem; }
+  .panel { border: 1px solid #e5e7eb; border-radius: .375rem; padding: 1rem; min-inline-size: 0; }
+  .panel > h3 { margin: 0 0 .5rem; font-size: .9375rem; }
+  .panel > p { margin: 0 0 .75rem; color: #4b5563; font-size: .875rem; }
+  .stage { display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-start; padding: 1rem; background: #f9fafb; border-radius: .25rem; }
+  .stage .auk-tabs, .stage .auk-dialog[open] { flex: 1 1 100%; }
+  .stage .auk-dialog[open] { position: static; margin: 0; max-inline-size: 100%; }
+  .sheet-table { border-collapse: collapse; inline-size: 100%; font-size: .8125rem; }
+  .sheet-table th, .sheet-table td { text-align: start; padding: .3rem .5rem; border-block-end: 1px solid #e5e7eb; vertical-align: top; }
+  .sheet-table th { color: #4b5563; font-weight: 600; }
+  @media print { body { padding: 0; } .panel, .stage, .chip { break-inside: avoid; } }
+@layer auk {
+  .auk-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--auk-alert-gap, 0.625rem);
+    padding-block: var(--auk-alert-padding-block, 0.75rem);
+    padding-inline: var(--auk-alert-padding-inline, 1rem);
+    border: var(--auk-alert-border-width, 1px) solid var(--auk-alert-border-color, #1e3a8a);
+    border-radius: var(--auk-alert-radius, 0.375rem);
+    font-family: var(--auk-alert-font-family, inherit);
+    font-size: var(--auk-alert-font-size, 1rem);
+    line-height: var(--auk-alert-line-height, 1.5);
+    color: var(--auk-alert-color, #1e3a8a);
+    background-color: var(--auk-alert-bg, #dbeafe);
+  }
+
+  .auk-alert:empty,
+  .auk-alert:not(:has([data-part="message"]:not(:empty))) {
+    display: none;
+  }
+
+  .auk-alert[data-variant="success"] {
+    color: var(--auk-alert-success-color, #14532d);
+    background-color: var(--auk-alert-success-bg, #dcfce7);
+    border-color: var(--auk-alert-success-border-color, #14532d);
+  }
+
+  .auk-alert[data-variant="warning"] {
+    color: var(--auk-alert-warning-color, #78350f);
+    background-color: var(--auk-alert-warning-bg, #fef3c7);
+    border-color: var(--auk-alert-warning-border-color, #78350f);
+  }
+
+  .auk-alert[data-variant="error"] {
+    color: var(--auk-alert-error-color, #b91c1c);
+    background-color: var(--auk-alert-error-bg, #fee2e2);
+    border-color: var(--auk-alert-error-border-color, #b91c1c);
+  }
+
+  .auk-alert [data-part="icon"] {
+    flex: none;
+    font-size: var(--auk-alert-icon-size, 1.125rem);
+    line-height: var(--auk-alert-line-height, 1.5);
+  }
+
+  .auk-alert [data-part="severity"] {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+  </style>
+</helmet>
+<div style="width: 1200px; height: 760px; box-sizing: border-box; overflow: auto; background: #ffffff; padding: 32px 36px; color: #111827;">
+  <h2 id="h-ui-alert">Alert</h2>
+  <p class="sheet-meta">Skill <code>ui-alert</code>, root class <code>auk-alert</code>, 21 properties of which 14 carry brand.</p>
+  <div class="panels">
+    <div class="panel" id="specimen-ui-alert">
+      <h3>Specimen</h3>
+      <p>The reference's Structure block, painted by its own Styles block: every variant and state the contract names.</p>
+      <div class="stage">
+<!-- Error. Assertive: interrupts. Reserve for something the user must deal with. -->
+<div class="auk-alert" data-variant="error" role="alert" aria-live="assertive" aria-atomic="true">
+  <span data-part="icon" aria-hidden="true">&#9888;</span>
+  <span data-part="severity">Error:</span>
+  <span data-part="message"></span>
+</div>
+
+<!-- Success, warning and info are polite: they wait their turn. -->
+<div class="auk-alert" data-variant="success" role="status" aria-live="polite" aria-atomic="true">
+  <span data-part="icon" aria-hidden="true">&#10003;</span>
+  <span data-part="severity">Success:</span>
+  <span data-part="message"></span>
+</div>
+
+<div class="auk-alert" data-variant="warning" role="status" aria-live="polite" aria-atomic="true">
+  <span data-part="icon" aria-hidden="true">&#9888;</span>
+  <span data-part="severity">Warning:</span>
+  <span data-part="message"></span>
+</div>
+
+<div class="auk-alert" data-variant="info" role="status" aria-live="polite" aria-atomic="true">
+  <span data-part="icon" aria-hidden="true">&#8505;</span>
+  <span data-part="severity">Information:</span>
+  <span data-part="message"></span>
+</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Anatomy</h3>
+      <p>The same names in code and in a design tool, by rule.</p>
+      <table class="sheet-table">
+        <thead><tr><th>Kind</th><th>Name</th><th>In code</th><th>Figma name</th></tr></thead>
+        <tbody>
+        <tr><td>part</td><td>icon</td><td><code>data-part=&quot;icon&quot;</code></td><td><code>Icon</code></td></tr>
+        <tr><td>part</td><td>severity</td><td><code>data-part=&quot;severity&quot;</code></td><td><code>Severity</code></td></tr>
+        <tr><td>part</td><td>message</td><td><code>data-part=&quot;message&quot;</code></td><td><code>Message</code></td></tr>
+        <tr><td>variant</td><td>info</td><td><code>data-variant=&quot;info&quot;</code></td><td><code>Variant=Info</code></td></tr>
+        <tr><td>variant</td><td>success</td><td><code>data-variant=&quot;success&quot;</code></td><td><code>Variant=Success</code></td></tr>
+        <tr><td>variant</td><td>warning</td><td><code>data-variant=&quot;warning&quot;</code></td><td><code>Variant=Warning</code></td></tr>
+        <tr><td>variant</td><td>error</td><td><code>data-variant=&quot;error&quot;</code></td><td><code>Variant=Error</code></td></tr>
+        <tr><td>state</td><td>default</td><td>no attribute</td><td><code>State=Default</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <h3>Tokens</h3>
+      <p>Roles read: <code>var(--auk-role-info)</code>, <code>var(--auk-role-info-surface)</code>, <code>var(--auk-role-danger)</code>, <code>var(--auk-role-danger-surface)</code>, <code>var(--auk-role-success)</code>, <code>var(--auk-role-success-surface)</code>, <code>var(--auk-role-warning)</code>, <code>var(--auk-role-warning-surface)</code>, <code>var(--auk-role-radius)</code>, <code>var(--auk-role-font)</code>.</p>
+      <table class="sheet-table">
+        <thead><tr><th>Property</th><th>Shipped fallback</th><th>Kind</th><th>Role</th></tr></thead>
+        <tbody>
+        <tr><td><code>--auk-alert-gap</code></td><td><code>0.625rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-alert-padding-block</code></td><td><code>0.75rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-alert-padding-inline</code></td><td><code>1rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-alert-border-width</code></td><td><code>1px</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-alert-border-color</code></td><td><code>#1e3a8a</code></td><td>brand</td><td>info</td></tr>
+        <tr><td><code>--auk-alert-radius</code></td><td><code>0.375rem</code></td><td>brand</td><td>radius</td></tr>
+        <tr><td><code>--auk-alert-font-family</code></td><td><code>inherit</code></td><td>brand</td><td>font</td></tr>
+        <tr><td><code>--auk-alert-font-size</code></td><td><code>1rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-alert-line-height</code></td><td><code>1.5</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-alert-color</code></td><td><code>#1e3a8a</code></td><td>brand</td><td>info</td></tr>
+        <tr><td><code>--auk-alert-bg</code></td><td><code>#dbeafe</code></td><td>brand</td><td>info-surface</td></tr>
+        <tr><td><code>--auk-alert-success-color</code></td><td><code>#14532d</code></td><td>brand</td><td>success</td></tr>
+        <tr><td><code>--auk-alert-success-bg</code></td><td><code>#dcfce7</code></td><td>brand</td><td>success-surface</td></tr>
+        <tr><td><code>--auk-alert-success-border-color</code></td><td><code>#14532d</code></td><td>brand</td><td>success</td></tr>
+        <tr><td><code>--auk-alert-warning-color</code></td><td><code>#78350f</code></td><td>brand</td><td>warning</td></tr>
+        <tr><td><code>--auk-alert-warning-bg</code></td><td><code>#fef3c7</code></td><td>brand</td><td>warning-surface</td></tr>
+        <tr><td><code>--auk-alert-warning-border-color</code></td><td><code>#78350f</code></td><td>brand</td><td>warning</td></tr>
+        <tr><td><code>--auk-alert-error-color</code></td><td><code>#b91c1c</code></td><td>brand</td><td>danger</td></tr>
+        <tr><td><code>--auk-alert-error-bg</code></td><td><code>#fee2e2</code></td><td>brand</td><td>danger-surface</td></tr>
+        <tr><td><code>--auk-alert-error-border-color</code></td><td><code>#b91c1c</code></td><td>brand</td><td>danger</td></tr>
+        <tr><td><code>--auk-alert-icon-size</code></td><td><code>1.125rem</code></td><td>measured</td><td>-</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+// Bring each specimen to the state where its surfaces are painted: modules wired, the
+// auto popover shown against its trigger, a message written into every alert region.
+document.querySelectorAll('.auk-popover[popover="auto"]').forEach((el) => {
+  const trigger = document.querySelector('[popovertarget="' + el.id + '"]');
+  try { el.showPopover(trigger ? { source: trigger } : undefined); } catch (e) { el.showPopover(); }
+});
+document.querySelectorAll('.auk-alert [data-part="message"]').forEach((el) => {
+  el.textContent = 'Written into the region after load, the way a page would.';
+});
+</script>
+</x-dc>
+</body>
+</html>

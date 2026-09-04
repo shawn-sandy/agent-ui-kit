@@ -22,10 +22,17 @@ npm test                                    # vitest only - the fast inner loop
 npm run test:e2e                            # Playwright only
 node scripts/build-demos.mjs                # regenerate demos from references
 node scripts/build-properties.mjs           # regenerate docs/properties.md from references
+node scripts/build-tokens.mjs               # regenerate skills/ui-theme/references/auk.tokens.json and auk-roles.css
+node scripts/build-design.mjs               # regenerate docs/designs/components/index.html (--canvas adds the Claude Design projection)
 ```
 
 `docs/properties.md` is generated from the references' css blocks and is never
-hand-edited; `tests/integration/properties-doc.spec.ts` fails when it drifts.
+hand-edited; `tests/integration/properties-doc.spec.ts` fails when it drifts. The same
+holds for `skills/ui-theme/references/auk.tokens.json` and `auk-roles.css` (the role
+layer, from the references and the ui-theme mapping table) and for
+`docs/designs/components/index.html` (the component sheet, plus its optional canvas
+projection): `tests/integration/tokens-file.spec.ts` and `design-sheet.spec.ts` fail
+when they drift, so edit a reference or the mapping table and regenerate.
 
 There is no lint, format, or typecheck script and no ESLint/Prettier/Biome config.
 Do not add one. "Lint" here means `node scripts/lint-portability.mjs`, run from

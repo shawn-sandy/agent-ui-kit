@@ -42,6 +42,14 @@ it('the repository has components in it', () => {
   expect(skills.length).toBeGreaterThan(0);
 });
 
+it('the slug role is reserved for the role layer', () => {
+  // --auk-role-<name> parses under the property grammar as component `role`, so a
+  // component of that name would collide with every role binding in auk-roles.css.
+  // The per-component var() rule below already keeps a reference from reading a
+  // --auk-role-* property, because its own slug is never `role`.
+  expect(skills).not.toContain('ui-role');
+});
+
 describe.each(skills)('skills/%s', (name) => {
   const dir = join(SKILLS_DIR, name);
   const skillPath = join(dir, 'SKILL.md');
@@ -176,6 +184,22 @@ describe.each(skills)('skills/%s', (name) => {
     // the shapes it must reject, an early-closed layer among them.
     const css = fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!;
     expect(layerProblem(css)).toBeNull();
+  });
+
+  // The three guards behind the settled questions in docs/component-spec.md: a
+  // reference never sets the colour scheme, never ships a dark value through
+  // light-dark(), and never invents a dark palette behind a media query. Dark is a
+  // theme concern, mirrored from the project's own form by ui-theme.
+  component('reference css never sets color-scheme', () => {
+    expect(fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!).not.toContain('color-scheme');
+  });
+
+  component('reference css never ships a dark value through light-dark()', () => {
+    expect(fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!).not.toContain('light-dark(');
+  });
+
+  component('reference css never carries a prefers-color-scheme query', () => {
+    expect(fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!).not.toContain('prefers-color-scheme');
   });
 
   component('demo works with no custom properties defined anywhere', () => {

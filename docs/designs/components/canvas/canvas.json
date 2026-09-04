@@ -1,0 +1,72 @@
+{
+  "artboards": [
+    {
+      "file": "foundations.dc.html",
+      "title": "Foundations - the 23 roles",
+      "x": 0,
+      "y": 0,
+      "w": 1200,
+      "h": 640
+    },
+    {
+      "file": "ui-alert.dc.html",
+      "title": "Alert - specimen, anatomy, tokens",
+      "x": 0,
+      "y": 780,
+      "w": 1200,
+      "h": 760
+    },
+    {
+      "file": "ui-box.dc.html",
+      "title": "Box - specimen, anatomy, tokens",
+      "x": 1280,
+      "y": 780,
+      "w": 1200,
+      "h": 760
+    },
+    {
+      "file": "ui-button.dc.html",
+      "title": "Button - specimen, anatomy, tokens",
+      "x": 2560,
+      "y": 780,
+      "w": 1200,
+      "h": 760
+    },
+    {
+      "file": "ui-dialog.dc.html",
+      "title": "Dialog - specimen, anatomy, tokens",
+      "x": 0,
+      "y": 1620,
+      "w": 1200,
+      "h": 760
+    },
+    {
+      "file": "ui-popover.dc.html",
+      "title": "Popover - specimen, anatomy, tokens",
+      "x": 1280,
+      "y": 1620,
+      "w": 1200,
+      "h": 760
+    },
+    {
+      "file": "ui-tabs.dc.html",
+      "title": "Tabs - specimen, anatomy, tokens",
+      "x": 2560,
+      "y": 1620,
+      "w": 1200,
+      "h": 760
+    }
+  ],
+  "annotations": [
+    {
+      "id": "projection-note",
+      "x": 1260,
+      "y": 40,
+      "w": 320,
+      "text": "Claude Design projection of docs/designs/components/index.html, written by scripts/build-design.mjs --canvas.\nThe sheet is the record; regenerate, never edit these artboards."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

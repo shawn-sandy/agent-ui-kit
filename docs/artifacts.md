@@ -32,6 +32,7 @@ from the same frontmatter.
 | [Plan: Prove each skill by testing what an agent actually builds from it](https://claude.ai/code/artifact/dee6ed17-545d-4356-b5ba-2063e66d4436) | todo | `docs/plans/add-build-layer-for-agent-built-components.md` |
 | [Plan: Add the ui-theme workflow skill that binds a project's styles to the auk custom properties](https://claude.ai/code/artifact/f21dc0a6-79c1-453a-b568-9bc98ef8ec2b) | completed | `docs/plans/add-ui-theme-workflow-skill.md` |
 | [Plan: Bring ui-dialog back in line with the native dialog element](https://claude.ai/code/artifact/f56741f9-bfb0-4616-bc12-78e829d5d996) | todo | `docs/plans/sync-ui-dialog-with-native-spec.md` |
+| [Plan: Support any design system by publishing the auk role layer as a contract](https://claude.ai/code/artifact/1c4b9538-2e3b-4319-b65c-6f5f18c31d71) | in-progress | `docs/plans/support-any-design-system.md` |
 
 ## Designs
 

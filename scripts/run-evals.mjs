@@ -69,8 +69,13 @@ const mode = process.argv[2];
 const ISOLATE = process.env.EVAL_ISOLATE !== '0';
 const LABEL = ISOLATE ? 'isolated' : 'crowded';
 
+// EVAL_SKILLS=ui-theme,ui-button narrows a sweep to the named skills' scenarios. A
+// full sweep is about 75 model calls; re-measuring one skill's description after an
+// edit does not need the other six to run again.
+const ONLY = process.env.EVAL_SKILLS ? process.env.EVAL_SKILLS.split(',').map((s) => s.trim()) : null;
 const scenarios = readdirSync(resolve(ROOT, 'evals'))
   .filter((f) => f.endsWith('.json'))
+  .filter((f) => !ONLY || ONLY.includes(f.replace(/\.json$/, '')))
   .flatMap((f) => {
     const doc = JSON.parse(readFileSync(resolve(ROOT, 'evals', f), 'utf8'));
     return doc.scenarios.map((s) => ({ ...s, skill: doc.skill }));
@@ -131,14 +136,21 @@ function isError(output) {
   return output.startsWith('__EVAL_ERROR__');
 }
 
+/** Every parsed stream-json event in the CLI's output, header lines from a failed run skipped. */
+function events(streamJson) {
+  const out = [];
+  for (const line of streamJson.split('\n')) {
+    if (!line.trim().startsWith('{')) continue;
+    try { out.push(JSON.parse(line)); } catch { /* a partial line */ }
+  }
+  return out;
+}
+
 // The Skill tool call is the activation signal. stream-json emits one assistant
 // message per tool use; we look for a Skill invocation and pull the skill name out.
 function skillsInvoked(streamJson) {
   const names = new Set();
-  for (const line of streamJson.split('\n')) {
-    if (!line.trim().startsWith('{')) continue;
-    let evt;
-    try { evt = JSON.parse(line); } catch { continue; }
+  for (const evt of events(streamJson)) {
     const content = evt?.message?.content;
     if (!Array.isArray(content)) continue;
     for (const block of content) {
@@ -148,6 +160,16 @@ function skillsInvoked(streamJson) {
     }
   }
   return [...names];
+}
+
+/**
+ * How the run ended, for the record: the CLI's result subtype (`success`,
+ * `error_max_turns`, ...), or the exit header when the process never produced one.
+ */
+function exitOf(output) {
+  const result = events(output).find((evt) => evt.type === 'result');
+  if (result?.subtype) return result.subtype;
+  return isError(output) ? output.split('\n')[0].replace('__EVAL_ERROR__ ', '') : 'no result event';
 }
 
 async function skillsOne(sc, model) {
@@ -163,10 +185,16 @@ async function skillsOne(sc, model) {
     ...(ISOLATE ? ['--setting-sources', 'project'] : []),
     sc.prompt,
   ], 420000, cwd);
-  const error = isError(out);
   const invoked = skillsInvoked(out);
   const ours = invoked.filter((n) => n.startsWith('agent-ui-skills'));
   const fired = ours.some((n) => n.endsWith(':' + sc.skill));
+  // Reached a model: the stream holds at least one assistant message. A non-zero exit
+  // after that - the CLI stopping at --max-turns while the model was still working,
+  // most often - is recorded under `exit` but is not a crash: the triggering decision
+  // this run measures was already made and captured above.
+  const reached = events(out).some((evt) => evt.type === 'assistant');
+  const error = !reached;
+  const exit = exitOf(out);
   // An adjacent scenario asserts that THIS skill stays quiet. Another component
   // skill answering instead is a correct outcome, not a miss - "blocks the page until
   // they confirm" really is the dialog's job, and the alert must not claim it.
@@ -177,7 +205,7 @@ async function skillsOne(sc, model) {
   const correct = error ? false : sc.expect === null ? !fired : fired;
   return {
     id: sc.id, skill: sc.skill, kind: sc.kind, expect: sc.expect,
-    model, mode: LABEL, invoked, error, correct,
+    model, mode: LABEL, invoked, error, exit, correct,
   };
 }
 
@@ -214,7 +242,7 @@ if (mode === 'baseline') {
   const res = await pool(jobs, ({ sc, model }) => skillsOne(sc, model));
   writeFileSync(resolve(OUT, `skills-${LABEL}.json`), JSON.stringify(res, null, 2));
   for (const r of res) {
-    console.log(`${r.mode}\t${r.model}\t${r.id}\texpect=${r.expect ?? 'none'}\tinvoked=${r.invoked.join(',') || '-'}\t${r.correct ? 'PASS' : 'FAIL'}`);
+    console.log(`${r.mode}\t${r.model}\t${r.id}\texpect=${r.expect ?? 'none'}\tinvoked=${r.invoked.join(',') || '-'}\texit=${r.exit}\t${r.correct ? 'PASS' : 'FAIL'}`);
   }
 } else {
   console.error('usage: node scripts/run-evals.mjs baseline|skills');

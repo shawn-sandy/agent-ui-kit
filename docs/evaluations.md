@@ -1,7 +1,8 @@
 # Evaluations
 
 Whether a realistically phrased request reaches the right skill, and what the models
-produce when it does not. Recorded 2026-09-02 against `agent-ui-skills` 0.2.0. Those
+produce when it does not. Recorded 2026-09-02 against `agent-ui-skills` 0.2.0, with the
+design-system section below added 2026-09-04 against 0.4.0. Those
 runs predate the harness passing `--add-dir`, so they could not read `references/` and
 built from the SKILL.md summary; triggering is captured at the Skill call, so the
 numbers below remain comparable.
@@ -158,6 +159,47 @@ silent. `ui-alert-adjacent` - *"interrupts the user and blocks the page until th
 confirm"* - correctly fired the **dialog** skill on five of six runs. That is the right
 answer, and the alert skill staying out of it is exactly what the scenario tests.
 
+## Design-system requests
+
+Recorded 2026-09-04 against `agent-ui-skills` 0.4.0 in the isolated session shape, with
+`EVAL_SKILLS=ui-theme`: the seven ui-theme scenarios - the three from 0.3.0 and the four
+added with the role layer (`ui-theme-shadcn`, `ui-theme-figma`, `ui-theme-token-file`,
+`ui-theme-override-adjacent`) - on Haiku, Sonnet and Opus, one run each. The fixture
+project carried an `index.html` with auk buttons, a dialog and tabs built from the
+references, `styles/tokens.css`, a shadcn-style `globals.css` and a DTCG
+`tokens/brand.tokens.json`, so every scenario had the file it names.
+
+| Scenario | Haiku | Sonnet | Opus |
+| --- | --- | --- | --- |
+| ui-theme-obvious | miss, no skill invoked | ui-theme fired | ui-theme fired |
+| ui-theme-oblique | miss, no skill invoked | ui-theme fired | ui-theme fired |
+| ui-theme-adjacent | quiet (pass) | quiet (pass) | quiet (pass) |
+| ui-theme-shadcn | miss, no skill invoked | ui-theme fired | ui-theme fired |
+| ui-theme-figma | miss, no skill invoked | ui-theme fired | ui-theme fired |
+| ui-theme-token-file | miss, no skill invoked | ui-theme fired | ui-theme fired |
+| ui-theme-override-adjacent | quiet (pass) | quiet (pass) | ui-button fired, ui-theme quiet (pass) |
+| **Total** | **2 / 7** | **7 / 7** | **7 / 7** |
+
+Fifteen of the twenty-one runs ended with the CLI's `error_max_turns`. On Sonnet and Opus
+that was the skill working, not failing: after ui-theme fired, the model copied
+`auk-roles.css` into the project and wrote the role block - Sonnet's shadcn run bound
+seven roles, `--auk-role-primary: var(--primary)` through `--auk-role-radius:
+var(--radius)`, in `globals.css` - and the runner's `--max-turns 8` stopped it before it
+could report. The first sweep of the day counted every non-zero exit as an error and
+scored 2 / 7 on all three models; the runner was corrected the same day (see
+Reproducing) and the sweep re-run. The table is the re-run.
+
+One description rewrite was tried for Haiku, as the plan requires: shorter and
+trigger-verbs-first (567 characters against 655), re-run on Haiku alone. It scored 2 / 7
+again, with no skill invoked on any of the five triggering scenarios, so the original
+description ships - it is the one all three models were measured on. This is the known
+limitation recorded above, unchanged: Haiku decides not to consult a skill before any
+description is compared, and the description cannot reach that decision.
+
+The role-layer plan's acceptance criterion that the four new scenarios pass on all three
+models is therefore met on Sonnet and Opus and not on Haiku, and the plan stays
+in-progress on that criterion alone.
+
 ## Reproducing
 
 ```bash
@@ -167,6 +209,15 @@ EVAL_ISOLATE=0 scripts/eval.sh skills   # the same, in a crowded session
 ```
 
 `EVAL_MODELS` and `EVAL_CONCURRENCY` control the sweep; `EVAL_PROJECT` points at the
-fixture project each run gets its own copy of. Results are scored by
-`scripts/score-evals.mjs`, kept separate from the runner so the correctness rule can be
-corrected without paying for another sweep.
+fixture project each run gets its own copy of; `EVAL_SKILLS=ui-theme` narrows a sweep
+to one skill's scenarios, so a description edit can be re-measured without the other
+six skills running again. Results are scored by `scripts/score-evals.mjs`, kept
+separate from the runner so the correctness rule can be corrected without paying for
+another sweep.
+
+Each recorded row carries the CLI's exit reason under `exit`. A run counts as an
+error only when no assistant message came back at all; a run the CLI stopped at
+`--max-turns` (`error_max_turns`) after the model had already invoked a skill still
+reached the model, and is scored on what the model did. Before 2026-09-04 the runner
+took any non-zero exit as an error, which marked every ui-theme run that copied the
+roles file and kept working as a miss.

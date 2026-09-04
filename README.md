@@ -17,9 +17,10 @@ demo is reference material, not production code.
 
 ## Status
 
-Version 0.3.0. Seven skills ship: six components - **box**, **button**, **alert**,
+Version 0.4.0. Seven skills ship: six components - **box**, **button**, **alert**,
 **dialog**, **tabs** and **popover** - and one workflow, **theme**, which binds a
-project's existing colours, radius and type to the components' custom properties.
+project's design tokens to the role layer every component's colours, radius and type
+chain to.
 The components were chosen to stress different parts of the format rather than to be
 a useful catalog - a purely presentational primitive, no JavaScript, a live region,
 heavy focus management, keyboard navigation, and a non-modal layer in the browser's
@@ -30,6 +31,27 @@ Both vendors load the tree and use it: see [docs/vendor-support.md](docs/vendor-
 for what actually happened, including what did not work.
 
 The reference format is still moving - pin a commit if you depend on it.
+
+## Fits your design system
+
+Every brand-bearing value chains to one of 23 semantic roles, so a design system binds its tokens once:
+
+```css
+:root {
+  --auk-role-primary: var(--color-action-primary);
+  --auk-role-on-primary: var(--color-action-on-primary);
+  --auk-role-text: var(--color-text-default);
+  --auk-role-surface: var(--color-surface-default);
+  --auk-role-border: var(--color-border-default);
+  --auk-role-radius: var(--radius-md);
+  --auk-role-font: var(--font-sans);
+}
+```
+
+A brand is at most 23 lines, and everything unbound keeps its shipped default. The
+same contract ships as a DTCG 2025.10 token file, `skills/ui-theme/references/auk.tokens.json`,
+for a token build, or (vendor-specific) for import into Figma or Penpot as one variable
+collection. The binding rules are in [docs/theming.md](docs/theming.md).
 
 ## Install
 
@@ -81,7 +103,9 @@ agent-ui-skills/
 ├── tests/                  # frontmatter, manifests, and browser suites
 ├── scripts/
 │   ├── check.sh            # the single local gate
-│   └── build-demos.mjs     # rewrites each demo's component code from its reference
+│   ├── build-demos.mjs     # rewrites each demo's component code from its reference
+│   ├── build-tokens.mjs    # writes the role layer: auk.tokens.json and auk-roles.css
+│   └── build-design.mjs    # writes the component sheet under docs/designs/components/
 └── docs/                   # specification, evaluations, vendor results
 ```
 
@@ -134,8 +158,9 @@ demo that drifts from its reference fails the build.
   reaches the right skill, measured across three models.
 - [docs/vendor-support.md](docs/vendor-support.md) - what each vendor did with the
   tree, including the failures.
-- [docs/theming.md](docs/theming.md) - the three ways to restyle a component, and
-  the layer order a project declares so its own reset does not undo one.
+- [docs/theming.md](docs/theming.md) - the four ways to restyle a component, how a
+  design system binds the role layer, and the layer order a project declares so its
+  own reset does not undo one.
 - [docs/properties.md](docs/properties.md) - every `--auk-*` property with its
   fallback and kind, generated from the references.
 

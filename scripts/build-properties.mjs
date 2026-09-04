@@ -1,38 +1,97 @@
 #!/usr/bin/env node
 /**
- * Render docs/properties.md - every `--auk-*` property with its fallback and kind -
- * from the component references, through scripts/auk-properties.mjs.
+ * Render docs/properties.md from the component references: each component's anatomy -
+ * parts, variants and states, with the form the code uses and the name a design tool
+ * uses for the same thing - the roles it reads, and every `--auk-*` property with its
+ * fallback and kind, through scripts/auk-properties.mjs and scripts/build-tokens.mjs.
  *
  * The file is generated and never hand-edited: tests/integration/properties-doc.spec.ts
  * fails when the committed copy differs from render() by a byte.
  *
  *   node scripts/build-properties.mjs      rewrite docs/properties.md
  */
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readProperties } from './auk-properties.mjs';
+import { readRoles } from './build-tokens.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'docs', 'properties.md');
 
-/** The whole document as a string; one section and one table per component. */
+/** The first fenced block of a given language, or an empty string. */
+const fenced = (markdown, lang) => markdown.match(new RegExp('```' + lang + '\\n([\\s\\S]*?)```', 'm'))?.[1] ?? '';
+
+/** The design-tool spelling of a kebab-case name: `tablist` is `Tablist`, `no-results` is `No Results`. */
+const titleCase = (name) => name.split('-').map((word) => word[0].toUpperCase() + word.slice(1)).join(' ');
+
+/**
+ * A component's anatomy, read from its qualifier line against its Structure and Styles
+ * blocks - never assumed. A part is an attribute only when the Structure block carries
+ * `data-part="<name>"`; the dialog declares `title`, `close` and `backdrop`, which the
+ * markup addresses by heading, class and pseudo-element. A state's DOM form is the first
+ * selector fragment in the Styles block whose name carries the state word - `:hover`,
+ * `:focus-visible`, `[aria-disabled="true"]`, `:popover-open` - with `:not(...)` skipped
+ * so a negation never stands in for the state it negates. The Figma names follow
+ * docs/component-spec.md by rule: Title Case layer names, `Variant=<Value>` and
+ * `State=<Value>`, with `State=Default` first because a component set needs its
+ * resting variant named.
+ *
+ * @param {string} markdown one component reference
+ * @returns {{ parts: {name: string, attribute: boolean, code: string, figma: string}[],
+ *   variants: {name: string, code: string, figma: string}[],
+ *   states: {name: string, code: string, figma: string}[] }}
+ */
+export function anatomy(markdown) {
+  const line = markdown.match(/^Qualifiers: parts (.+?); variants (.+?); states (.+?)\.$/m);
+  if (!line) throw new Error('reference has no qualifier line');
+  const names = (cell) => (cell.trim() === 'none' ? [] : [...cell.matchAll(/`([a-z0-9-]+)`/g)].map((m) => m[1]));
+  const html = fenced(markdown, 'html');
+  const fragments = [...fenced(markdown, 'css').matchAll(/\[[a-z-]+(?:="[^"]*")?\]|:(?!not\b)[a-z-]+/g)].map((m) => m[0]);
+  const selectorFor = (state) => fragments.find((fragment) => fragment.split(/[^a-z]+/).includes(state));
+  return {
+    parts: names(line[1]).map((name) => {
+      const attribute = html.includes(`data-part="${name}"`);
+      return { name, attribute, code: attribute ? `data-part="${name}"` : 'no data-part attribute', figma: titleCase(name) };
+    }),
+    variants: names(line[2]).map((name) => ({ name, code: `data-variant="${name}"`, figma: `Variant=${titleCase(name)}` })),
+    states: [
+      { name: 'default', code: 'no attribute', figma: 'State=Default' },
+      ...names(line[3]).map((name) => ({ name, code: selectorFor(name) ?? 'no selector in Styles', figma: `State=${titleCase(name)}` })),
+    ],
+  };
+}
+
+/** The whole document as a string; one section per component with its anatomy, roles and properties. */
 export function render() {
   const properties = readProperties(join(ROOT, 'skills'));
+  const roles = readRoles();
   const components = [...new Set(properties.map((p) => p.component))];
+  const code = (text) => (text.startsWith('no ') ? text : `\`${text}\``);
   const lines = [
     '# Custom properties',
     '',
     `Every \`--auk-*\` property the component references read - ${properties.length} across`,
     `${components.length} components - with the literal fallback the browser uses when nobody sets it.`,
-    'Kind is `brand` for a colour, corner radius or type family, which `ui-theme` maps, and',
-    '`measured` for a size, spacing, duration or placement that `tests/e2e/` measures and a',
-    'theme leaves alone. Where to set one is in [docs/theming.md](theming.md).',
+    'Kind is `brand` for a colour, corner radius or type family, which `ui-theme` maps onto',
+    'one of its roles, and `measured` for a size, spacing, duration or placement that',
+    '`tests/e2e/` measures and a theme leaves alone. Each section opens with the',
+    "component's anatomy - its parts, variants and states, with the form the code uses and",
+    'the name a design tool uses for the same thing - and the roles it reads. Where to set',
+    'a property is in [docs/theming.md](theming.md).',
     '',
     'Generated by `node scripts/build-properties.mjs`. Edit the references, not this file.',
   ];
   for (const component of components) {
-    lines.push('', `## ${component}`, '', '| Property | Fallback | Kind |', '| --- | --- | --- |');
+    const slug = component.replace(/^ui-/, '');
+    const a = anatomy(readFileSync(join(ROOT, 'skills', component, 'references', `${component}.md`), 'utf8'));
+    lines.push('', `## ${component}`, '', '| Kind | Name | In code | Figma name |', '| --- | --- | --- | --- |');
+    for (const p of a.parts) lines.push(`| part | ${p.name} | ${code(p.code)} | \`${p.figma}\` |`);
+    for (const v of a.variants) lines.push(`| variant | ${v.name} | ${code(v.code)} | \`${v.figma}\` |`);
+    for (const s of a.states) lines.push(`| state | ${s.name} | ${code(s.code)} | \`${s.figma}\` |`);
+    const read = roles.filter((r) => r.properties.some((p) => p.startsWith(`--auk-${slug}-`)));
+    lines.push('', `Roles read: ${read.map((r) => `\`var(--auk-role-${r.name})\``).join(', ')}.`);
+    lines.push('', '| Property | Fallback | Kind |', '| --- | --- | --- |');
     for (const p of properties.filter((x) => x.component === component)) {
       lines.push(`| \`${p.property}\` | \`${p.fallback}\` | ${p.brand ? 'brand' : 'measured'} |`);
     }

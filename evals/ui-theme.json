@@ -31,6 +31,50 @@
       "prompt": "In index.html, the site header's navigation links should use our brand colour from styles/tokens.css and a slightly larger font. The header is plain markup, not one of the ui- components.",
       "baselineFailure": "n/a - this scenario asserts the theme skill stays quiet",
       "detect": {}
+    },
+    {
+      "id": "ui-theme-shadcn",
+      "kind": "obvious",
+      "expect": "ui-theme",
+      "prompt": "index.html has auk buttons and a confirm dialog built from the ui- skills, still in their default blue. globals.css declares our shadcn/ui tokens: --primary, --primary-foreground, --background, --foreground, --border, --ring and --radius. Make the components follow those tokens.",
+      "baselineFailure": "redeclares the 69 component properties one by one with copied values, or restyles the auk selectors directly, instead of binding the seven roles the design system already names",
+      "detect": {
+        "binds a role to a project token": "--auk-role-[a-z-]+:\\s*var\\(--",
+        "binds component properties one by one instead": "--auk-(?:button|dialog|tabs|alert|box|popover)-[a-z-]+:\\s*var\\(--(?!auk-role-)",
+        "copies a literal instead of binding a token": "--auk-[a-z-]+:\\s*#[0-9a-fA-F]{3,8}"
+      }
+    },
+    {
+      "id": "ui-theme-figma",
+      "kind": "oblique",
+      "expect": "ui-theme",
+      "prompt": "Our design tokens live in the Figma file at https://www.figma.com/design/AbC123def/Brand-tokens. The buttons and the tabs in index.html were built from the ui- skills and should use those tokens rather than the defaults they came with.",
+      "baselineFailure": "asks for or invents hex values and writes them into the component CSS, with no path from the Figma variables or their exported token file to the properties the components already read",
+      "detect": {
+        "binds a role to a project token": "--auk-role-[a-z-]+:\\s*var\\(--",
+        "copies a literal instead of binding a token": "--auk-[a-z-]+:\\s*#[0-9a-fA-F]{3,8}"
+      }
+    },
+    {
+      "id": "ui-theme-token-file",
+      "kind": "oblique",
+      "expect": "ui-theme",
+      "prompt": "Our token build writes tokens/brand.tokens.json, a DTCG token file. Wire the auk components in index.html up to it so they pick up the brand instead of their shipped colours.",
+      "baselineFailure": "writes a bespoke script that reads the JSON at runtime, or hand-copies values out of it, instead of binding the token names the file already exports to the role layer",
+      "detect": {
+        "binds a role to a project token": "--auk-role-[a-z-]+:\\s*var\\(--",
+        "adds a runtime token loader": "fetch\\([^)]*tokens|import\\s.*tokens\\.json"
+      }
+    },
+    {
+      "id": "ui-theme-override-adjacent",
+      "kind": "adjacent",
+      "expect": null,
+      "prompt": "In index.html, only the destructive button should get a darker red than the brand's danger colour - use #7f1d1d - and nothing else on the page may change.",
+      "baselineFailure": "n/a - this scenario asserts the theme skill stays quiet; one component made to differ from its role is a component property set by hand, not a theme",
+      "detect": {
+        "binds a role": "--auk-role-"
+      }
     }
   ]
 }

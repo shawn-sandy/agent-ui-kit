@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+  :root { color-scheme: light; }
+  body { margin: 0; padding: 2rem 2.5rem 4rem; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #111827; background: #ffffff; line-height: 1.5; }
+  .sheet-header { border-block-end: 1px solid #e5e7eb; padding-block-end: 1rem; margin-block-end: 2rem; }
+  .sheet-header h1 { margin: 0 0 .25rem; font-size: 1.75rem; }
+  .sheet-header p, .sheet-meta { margin: .25rem 0; color: #4b5563; max-width: 72ch; font-size: .9375rem; }
+  .sheet-section { margin-block: 2.5rem; }
+  .sheet-section > h2 { font-size: 1.25rem; margin: 0 0 .25rem; }
+  .chips { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: .75rem; }
+  .chip { display: flex; gap: .75rem; align-items: flex-start; border: 1px solid #e5e7eb; border-radius: .375rem; padding: .625rem; font-size: .8125rem; }
+  .swatch { flex: none; inline-size: 2.5rem; block-size: 2.5rem; border-radius: .25rem; border: 1px solid #e5e7eb; background: #ffffff; }
+  .swatch-radius { border: 2px solid #111827; }
+  .swatch-font { text-align: center; line-height: 2.5rem; font-weight: 600; }
+  .chip-body { display: grid; gap: .1rem; min-inline-size: 0; }
+  .chip-name { font-weight: 600; }
+  .chip code, .sheet-table code, .sheet-meta code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8125em; }
+  .chip-value { color: #4b5563; overflow-wrap: anywhere; }
+  .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1.25rem; align-items: start; margin-block-start: 1rem; }
+  .panel { border: 1px solid #e5e7eb; border-radius: .375rem; padding: 1rem; min-inline-size: 0; }
+  .panel > h3 { margin: 0 0 .5rem; font-size: .9375rem; }
+  .panel > p { margin: 0 0 .75rem; color: #4b5563; font-size: .875rem; }
+  .stage { display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-start; padding: 1rem; background: #f9fafb; border-radius: .25rem; }
+  .stage .auk-tabs, .stage .auk-dialog[open] { flex: 1 1 100%; }
+  .stage .auk-dialog[open] { position: static; margin: 0; max-inline-size: 100%; }
+  .sheet-table { border-collapse: collapse; inline-size: 100%; font-size: .8125rem; }
+  .sheet-table th, .sheet-table td { text-align: start; padding: .3rem .5rem; border-block-end: 1px solid #e5e7eb; vertical-align: top; }
+  .sheet-table th { color: #4b5563; font-weight: 600; }
+  @media print { body { padding: 0; } .panel, .stage, .chip { break-inside: avoid; } }
+@layer auk {
+  .auk-box {
+    box-sizing: border-box;
+    display: block;
+    padding: var(--auk-box-padding, 1rem);
+    border: var(--auk-box-border-width, 1px) solid var(--auk-box-border-color, transparent);
+    border-radius: var(--auk-box-radius, 0.375rem);
+    min-block-size: var(--auk-box-min-block-size, auto);
+    color: var(--auk-box-color, #1f2937);
+    background-color: var(--auk-box-bg, #ffffff);
+  }
+
+  .auk-box[data-variant="invert"] {
+    color: var(--auk-box-invert-color, #f9fafb);
+    background-color: var(--auk-box-invert-bg, #1f2937);
+    border-color: var(--auk-box-invert-border-color, transparent);
+  }
+}
+  </style>
+</helmet>
+<div style="width: 1200px; height: 760px; box-sizing: border-box; overflow: auto; background: #ffffff; padding: 32px 36px; color: #111827;">
+  <h2 id="h-ui-box">Box</h2>
+  <p class="sheet-meta">Skill <code>ui-box</code>, root class <code>auk-box</code>, 10 properties of which 7 carry brand.</p>
+  <div class="panels">
+    <div class="panel" id="specimen-ui-box">
+      <h3>Specimen</h3>
+      <p>The reference's Structure block, painted by its own Styles block: every variant and state the contract names.</p>
+      <div class="stage">
+<!-- Plain. The base rule; no attribute needed. -->
+<div class="auk-box">
+  <h2>Delivery window</h2>
+  <p>Orders placed before 4pm ship the same working day.</p>
+</div>
+
+<!-- Inverted. Foreground and background swap together, never one alone. -->
+<div class="auk-box" data-variant="invert">
+  <h2>Out of stock</h2>
+  <p>This item is expected back in three weeks.</p>
+</div>
+
+<!-- Nested. A box inside a box is the composition story: the outer one is the
+     enclosure, the inner one is a callout, and neither re-declares the other. -->
+<div class="auk-box">
+  <h2>Payment</h2>
+  <p>Cards are charged when the order ships.</p>
+  <div class="auk-box" data-variant="invert">
+    <p>Refunds take up to five working days to appear.</p>
+  </div>
+</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Anatomy</h3>
+      <p>The same names in code and in a design tool, by rule.</p>
+      <table class="sheet-table">
+        <thead><tr><th>Kind</th><th>Name</th><th>In code</th><th>Figma name</th></tr></thead>
+        <tbody>
+        <tr><td>variant</td><td>invert</td><td><code>data-variant=&quot;invert&quot;</code></td><td><code>Variant=Invert</code></td></tr>
+        <tr><td>state</td><td>default</td><td>no attribute</td><td><code>State=Default</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <h3>Tokens</h3>
+      <p>Roles read: <code>var(--auk-role-text)</code>, <code>var(--auk-role-surface)</code>, <code>var(--auk-role-border)</code>, <code>var(--auk-role-inverse)</code>, <code>var(--auk-role-on-inverse)</code>, <code>var(--auk-role-radius)</code>.</p>
+      <table class="sheet-table">
+        <thead><tr><th>Property</th><th>Shipped fallback</th><th>Kind</th><th>Role</th></tr></thead>
+        <tbody>
+        <tr><td><code>--auk-box-padding</code></td><td><code>1rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-box-border-width</code></td><td><code>1px</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-box-border-color</code></td><td><code>transparent</code></td><td>brand</td><td>border</td></tr>
+        <tr><td><code>--auk-box-radius</code></td><td><code>0.375rem</code></td><td>brand</td><td>radius</td></tr>
+        <tr><td><code>--auk-box-min-block-size</code></td><td><code>auto</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-box-color</code></td><td><code>#1f2937</code></td><td>brand</td><td>text</td></tr>
+        <tr><td><code>--auk-box-bg</code></td><td><code>#ffffff</code></td><td>brand</td><td>surface</td></tr>
+        <tr><td><code>--auk-box-invert-color</code></td><td><code>#f9fafb</code></td><td>brand</td><td>on-inverse</td></tr>
+        <tr><td><code>--auk-box-invert-bg</code></td><td><code>#1f2937</code></td><td>brand</td><td>inverse</td></tr>
+        <tr><td><code>--auk-box-invert-border-color</code></td><td><code>transparent</code></td><td>brand</td><td>inverse</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+// Bring each specimen to the state where its surfaces are painted: modules wired, the
+// auto popover shown against its trigger, a message written into every alert region.
+document.querySelectorAll('.auk-popover[popover="auto"]').forEach((el) => {
+  const trigger = document.querySelector('[popovertarget="' + el.id + '"]');
+  try { el.showPopover(trigger ? { source: trigger } : undefined); } catch (e) { el.showPopover(); }
+});
+document.querySelectorAll('.auk-alert [data-part="message"]').forEach((el) => {
+  el.textContent = 'Written into the region after load, the way a page would.';
+});
+</script>
+</x-dc>
+</body>
+</html>

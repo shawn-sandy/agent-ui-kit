@@ -1,0 +1,304 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+  :root { color-scheme: light; }
+  body { margin: 0; padding: 2rem 2.5rem 4rem; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #111827; background: #ffffff; line-height: 1.5; }
+  .sheet-header { border-block-end: 1px solid #e5e7eb; padding-block-end: 1rem; margin-block-end: 2rem; }
+  .sheet-header h1 { margin: 0 0 .25rem; font-size: 1.75rem; }
+  .sheet-header p, .sheet-meta { margin: .25rem 0; color: #4b5563; max-width: 72ch; font-size: .9375rem; }
+  .sheet-section { margin-block: 2.5rem; }
+  .sheet-section > h2 { font-size: 1.25rem; margin: 0 0 .25rem; }
+  .chips { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: .75rem; }
+  .chip { display: flex; gap: .75rem; align-items: flex-start; border: 1px solid #e5e7eb; border-radius: .375rem; padding: .625rem; font-size: .8125rem; }
+  .swatch { flex: none; inline-size: 2.5rem; block-size: 2.5rem; border-radius: .25rem; border: 1px solid #e5e7eb; background: #ffffff; }
+  .swatch-radius { border: 2px solid #111827; }
+  .swatch-font { text-align: center; line-height: 2.5rem; font-weight: 600; }
+  .chip-body { display: grid; gap: .1rem; min-inline-size: 0; }
+  .chip-name { font-weight: 600; }
+  .chip code, .sheet-table code, .sheet-meta code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8125em; }
+  .chip-value { color: #4b5563; overflow-wrap: anywhere; }
+  .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1.25rem; align-items: start; margin-block-start: 1rem; }
+  .panel { border: 1px solid #e5e7eb; border-radius: .375rem; padding: 1rem; min-inline-size: 0; }
+  .panel > h3 { margin: 0 0 .5rem; font-size: .9375rem; }
+  .panel > p { margin: 0 0 .75rem; color: #4b5563; font-size: .875rem; }
+  .stage { display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-start; padding: 1rem; background: #f9fafb; border-radius: .25rem; }
+  .stage .auk-tabs, .stage .auk-dialog[open] { flex: 1 1 100%; }
+  .stage .auk-dialog[open] { position: static; margin: 0; max-inline-size: 100%; }
+  .sheet-table { border-collapse: collapse; inline-size: 100%; font-size: .8125rem; }
+  .sheet-table th, .sheet-table td { text-align: start; padding: .3rem .5rem; border-block-end: 1px solid #e5e7eb; vertical-align: top; }
+  .sheet-table th { color: #4b5563; font-weight: 600; }
+  @media print { body { padding: 0; } .panel, .stage, .chip { break-inside: avoid; } }
+@layer auk {
+  .auk-popover {
+    inline-size: var(--auk-popover-inline-size, min(22rem, calc(100vw - 2rem)));
+    max-block-size: var(--auk-popover-max-block-size, calc(100vh - 4rem));
+    padding: 0;
+    border: var(--auk-popover-border-width, 1px) solid var(--auk-popover-border-color, #d1d5db);
+    border-radius: var(--auk-popover-radius, 0.5rem);
+    font-family: var(--auk-popover-font-family, inherit);
+    color: var(--auk-popover-color, #111827);
+    background-color: var(--auk-popover-bg, #ffffff);
+    box-shadow: var(--auk-popover-box-shadow, 0 10px 25px rgba(17, 24, 39, 0.18));
+  }
+
+  .auk-popover:popover-open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .auk-popover[data-placement="center"]:popover-open {
+    inset: 0;
+    margin: auto;
+  }
+
+  .auk-popover[data-placement="top"]:popover-open {
+    inset-block: var(--auk-popover-page-offset, 1rem) auto;
+    inset-inline: 0;
+    margin-block: 0 auto;
+    margin-inline: auto;
+  }
+
+  .auk-popover[data-placement="bottom"]:popover-open {
+    inset-block: auto var(--auk-popover-page-offset, 1rem);
+    inset-inline: 0;
+    margin-block: auto 0;
+    margin-inline: auto;
+  }
+
+  .auk-popover[data-placement="left"]:popover-open {
+    inset-block: 0;
+    inset-inline: var(--auk-popover-page-offset, 1rem) auto;
+    margin-block: auto;
+    margin-inline: 0 auto;
+  }
+
+  .auk-popover[data-placement="right"]:popover-open {
+    inset-block: 0;
+    inset-inline: auto var(--auk-popover-page-offset, 1rem);
+    margin-block: auto;
+    margin-inline: auto 0;
+  }
+
+  @supports (position-area: block-end) {
+    .auk-popover:not([data-placement]):popover-open,
+    .auk-popover[data-placement="trigger"]:popover-open {
+      inset: auto;
+      margin: var(--auk-popover-offset, 0.25rem) 0 0;
+      position-area: var(--auk-popover-position-area, block-end span-inline-end);
+      position-try-fallbacks: var(--auk-popover-position-try-fallbacks, flip-block, flip-inline, flip-block flip-inline);
+    }
+  }
+
+  .auk-popover [data-part="header"] {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--auk-popover-gap, 0.75rem);
+    padding: var(--auk-popover-padding, 1rem);
+    border-block-end: var(--auk-popover-divider-width, 1px) solid var(--auk-popover-divider-color, #e5e7eb);
+  }
+
+  .auk-popover [data-part="title"] {
+    margin: 0;
+    font-size: var(--auk-popover-title-size, 1rem);
+    line-height: var(--auk-popover-title-line-height, 1.4);
+  }
+
+  .auk-popover [data-part="body"] {
+    padding: var(--auk-popover-padding, 1rem);
+    overflow-y: auto;
+    color: var(--auk-popover-body-color, #374151);
+    line-height: var(--auk-popover-line-height, 1.5);
+  }
+
+  .auk-popover [data-part="close"] {
+    flex: none;
+    min-inline-size: var(--auk-popover-close-size, 2.75rem);
+    min-block-size: var(--auk-popover-close-size, 2.75rem);
+    border: var(--auk-popover-close-border-width, 1px) solid var(--auk-popover-close-border-color, transparent);
+    border-radius: var(--auk-popover-close-radius, 0.375rem);
+    font-family: var(--auk-popover-font-family, inherit);
+    font-size: var(--auk-popover-close-font-size, 1.25rem);
+    color: var(--auk-popover-close-color, #1f2937);
+    background-color: var(--auk-popover-close-bg, transparent);
+    cursor: pointer;
+  }
+
+  .auk-popover [data-part="close"]:focus-visible,
+  .auk-popover [data-part="body"] :focus-visible {
+    outline: var(--auk-popover-focus-width, 3px) solid var(--auk-popover-focus-color, #111827);
+    outline-offset: var(--auk-popover-focus-offset, 2px);
+  }
+}
+  </style>
+</helmet>
+<div style="width: 1200px; height: 760px; box-sizing: border-box; overflow: auto; background: #ffffff; padding: 32px 36px; color: #111827;">
+  <h2 id="h-ui-popover">Popover</h2>
+  <p class="sheet-meta">Skill <code>ui-popover</code>, root class <code>auk-popover</code>, 31 properties of which 13 carry brand.</p>
+  <div class="panels">
+    <div class="panel" id="specimen-ui-popover">
+      <h3>Specimen</h3>
+      <p>The reference's Structure block, painted by its own Styles block: every variant and state the contract names.</p>
+      <div class="stage">
+<button class="auk-button" type="button" id="filters-trigger"
+        popovertarget="filters-popover" aria-expanded="false">
+  Filters
+</button>
+
+<div class="auk-popover" id="filters-popover" popover="auto" data-placement="trigger"
+     role="group" aria-labelledby="filters-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="filters-popover-title">Filter results</h2>
+  </div>
+  <div data-part="body">
+    <p>An auto popover closes on Escape and on a click outside it.</p>
+    <button class="auk-button" type="button" id="filters-apply" autofocus>Apply</button>
+  </div>
+</div>
+
+<button class="auk-button" type="button" id="notes-trigger"
+        popovertarget="notes-popover" aria-expanded="false">
+  Release notes
+</button>
+
+<div class="auk-popover" id="notes-popover" popover="manual" data-placement="center"
+     role="group" aria-labelledby="notes-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="notes-popover-title">What changed</h2>
+    <button data-part="close" type="button" popovertarget="notes-popover"
+            popovertargetaction="hide" aria-label="Close release notes">
+      <span aria-hidden="true">&#215;</span>
+    </button>
+  </div>
+  <div data-part="body">
+    <p>A manual popover ignores Escape and outside clicks. It closes only here.</p>
+  </div>
+</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Anatomy</h3>
+      <p>The same names in code and in a design tool, by rule.</p>
+      <table class="sheet-table">
+        <thead><tr><th>Kind</th><th>Name</th><th>In code</th><th>Figma name</th></tr></thead>
+        <tbody>
+        <tr><td>part</td><td>header</td><td><code>data-part=&quot;header&quot;</code></td><td><code>Header</code></td></tr>
+        <tr><td>part</td><td>title</td><td><code>data-part=&quot;title&quot;</code></td><td><code>Title</code></td></tr>
+        <tr><td>part</td><td>body</td><td><code>data-part=&quot;body&quot;</code></td><td><code>Body</code></td></tr>
+        <tr><td>part</td><td>close</td><td><code>data-part=&quot;close&quot;</code></td><td><code>Close</code></td></tr>
+        <tr><td>state</td><td>default</td><td>no attribute</td><td><code>State=Default</code></td></tr>
+        <tr><td>state</td><td>open</td><td><code>:popover-open</code></td><td><code>State=Open</code></td></tr>
+        <tr><td>state</td><td>focus</td><td><code>:focus-visible</code></td><td><code>State=Focus</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <h3>Tokens</h3>
+      <p>Roles read: <code>var(--auk-role-text)</code>, <code>var(--auk-role-surface)</code>, <code>var(--auk-role-border)</code>, <code>var(--auk-role-divider)</code>, <code>var(--auk-role-focus)</code>, <code>var(--auk-role-shadow)</code>, <code>var(--auk-role-radius)</code>, <code>var(--auk-role-font)</code>.</p>
+      <table class="sheet-table">
+        <thead><tr><th>Property</th><th>Shipped fallback</th><th>Kind</th><th>Role</th></tr></thead>
+        <tbody>
+        <tr><td><code>--auk-popover-inline-size</code></td><td><code>min(22rem, calc(100vw - 2rem))</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-max-block-size</code></td><td><code>calc(100vh - 4rem)</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-border-width</code></td><td><code>1px</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-border-color</code></td><td><code>#d1d5db</code></td><td>brand</td><td>border</td></tr>
+        <tr><td><code>--auk-popover-radius</code></td><td><code>0.5rem</code></td><td>brand</td><td>radius</td></tr>
+        <tr><td><code>--auk-popover-font-family</code></td><td><code>inherit</code></td><td>brand</td><td>font</td></tr>
+        <tr><td><code>--auk-popover-color</code></td><td><code>#111827</code></td><td>brand</td><td>text</td></tr>
+        <tr><td><code>--auk-popover-bg</code></td><td><code>#ffffff</code></td><td>brand</td><td>surface</td></tr>
+        <tr><td><code>--auk-popover-box-shadow</code></td><td><code>0 10px 25px rgba(17, 24, 39, 0.18)</code></td><td>brand</td><td>shadow</td></tr>
+        <tr><td><code>--auk-popover-page-offset</code></td><td><code>1rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-offset</code></td><td><code>0.25rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-position-area</code></td><td><code>block-end span-inline-end</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-position-try-fallbacks</code></td><td><code>flip-block, flip-inline, flip-block flip-inline</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-gap</code></td><td><code>0.75rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-padding</code></td><td><code>1rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-divider-width</code></td><td><code>1px</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-divider-color</code></td><td><code>#e5e7eb</code></td><td>brand</td><td>divider</td></tr>
+        <tr><td><code>--auk-popover-title-size</code></td><td><code>1rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-title-line-height</code></td><td><code>1.4</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-body-color</code></td><td><code>#374151</code></td><td>brand</td><td>text</td></tr>
+        <tr><td><code>--auk-popover-line-height</code></td><td><code>1.5</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-close-size</code></td><td><code>2.75rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-close-border-width</code></td><td><code>1px</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-close-border-color</code></td><td><code>transparent</code></td><td>brand</td><td>border</td></tr>
+        <tr><td><code>--auk-popover-close-radius</code></td><td><code>0.375rem</code></td><td>brand</td><td>radius</td></tr>
+        <tr><td><code>--auk-popover-close-font-size</code></td><td><code>1.25rem</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-close-color</code></td><td><code>#1f2937</code></td><td>brand</td><td>text</td></tr>
+        <tr><td><code>--auk-popover-close-bg</code></td><td><code>transparent</code></td><td>brand</td><td>surface</td></tr>
+        <tr><td><code>--auk-popover-focus-width</code></td><td><code>3px</code></td><td>measured</td><td>-</td></tr>
+        <tr><td><code>--auk-popover-focus-color</code></td><td><code>#111827</code></td><td>brand</td><td>focus</td></tr>
+        <tr><td><code>--auk-popover-focus-offset</code></td><td><code>2px</code></td><td>measured</td><td>-</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+/**
+ * Wire a native popover for accessible use.
+ *
+ * Triggers are any element outside the popover carrying
+ * `popovertarget="<popover id>"`. A control inside the popover that carries the same
+ * attribute - a close button using `popovertargetaction="hide"` - is not a trigger
+ * and is skipped, so it never advertises the popover's open state as its own.
+ *
+ * @param {HTMLElement} popover - the popover element, which must have an id
+ * @returns {() => void} teardown that removes every listener this added
+ */
+function initPopover(popover) {
+  if (!popover || !popover.id) throw new Error('initPopover needs an element with an id');
+
+  const triggers = Array.from(
+    document.querySelectorAll('[popovertarget="' + popover.id + '"]'),
+  ).filter((el) => !popover.contains(el));
+
+  function onToggle(event) {
+    const open = event.newState === 'open';
+    triggers.forEach((el) => el.setAttribute('aria-expanded', String(open)));
+    if (open || popover.popover !== 'manual') return;
+
+    // Only `manual` reaches here. Closing one from a control inside it leaves focus
+    // on that control, which the close has just made `display: none`; closing one
+    // any other way can drop focus on the body. Both are dead ends for a keyboard
+    // user. Focus landing anywhere else means the user moved it deliberately, and
+    // moving it again would be the component fighting them.
+    const active = document.activeElement;
+    const stranded = !active || active === document.body || popover.contains(active);
+    if (!stranded) return;
+
+    const target = triggers.find((el) => el.isConnected);
+    if (target) target.focus();
+  }
+
+  // Match the markup to reality before the first toggle, so a popover that is
+  // already open on load does not advertise itself as closed.
+  const openNow = String(popover.matches(':popover-open'));
+  triggers.forEach((el) => el.setAttribute('aria-expanded', openNow));
+  popover.addEventListener('toggle', onToggle);
+
+  return function teardown() {
+    popover.removeEventListener('toggle', onToggle);
+  };
+}
+// Bring each specimen to the state where its surfaces are painted: modules wired, the
+// auto popover shown against its trigger, a message written into every alert region.
+document.querySelectorAll('.auk-popover').forEach(initPopover);
+document.querySelectorAll('.auk-popover[popover="auto"]').forEach((el) => {
+  const trigger = document.querySelector('[popovertarget="' + el.id + '"]');
+  try { el.showPopover(trigger ? { source: trigger } : undefined); } catch (e) { el.showPopover(); }
+});
+document.querySelectorAll('.auk-alert [data-part="message"]').forEach((el) => {
+  el.textContent = 'Written into the region after load, the way a page would.';
+});
+</script>
+</x-dc>
+</body>
+</html>
