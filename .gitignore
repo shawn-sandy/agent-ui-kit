@@ -14,5 +14,7 @@ evals/results/
 # No lockfile: it would be copied on plugin install and only CI ever used it.
 package-lock.json
 
+# Per-agent scratch memory written by review subagents; never part of the tree.
+.claude/agent-memory/
 # Local artifact inbox written by the save-artifact skill; the committed copy lives under docs/artifacts/
 .claude/artifacts/
