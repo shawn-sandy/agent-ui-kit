@@ -21,11 +21,11 @@ entry matches exactly one of the five Props rules, decided by the entry's type a
 default and nothing else, so two authors map the same entry the same way.
 
 `tests/unit/ui-compose-mapping.spec.ts` pins the table to the component references:
-every row it maps must be one of the seven contract rows or the qualifier line, every
-Props entry in every shipped contract must fall under exactly one rule, and the
-counts in the paragraph above are measured from the contracts rather than typed on
-trust. A seventh component, or a new Props entry in an existing one, fails that test
-until the table covers it.
+every row it maps must be one of the seven contract rows or the qualifier line, each
+mapped row appears exactly once, every Props entry in every shipped contract must
+fall under exactly one rule, and the counts in the paragraph above are measured from
+the contracts rather than typed on trust. A seventh component, or a new Props entry
+in an existing one, fails that test until the table covers it.
 
 ## Guard
 
@@ -103,11 +103,14 @@ or the state that drives an entry the module writes. A required entry with one f
 value is hard-coded. No prop may remove a required accessibility attribute: nothing
 in the surface can unset the dialog's `aria-labelledby`, the alert's `aria-atomic`,
 the popover's `role="group"` or a tab's `aria-controls`, and a prop that could is a
-defect in the surface, not a feature of it. The element's own native attributes - an
-`id`, an event handler, a `title` - pass through to the root and are not props of
-the contract; the contract's attributes are the typed ones. Prop names drop the
-`data-` and `aria-` prefixes because the prefix is how the attribute travels in
-markup, not what it means.
+defect in the surface, not a feature of it. Native attributes the contract does not
+name - an extra class, an event handler, a `lang` - pass through to the root and are
+not props of the contract; an attribute the contract does name is a typed prop, which
+is why `id` is a required string on the dialog, the popover and every tab and panel.
+A prop named for a choice or a state drops its `data-` or `aria-` prefix - `variant`,
+`iconOnly`, `unavailable` - because the prefix is how the attribute travels in
+markup, not what it means; an attribute whose value the consumer writes verbatim,
+`aria-label`, keeps its name so the accessible name stays visible in the surface.
 
 **Split only on structure.** A prop that changes which parts render is structural,
 and a structural prop becomes its own variant component behind a thin router: the
@@ -119,7 +122,8 @@ not, so it splits into an auto and a manual variant behind a router; `ui-button`
 `data-icon-only` changes the label's shape but not which parts render, so it stays
 a prop; `ui-alert` `role` and `aria-live` are paired to the variant, so they are
 derived. Never one boolean per variant, and never a flag that switches the layout
-inside one component.
+inside one component. The shipped popover projection still branches on `mode` inside
+one component; it predates this rule and is not the shape to copy - the router is.
 
 **Compose sibling auk components.** When the project already owns a sibling auk
 component - a button in a dialog's footer, a button as a popover's trigger - the new

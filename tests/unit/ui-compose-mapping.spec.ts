@@ -90,6 +90,16 @@ describe('the mapping table is a faithful copy of the component contracts', () =
     }
   });
 
+  it('maps each covered contract row exactly once, and leaves Role and WCAG to the Element row and the browser suite', () => {
+    // A bare row count would let one row be deleted and another duplicated in its place.
+    const names = mapped.map((m) => m.contractRow);
+    for (const row of ['Element', 'Slots', 'Variants', 'Behaviour', QUALIFIER]) {
+      expect(names.filter((n) => n === row), `${row} rows`).toHaveLength(1);
+    }
+    expect(names.filter((n) => n === 'Props'), 'Props rows').toHaveLength(5);
+    for (const row of ['Role', 'WCAG']) expect(names, `${row} is mapped by name`).not.toContain(row);
+  });
+
   it('the Props rows name each of the five rules exactly once, and no other row names one', () => {
     const named = mapped.filter((m) => m.contractRow === 'Props').map((m) => m.rule);
     expect([...named].sort()).toEqual([...PROPS_RULES].sort());
