@@ -339,7 +339,9 @@ var protoRecord; // set inside the records module; the live dialog calls it
 /* The module as the plan proposes it: openers, closers, focus restoration, and a
    backdrop fallback that attaches only where the browser has no native closedby.
    The fallback mirrors native light dismiss: press and release must both land on
-   the dialog element itself, which is what the backdrop retargets to. */
+   the dialog element itself, which is what the backdrop retargets to. The click
+   target alone cannot tell, because a click whose press and release land on
+   different elements fires on their common ancestor, and that is the dialog. */
 function initDialog(dialog) {
   if (!dialog || !dialog.id) throw new Error('initDialog needs a <dialog> with an id');
 
@@ -347,6 +349,7 @@ function initDialog(dialog) {
   var closers = Array.prototype.slice.call(dialog.querySelectorAll('[data-dialog-close]'));
   var opener = null;
   var pressedOnDialog = false;
+  var releasedOnDialog = false;
   var nativeClosedBy = 'closedBy' in HTMLDialogElement.prototype;
 
   function open(event) {
@@ -359,9 +362,11 @@ function initDialog(dialog) {
     dialog.close();
   }
   function onPointerDown(event) { pressedOnDialog = event.target === dialog; }
+  function onPointerUp(event) { releasedOnDialog = event.target === dialog; }
   function onDialogClick(event) {
-    var hit = pressedOnDialog && event.target === dialog;
+    var hit = pressedOnDialog && releasedOnDialog && event.target === dialog;
     pressedOnDialog = false;
+    releasedOnDialog = false;
     if (hit && dialog.getAttribute('closedby') === 'any') dialog.close();
   }
   function onClose() {
@@ -379,6 +384,7 @@ function initDialog(dialog) {
   closers.forEach(function (el) { el.addEventListener('click', close); });
   if (!nativeClosedBy) {
     dialog.addEventListener('pointerdown', onPointerDown);
+    dialog.addEventListener('pointerup', onPointerUp);
     dialog.addEventListener('click', onDialogClick);
   }
   dialog.addEventListener('close', onClose);
@@ -387,6 +393,7 @@ function initDialog(dialog) {
     openers.forEach(function (el) { el.removeEventListener('click', open); });
     closers.forEach(function (el) { el.removeEventListener('click', close); });
     dialog.removeEventListener('pointerdown', onPointerDown);
+    dialog.removeEventListener('pointerup', onPointerUp);
     dialog.removeEventListener('click', onDialogClick);
     dialog.removeEventListener('close', onClose);
   };
