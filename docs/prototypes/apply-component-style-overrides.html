@@ -172,9 +172,9 @@ the layered button's padding.</p>
 <p class="measure" id="measure"></p>
 
 <table class="readout">
-  <caption>Computed style on the preview button, read with getComputedStyle after every change.</caption>
+  <caption>Computed style on the preview button, read with getComputedStyle. Each row is measured with and without that one override, so a row masked by another scope reads no.</caption>
   <thead>
-    <tr><th scope="col">Override</th><th scope="col">Reads</th><th scope="col">Before</th><th scope="col">Now</th><th scope="col">Applied</th></tr>
+    <tr><th scope="col">Override</th><th scope="col">Reads</th><th scope="col">Without it</th><th scope="col">With all</th><th scope="col">Applied</th></tr>
   </thead>
   <tbody id="readout"></tbody>
 </table>
@@ -341,7 +341,7 @@ function resetStore() {
     save(records);
     render();
     form.reset();
-    var first = form.querySelector('input');
+    var first = form.querySelector('input, select, textarea');
     if (first) first.focus();
     announce('Record added. ' + records.length + ' total.');
   });
@@ -405,13 +405,21 @@ function resetStore() {
     tr.appendChild(td);
   }
 
-  function apply() {
-    var records = load();
+  // The rendered table is the source of truth: it shows what the table script holds even
+  // where storage is unavailable, and it is exactly what the reader sees.
+  function tableRecords() {
+    return Array.prototype.map.call(document.querySelectorAll('#rows tr'), function (tr) {
+      if (tr.querySelector('.empty-state')) return null;
+      var td = tr.children;
+      return { scope: td[0].textContent.trim(), property: td[1].textContent.trim(), value: td[2].textContent.trim() };
+    }).filter(Boolean);
+  }
+
+  function applyAll(records) {
     clear();
-    var before = records.map(function (r) { return computed(reads(String(r.property || '').trim())); });
     var css = '';
     records.forEach(function (r) {
-      var p = String(r.property || '').trim(), v = String(r.value || '').trim();
+      var p = r.property, v = r.value;
       if (!p) return;
       if (r.scope === 'root')          { rootStyle.setProperty(p, v);     applied.push({ target: document.documentElement, property: p }); }
       else if (r.scope === 'ancestor') { scopeEl.style.setProperty(p, v); applied.push({ target: scopeEl, property: p }); }
@@ -420,19 +428,30 @@ function resetStore() {
     });
     // Stylesheet text cannot run script; a bad value can only restyle this viewer's own page.
     userRules.textContent = css;
+  }
+
+  function apply() {
+    var records = tableRecords();
+    applyAll(records);
+    var withAll = records.map(function (r) { return computed(reads(r.property)); });
+    // ponytail: one re-apply per row measures that row's own effect; rows are a handful, so the
+    // quadratic cost is invisible. A row masked by a stronger scope now reads "no".
+    var without = records.map(function (r, i) {
+      applyAll(records.filter(function (_, j) { return j !== i; }));
+      return computed(reads(r.property));
+    });
+    applyAll(records);
 
     while (readout.firstChild) readout.removeChild(readout.firstChild);
     var count = 0;
     records.forEach(function (r, i) {
-      var p = String(r.property || '').trim();
-      var now = computed(reads(p));
-      var changed = now !== before[i];
+      var changed = withAll[i] !== without[i];
       if (changed) count++;
       var tr = document.createElement('tr');
-      cell(tr, r.scope + ' ' + p + ' = ' + r.value);
-      cell(tr, reads(p));
-      cell(tr, before[i] || '(none)');
-      cell(tr, now || '(none)');
+      cell(tr, r.scope + ' ' + r.property + ' = ' + r.value);
+      cell(tr, reads(r.property));
+      cell(tr, without[i] || '(none)');
+      cell(tr, withAll[i] || '(none)');
       cell(tr, changed ? 'yes' : 'no', changed ? 'yes' : 'no');
       readout.appendChild(tr);
     });
