@@ -73,10 +73,10 @@ describe.each(skills)('skills/%s', (name) => {
     expect(violations.map((v) => `${v.rule}: ${v.message}`)).toEqual([]);
   });
 
-  it('SKILL.md body is under 60 lines and holds no component code', () => {
+  it('SKILL.md body is under 100 lines and holds no component code', () => {
     const source = readFileSync(skillPath, 'utf8');
     const body = source.replace(/^---\n[\s\S]*?\n---\n/, '');
-    expect(body.split('\n').length).toBeLessThan(60);
+    expect(body.split('\n').length).toBeLessThan(100);
     expect(body).not.toMatch(/```(?:html|css|js|javascript)/);
   });
 

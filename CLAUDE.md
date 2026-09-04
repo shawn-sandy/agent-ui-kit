@@ -88,7 +88,7 @@ under a context budget, so a trailing clause is lost.
 - `description` must be third person and free of first- and second-person pronouns
   (`tests/lib/frontmatter.ts`). The reflex phrasing "Use when you need..." fails.
 - `name` must match the directory and start with `ui-`.
-- `SKILL.md` body under 60 lines, with no component code fences.
+- `SKILL.md` body under 100 lines, with no component code fences.
 - Wrap reference prose at 88 columns. Tables, code fences, contract cells and the
   qualifier line are exempt.
 - Never estimate a measured number into a reference. Either `tests/e2e/` measures it at

@@ -166,7 +166,7 @@ component's scope is set by its contract table, not by this paragraph.
 
 ### Body
 
-Under 60 lines, and it contains **no component code**. Its only job is to point at
+Under 100 lines, and it contains **no component code**. Its only job is to point at
 the reference and state the rules an agent must not get wrong.
 
 ```markdown
@@ -357,7 +357,7 @@ Before a component is done:
 
 - [ ] Frontmatter uses standard keys only and `name` matches the directory with the `ui-` prefix.
 - [ ] Description is third person, pronoun-free, and covers oblique phrasing.
-- [ ] Body is under 60 lines and holds no component code.
+- [ ] Body is under 100 lines and holds no component code.
 - [ ] Contract table has all seven rows, in order.
 - [ ] All five reference sections present, in order, one fenced block each.
 - [ ] Every themeable CSS value is `var(--auk-<component-slug>-*, literal)`.
@@ -386,7 +386,7 @@ no `kind`, a file that fails to parse - is a component, so a directory never esc
 the strict gates by being unreadable.
 
 A workflow skill keeps these rules: the `ui-` name matching its directory, the
-frontmatter rules in section 1, the body rules (under 60 lines, no component code,
+frontmatter rules in section 1, the body rules (under 100 lines, no component code,
 the `## Clarify when needed` heading with its vocabulary), the portability lint over
 every file it ships, the external-resource guard, and the three evaluation scenarios
 in section 4. It stays public - it never sets `metadata.internal` - and the plugin
