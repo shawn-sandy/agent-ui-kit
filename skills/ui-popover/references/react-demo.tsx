@@ -1,4 +1,8 @@
 import * as React from 'react';
+// The sibling projection, composed rather than re-typed - see ui-compose. Under a
+// selective install of this skill alone the import dangles; the file is reference
+// material and is never executed.
+import { AukButton } from '../../ui-button/references/react-demo';
 
 /**
  * React projection of the popover contract. This is an adapter reference for apps
@@ -111,33 +115,31 @@ export function AukPopover({
 export function AukPopoverDemo() {
   return (
     <div>
-      <button
-        className="auk-button"
+      <AukButton
         type="button"
         id="filters-trigger"
         popoverTarget="filters-popover"
         aria-expanded="false"
       >
         Filters
-      </button>
-      <button
-        className="auk-button"
+      </AukButton>
+      <AukButton
         type="button"
-        data-variant="secondary"
+        variant="secondary"
         id="notes-trigger"
         popoverTarget="notes-popover"
         aria-expanded="false"
       >
         Release notes
-      </button>
+      </AukButton>
 
       <AukPopover id="filters-popover" title="Filter results">
         <p>An auto popover closes on Escape and on a click outside it.</p>
         {/* autoFocus is the native attribute. The popover attribute alone does not
             move focus in, and a scripted focus() call would lose :focus-visible. */}
-        <button className="auk-button" type="button" id="filters-apply" autoFocus>
+        <AukButton type="button" id="filters-apply" autoFocus>
           Apply
-        </button>
+        </AukButton>
       </AukPopover>
 
       <AukPopover
