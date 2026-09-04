@@ -236,8 +236,8 @@ themed on arrival.
 After the block is written:
 
 1. Open the page and confirm the components changed. A button still painted
-   `#1a56db` means the block loads before the component styles or a token name is
-   misspelled. Check with the browser's computed-style inspector, never by eye.
+   `#1a56db` means a token name is misspelled or the block never reached `:root`.
+   Check with the browser's computed-style inspector, never by eye.
 2. Re-measure. `tests/e2e/ui-theme.spec.ts` in this skill's repository binds a
    palette over every component demo and measures it: an axe scan for text contrast
    (1.4.3), a computed-style read of the focus outline width (2.4.7), and the
