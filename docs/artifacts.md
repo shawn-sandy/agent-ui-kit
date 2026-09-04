@@ -15,6 +15,7 @@ is stable: republishing updates the page in place, so links here never need to c
 | Artifact | What it is | Recorded in |
 | --- | --- | --- |
 | [ui-theme Proposal](https://claude.ai/code/artifact/35196d3b-8a93-4af5-a0ba-17cfa4956446) | Published page for the proposal to add a ui-theme skill. | not linked from the repo; source is `docs/proposals/add-ui-theme-skill.md` |
+| [Role Layer Proposal](https://claude.ai/code/artifact/fe77138e-4ea8-4b51-a6de-a31057fa5653) | Published page for the proposal to support any design system by publishing the auk role layer as a contract; carries a live specimen of the role chain. | `artifact-url` in `docs/proposals/support-any-design-system.md` and `docs/prompts/proposal-support-any-design-system.md` |
 
 ## Plans
 

@@ -5,6 +5,7 @@ techniques: Long-context grounding, XML structure, Comparison tables, Positive f
 created: 2026-09-04
 modified: 2026-09-04
 status: gathering
+artifact-url: https://claude.ai/code/artifact/fe77138e-4ea8-4b51-a6de-a31057fa5653
 generated-sha: e112b79f87fd9533d90599b078b0aeafaa091c258772da57ebfb54dfa2dc7551
 ---
 

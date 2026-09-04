@@ -3,6 +3,7 @@ status: proposal
 type: feature
 created: 2026-09-04
 repo-name: agent-ui-skills
+artifact-url: https://claude.ai/code/artifact/fe77138e-4ea8-4b51-a6de-a31057fa5653
 ---
 
 # Proposal: Support any design system by publishing the auk role layer as a contract
