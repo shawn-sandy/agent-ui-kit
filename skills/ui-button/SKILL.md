@@ -1,6 +1,6 @@
 ---
 name: ui-button
-description: Accessible button - a clickable control that runs an action in the current page. Use when adding, styling or disabling a button or submit control that stays keyboard-reachable. Not a link.
+description: Accessible button - a clickable control that runs an action in the current page. Use when adding or styling a button or submit control, or when disabling one that stays keyboard-reachable. Not a link.
 license: MIT
 ---
 

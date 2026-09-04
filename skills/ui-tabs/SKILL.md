@@ -1,6 +1,6 @@
 ---
 name: ui-tabs
-description: Accessible tabs - a row of controls showing one panel at a time. Use when adding a tabbed interface driven by arrow keys, with roving tabindex so one Tab press clears the row. Not page navigation.
+description: Accessible tabs - a row of controls showing one panel at a time. Use when adding tabs or switchable sections, or a row driven by arrow keys with roving tabindex. Not page navigation.
 license: MIT
 ---
 

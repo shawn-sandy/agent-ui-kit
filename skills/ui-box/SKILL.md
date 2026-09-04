@@ -1,6 +1,6 @@
 ---
 name: ui-box
-description: Accessible box - a padded, bordered container with paired text and background. Use when wrapping content in a card, panel, callout or tile that must survive forced colours. Not for arranging siblings.
+description: Accessible box - a padded, bordered container with paired text and background. Use when wrapping content in a card, panel or tile, or when it must survive forced colours. Not for arranging siblings.
 license: MIT
 ---
 

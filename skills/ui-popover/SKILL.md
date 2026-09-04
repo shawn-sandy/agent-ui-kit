@@ -1,6 +1,6 @@
 ---
 name: ui-popover
-description: Accessible non-modal popover built on the native HTML popover attribute. Use when adding a filter panel, settings flyout or dropdown that closes on Escape or an outside click. Not a modal.
+description: Accessible non-modal popover built on the native HTML popover attribute. Use when adding a filter panel, settings flyout or dropdown, or a layer closing on Escape or an outside click. Not a modal.
 license: MIT
 ---
 
