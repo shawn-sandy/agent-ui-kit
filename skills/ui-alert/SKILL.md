@@ -38,7 +38,9 @@ any assumptions.
 3. Render the region into the page **empty**, at load. Fill it later.
 4. Copy the Styles block as-is. It needs no custom properties to be defined.
    Override `--auk-alert-*` to theme it.
-5. Open `references/demo.html` to compare behaviour.
+5. In a component-based project, follow `ui-compose`: props from the contract table,
+   split only on structure, compose sibling auk components, render alone.
+6. Open `references/demo.html` to compare behaviour.
 
 ## Non-negotiable
 

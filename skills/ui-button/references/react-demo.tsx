@@ -31,15 +31,12 @@ function cx(...values: Array<string | undefined>) {
   return values.filter(Boolean).join(' ');
 }
 
-export function AukButton({
-  variant = 'primary',
-  iconOnly = false,
-  unavailable = false,
-  className,
-  onClick,
-  children,
-  ...props
-}: AukButtonProps) {
+// forwardRef so a composing component can hold the element: the dialog projection
+// keeps a ref to its opener and hands it back focus on close.
+export const AukButton = React.forwardRef<HTMLButtonElement, AukButtonProps>(function AukButton(
+  { variant = 'primary', iconOnly = false, unavailable = false, className, onClick, children, ...props },
+  ref,
+) {
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     if (unavailable) {
       event.preventDefault();
@@ -51,6 +48,7 @@ export function AukButton({
   return (
     <button
       {...props}
+      ref={ref}
       className={cx('auk-button', className)}
       data-variant={variant}
       data-icon-only={iconOnly ? '' : undefined}
@@ -60,7 +58,7 @@ export function AukButton({
       {children}
     </button>
   );
-}
+});
 
 export function AukButtonDemo() {
   const [count, setCount] = React.useState(0);

@@ -38,7 +38,9 @@ request already maps cleanly to the contract, proceed and state any assumptions.
 3. Copy the Behaviour module and call `initDialog(dialogElement)` once per dialog.
 4. Copy the Styles block as-is, including the `::backdrop` rule. Override
    `--auk-dialog-*` to theme it.
-5. Open `references/demo.html` and check the four behaviours listed there.
+5. In a component-based project, follow `ui-compose`: props from the contract table,
+   split only on structure, compose sibling auk components, render alone.
+6. Open `references/demo.html` and check the four behaviours listed there.
 
 ## Non-negotiable
 

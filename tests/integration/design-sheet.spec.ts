@@ -10,13 +10,14 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
+import { skillKind } from '../../scripts/skill-kind.mjs';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 const DIR = resolve(ROOT, 'docs/designs/components');
 const SHEET = resolve(DIR, 'index.html');
 const CANVAS = resolve(DIR, 'canvas/canvas.json');
 
-const components = readdirSync(resolve(ROOT, 'skills')).filter((d) => d.startsWith('ui-') && d !== 'ui-theme');
+const components = readdirSync(resolve(ROOT, 'skills')).filter((d) => skillKind(resolve(ROOT, 'skills', d)) === 'component');
 
 describe('docs/designs/components/index.html is the generator output', () => {
   it('exists', () => {

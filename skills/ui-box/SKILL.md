@@ -38,11 +38,12 @@ cleanly onto the contract, proceed and state any assumptions.
 ## Build it
 
 1. Read `references/ui-box.md` for the markup, styles and accessibility contract.
-2. Copy the Structure block. Keep the element and `data-variant` exactly; adapt only
-   template syntax to the target stack.
+2. Copy the Structure block. Keep the element and `data-variant` exactly.
 3. Copy the Styles block as-is. It needs no custom properties to be defined - every
    value has a literal fallback. Override `--auk-box-*` to theme it.
-4. Open `references/demo.html` in a browser to check the result behaves the same.
+4. In a component-based project, follow `ui-compose`: props from the contract table,
+   split only on structure, compose sibling auk components, render alone.
+5. Open `references/demo.html` in a browser to check the result behaves the same.
 
 ## Non-negotiable
 

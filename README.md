@@ -17,14 +17,23 @@ demo is reference material, not production code.
 
 ## Status
 
-Version 0.4.0. Seven skills ship: six components - **box**, **button**, **alert**,
-**dialog**, **tabs** and **popover** - and one workflow, **theme**, which binds a
-project's existing colours, radius and type to the components' custom properties.
-The components were chosen to stress different parts of the format rather than to be
-a useful catalog - a purely presentational primitive, no JavaScript, a live region,
-heavy focus management, keyboard navigation, and a non-modal layer in the browser's
-top layer. Their skill names are prefixed for discovery: `ui-box`, `ui-button`,
-`ui-alert`, `ui-dialog`, `ui-tabs`, `ui-popover` and `ui-theme`.
+Version 0.4.0. Eight skills ship: six components - **box**, **button**, **alert**,
+**dialog**, **tabs** and **popover** - and two workflows: **theme**, which binds a
+project's existing colours, radius and type to the components' custom properties,
+and **compose**, which shapes how a component is emitted into a project built from
+components. The components were chosen to stress different parts of the format
+rather than to be a useful catalog - a purely presentational primitive, no
+JavaScript, a live region, heavy focus management, keyboard navigation, and a
+non-modal layer in the browser's top layer. Their skill names are prefixed for
+discovery: `ui-box`, `ui-button`, `ui-alert`, `ui-dialog`, `ui-tabs`, `ui-popover`,
+`ui-theme` and `ui-compose`.
+
+`ui-compose` is the skill that shapes output for a component-based project: props
+typed from the contract table, a split only where a prop changes which parts render,
+sibling auk components composed rather than re-typed, and a component that renders
+alone. Every component skill's Build it points at it, so the set is meant to ship
+together: a selective install of one component skill still carries the four rules on
+that line, but the mapping itself lives in `ui-compose`.
 
 Both vendors load the tree and use it: see [docs/vendor-support.md](docs/vendor-support.md)
 for what actually happened, including what did not work.
@@ -62,7 +71,7 @@ The repository is both a plugin and its own marketplace.
 npx skills add shawn-sandy/agent-ui-skills
 ```
 
-One command installs the seven skills into Claude Code, Codex, Cursor, Copilot and the
+One command installs the eight skills into Claude Code, Codex, Cursor, Copilot and the
 other agents the CLI supports.
 
 **Claude Code**

@@ -69,6 +69,7 @@ guess and no reviewer has to arbitrate.
 | How does a component tell the host something changed? | It does not dispatch custom events. State lives in the DOM attributes above, and hosts listen to the native event (`click`, `change`) or observe the attribute. A shared event vocabulary is a thing to add once a component genuinely needs one. |
 | Where do behavioural options go? | Arguments to the init function, not DOM attributes: `initTabs(root, { wrap: false })`. `data-*` describes what the element *is*, never how the script should treat it. |
 | What belongs in the Props row? | Every attribute a consumer is expected to set or read, including ARIA ones. Attributes the module writes and nobody sets go in the Behaviour section instead. |
+| What does an agent emit in a component-based project? | The `ui-compose` mapping. `skills/ui-compose/references/ui-compose.md` maps every contract row to a typed prop, a hard-coded value, a derived value or the module's own attribute, and every component's Build it points at it with the four rules on the line: props from the contract table, split only on structure, compose sibling auk components, render alone. |
 | How is a union type written in a table cell? | With quoted values and the word `or`, not a pipe: `"true" or "false" or "mixed"`. A raw pipe breaks the table. |
 | What is the full custom property grammar? | `--auk-<component-slug>[-<variant-or-state>][-<part>]-<property>`. The property is always last; qualifiers sit between the component slug and the property, variant or state before part. `--auk-dialog-close-bg`, `--auk-alert-success-bg`, `--auk-tabs-selected-tab-border-block-end-color`. Segments are omitted when there is only one of the thing. |
 | How do skill names and component slugs map? | The skill name and directory are `ui-<component-slug>`. Strip exactly one leading `ui-` for the root class (`auk-icon-button`), custom properties, init function (`initIconButton`), React projection names and H1. |
@@ -201,8 +202,10 @@ One sentence: what it is.
 
 ## Build it
 1. Read `references/ui-<component-slug>.md`.
-2. Copy the Structure and Styles blocks; adapt only the template syntax to the stack.
-3. ...
+2. Copy the Structure and Styles blocks.
+3. In a component-based project, follow `ui-compose`: props from the contract table,
+   split only on structure, compose sibling auk components, render alone.
+4. ...
 
 ## Non-negotiable
 - the accessibility rules that must survive any port
@@ -282,7 +285,9 @@ Rules for the shape:
 Structure, styles and the accessibility contract are framework-agnostic. Only
 template syntax and reactivity binding are framework-specific, and neither belongs in
 a reference. No reference may name a framework, a preprocessor, a CSS-in-JS library
-or an external package.
+or an external package. A lowercase file extension names a file type, not a library,
+and is allowed: `ui-compose` lists the ones it reads to recognise a component-based
+project, and the portability lint is case-sensitive on whole words for that reason.
 
 The one exception is the required `references/react-demo.tsx` projection demo. It
 may name React and import React types or hooks because it is an adapter reference
@@ -368,6 +373,7 @@ Before a component is done:
 - [ ] Frontmatter uses standard keys only and `name` matches the directory with the `ui-` prefix.
 - [ ] Description is third person, pronoun-free, and covers oblique phrasing.
 - [ ] Body is under 100 lines and holds no component code.
+- [ ] Build it points at `ui-compose` with the four rules on the line.
 - [ ] Contract table has all seven rows, in order.
 - [ ] All five reference sections present, in order, one fenced block each.
 - [ ] Every themeable CSS value is `var(--auk-<component-slug>-*, literal)`.

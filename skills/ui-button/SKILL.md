@@ -33,10 +33,12 @@ cleanly to the contract, proceed and state any assumptions.
 
 1. Read `references/ui-button.md` for the markup, styles and accessibility contract.
 2. Copy the Structure block. Keep the element, `type`, `data-variant` and the ARIA
-   attributes exactly; adapt only template syntax to the target stack.
+   attributes exactly.
 3. Copy the Styles block as-is. It needs no custom properties to be defined - every
    value has a literal fallback. Override `--auk-button-*` to theme it.
-4. Open `references/demo.html` in a browser to check the result behaves the same.
+4. In a component-based project, follow `ui-compose`: props from the contract table,
+   split only on structure, compose sibling auk components, render alone.
+5. Open `references/demo.html` in a browser to check the result behaves the same.
 
 ## Non-negotiable
 
