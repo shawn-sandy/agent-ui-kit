@@ -6,30 +6,24 @@
  * counts the reference states in prose are measured, never typed on trust.
  */
 import { describe, expect, it } from 'vitest';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { skillKind } from '../../scripts/skill-kind.mjs';
+import { readProperties } from '../../scripts/auk-properties.mjs';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 const SKILLS_DIR = resolve(ROOT, 'skills');
 const reference = readFileSync(resolve(SKILLS_DIR, 'ui-theme/references/ui-theme.md'), 'utf8');
 
-/**
- * Brand-bearing: a colour, a corner radius or a type family. Everything else is a
- * size, spacing, duration or placement that tests/e2e/ measures and a theme leaves alone.
- */
-const BRAND = /-(?:color|bg|box-shadow|radius|font-family)$/;
 const COLOUR = /-(?:color|bg|box-shadow)$/;
 
-/** Every --auk-* property the component references read, measured from their css blocks. */
-const shipped = new Set<string>();
-for (const name of readdirSync(SKILLS_DIR)) {
-  if (skillKind(resolve(SKILLS_DIR, name)) !== 'component') continue;
-  const md = readFileSync(resolve(SKILLS_DIR, name, 'references', `${name}.md`), 'utf8');
-  const css = md.match(/```css\n([\s\S]*?)```/)?.[1] ?? '';
-  for (const m of css.matchAll(/var\((--auk-[a-z0-9-]+)/g)) shipped.add(m[1]);
-}
-const brandBearing = [...shipped].filter((p) => BRAND.test(p)).sort();
+/**
+ * Every --auk-* property the component references read, through the same parser that
+ * generates docs/properties.md, so the catalog and this table can never disagree.
+ * Brand-bearing is decided there: a colour, a corner radius or a type family.
+ */
+const properties = readProperties(SKILLS_DIR);
+const shipped = new Set(properties.map((p) => p.property));
+const brandBearing = properties.filter((p) => p.brand).map((p) => p.property).sort();
 
 /** The table rows under "## Mapping table", and every property their Properties cell names. */
 const section = reference.split('\n## Mapping table\n')[1]?.split('\n## ')[0] ?? '';

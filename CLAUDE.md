@@ -21,7 +21,11 @@ bash scripts/check.sh --prove               # what CI runs; adds failure proofs 
 npm test                                    # vitest only - the fast inner loop
 npm run test:e2e                            # Playwright only
 node scripts/build-demos.mjs                # regenerate demos from references
+node scripts/build-properties.mjs           # regenerate docs/properties.md from references
 ```
+
+`docs/properties.md` is generated from the references' css blocks and is never
+hand-edited; `tests/integration/properties-doc.spec.ts` fails when it drifts.
 
 There is no lint, format, or typecheck script and no ESLint/Prettier/Biome config.
 Do not add one. "Lint" here means `node scripts/lint-portability.mjs`, run from
@@ -88,7 +92,7 @@ under a context budget, so a trailing clause is lost.
 - `description` must be third person and free of first- and second-person pronouns
   (`tests/lib/frontmatter.ts`). The reflex phrasing "Use when you need..." fails.
 - `name` must match the directory and start with `ui-`.
-- `SKILL.md` body under 60 lines, with no component code fences.
+- `SKILL.md` body under 100 lines, with no component code fences.
 - Wrap reference prose at 88 columns. Tables, code fences, contract cells and the
   qualifier line are exempt.
 - Never estimate a measured number into a reference. Either `tests/e2e/` measures it at

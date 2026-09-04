@@ -76,6 +76,7 @@ guess and no reviewer has to arbitrate.
 | May a reference land without its `tests/e2e/` sibling? | No. A reference and the assertions backing its WCAG row land in the same change. |
 | Does the demo strip every `export `? | Yes, every occurrence at the start of a line. A module may export more than one thing. |
 | Are system colours exempt from the `var()` rule? | Yes, inside `@media (forced-colors: active)` only. Making `Highlight` or `GrayText` themeable would let a theme defeat the user's own high-contrast setting. The same exemption covers any value that exists to honour a user setting - the `0s` inside `@media (prefers-reduced-motion: reduce)` stays literal for exactly that reason. |
+| Why is the css block wrapped in `@layer auk { }`? | So a plain rule in the consuming project beats the component whatever its load order or specificity: the cascade ranks every unlayered declaration above every layered one, and six blocks sharing the one name merge into one layer. The cost is that an unlayered project reset outranks the component too, so the Styles prose tells the consumer to keep reset and base rules in a layer declared before `auk` and to set a `--auk-*` property on `:root`, an ancestor or the element. The full guide is `docs/theming.md`. |
 | What does the Structure block show? | Every variant and state named in the contract, as sibling examples in one block. The demo mirrors it. |
 | How wide is the prose? | Wrapped at 88 columns. The H1 is `# <Component> reference`. Prose between the H1 and `## Contract` is allowed. |
 | Does the 88-column rule cover tables and code? | No. Prose only, and only prose that can wrap. A contract cell, the qualifier line and a fenced block each stay on one line or wrap where they read best, however long that runs. |
@@ -166,7 +167,7 @@ component's scope is set by its contract table, not by this paragraph.
 
 ### Body
 
-Under 60 lines, and it contains **no component code**. Its only job is to point at
+Under 100 lines, and it contains **no component code**. Its only job is to point at
 the reference and state the rules an agent must not get wrong.
 
 ```markdown
@@ -260,6 +261,9 @@ Rules for the shape:
    questions), then plain CSS. Every themeable value is
    `var(--auk-<component-slug>-<prop>, <literal>)`. The fallback makes the component work
    with no custom properties defined anywhere; the variable makes it theme cleanly.
+   The whole block is wrapped in `@layer auk { }` with the body indented two spaces,
+   so a rule the consumer writes outside any layer wins over it; the prose above the
+   block says where an override goes (see the settled questions).
 3. **Behaviour** — a dependency-free ES module exporting `init<Component>(root)`. It
    may export other helpers, but that init function must exist and must return a
    teardown. No package import, no build syntax, no framework hook.
@@ -332,7 +336,7 @@ test.
 Six gates, in order. Any failure stops the run.
 
 1. **Vitest** — `tests/objective.spec.ts` (frontmatter conforms, no vendor token,
-   demo matches reference), `tests/unit/frontmatter.spec.ts` (the validator itself),
+   css wrapped in `@layer auk`, demo matches reference), `tests/unit/frontmatter.spec.ts` (the validator itself),
    `tests/unit/skill-kind.spec.ts` (the workflow partition, section 9),
    `tests/integration/manifests.spec.ts` (both plugin manifests agree).
 2. **Portability lint** — `scripts/lint-portability.mjs`, over `skills/` only,
@@ -357,10 +361,11 @@ Before a component is done:
 
 - [ ] Frontmatter uses standard keys only and `name` matches the directory with the `ui-` prefix.
 - [ ] Description is third person, pronoun-free, and covers oblique phrasing.
-- [ ] Body is under 60 lines and holds no component code.
+- [ ] Body is under 100 lines and holds no component code.
 - [ ] Contract table has all seven rows, in order.
 - [ ] All five reference sections present, in order, one fenced block each.
 - [ ] Every themeable CSS value is `var(--auk-<component-slug>-*, literal)`.
+- [ ] The css block is wrapped in `@layer auk { }` and the Styles prose says where an override goes.
 - [ ] No framework, preprocessor or package named outside the scoped React projection reference.
 - [ ] `references/react-demo.tsx` exists as a typed React projection reference.
 - [ ] Demo opens from `file://` and matches the reference verbatim.
@@ -386,7 +391,7 @@ no `kind`, a file that fails to parse - is a component, so a directory never esc
 the strict gates by being unreadable.
 
 A workflow skill keeps these rules: the `ui-` name matching its directory, the
-frontmatter rules in section 1, the body rules (under 60 lines, no component code,
+frontmatter rules in section 1, the body rules (under 100 lines, no component code,
 the `## Clarify when needed` heading with its vocabulary), the portability lint over
 every file it ships, the external-resource guard, and the three evaluation scenarios
 in section 4. It stays public - it never sets `metadata.internal` - and the plugin

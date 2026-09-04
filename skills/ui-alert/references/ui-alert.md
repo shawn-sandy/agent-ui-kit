@@ -69,61 +69,70 @@ nothing until a message arrives. The severity label is visually hidden rather th
 removed: sighted users read the icon and the colour, screen reader users hear the
 word.
 
+The block declares the `auk` cascade layer, so a rule written outside any layer wins
+over it whatever its order or specificity. A project's own reset and base rules must
+therefore sit in a layer declared before `auk`, for example `@layer reset, auk;`, with
+`auk` ahead of the project's utility layers; an unlayered reset outranks the component
+and strips its padding. Set a `--auk-alert-*` property on `:root` for every instance,
+on an ancestor for one region, or on the element itself for one instance.
+
 ```css
-.auk-alert {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--auk-alert-gap, 0.625rem);
-  padding-block: var(--auk-alert-padding-block, 0.75rem);
-  padding-inline: var(--auk-alert-padding-inline, 1rem);
-  border: var(--auk-alert-border-width, 1px) solid var(--auk-alert-border-color, #1e3a8a);
-  border-radius: var(--auk-alert-radius, 0.375rem);
-  font-family: var(--auk-alert-font-family, inherit);
-  font-size: var(--auk-alert-font-size, 1rem);
-  line-height: var(--auk-alert-line-height, 1.5);
-  color: var(--auk-alert-color, #1e3a8a);
-  background-color: var(--auk-alert-bg, #dbeafe);
-}
+@layer auk {
+  .auk-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--auk-alert-gap, 0.625rem);
+    padding-block: var(--auk-alert-padding-block, 0.75rem);
+    padding-inline: var(--auk-alert-padding-inline, 1rem);
+    border: var(--auk-alert-border-width, 1px) solid var(--auk-alert-border-color, #1e3a8a);
+    border-radius: var(--auk-alert-radius, 0.375rem);
+    font-family: var(--auk-alert-font-family, inherit);
+    font-size: var(--auk-alert-font-size, 1rem);
+    line-height: var(--auk-alert-line-height, 1.5);
+    color: var(--auk-alert-color, #1e3a8a);
+    background-color: var(--auk-alert-bg, #dbeafe);
+  }
 
-.auk-alert:empty,
-.auk-alert:not(:has([data-part="message"]:not(:empty))) {
-  display: none;
-}
+  .auk-alert:empty,
+  .auk-alert:not(:has([data-part="message"]:not(:empty))) {
+    display: none;
+  }
 
-.auk-alert[data-variant="success"] {
-  color: var(--auk-alert-success-color, #14532d);
-  background-color: var(--auk-alert-success-bg, #dcfce7);
-  border-color: var(--auk-alert-success-border-color, #14532d);
-}
+  .auk-alert[data-variant="success"] {
+    color: var(--auk-alert-success-color, #14532d);
+    background-color: var(--auk-alert-success-bg, #dcfce7);
+    border-color: var(--auk-alert-success-border-color, #14532d);
+  }
 
-.auk-alert[data-variant="warning"] {
-  color: var(--auk-alert-warning-color, #78350f);
-  background-color: var(--auk-alert-warning-bg, #fef3c7);
-  border-color: var(--auk-alert-warning-border-color, #78350f);
-}
+  .auk-alert[data-variant="warning"] {
+    color: var(--auk-alert-warning-color, #78350f);
+    background-color: var(--auk-alert-warning-bg, #fef3c7);
+    border-color: var(--auk-alert-warning-border-color, #78350f);
+  }
 
-.auk-alert[data-variant="error"] {
-  color: var(--auk-alert-error-color, #b91c1c);
-  background-color: var(--auk-alert-error-bg, #fee2e2);
-  border-color: var(--auk-alert-error-border-color, #b91c1c);
-}
+  .auk-alert[data-variant="error"] {
+    color: var(--auk-alert-error-color, #b91c1c);
+    background-color: var(--auk-alert-error-bg, #fee2e2);
+    border-color: var(--auk-alert-error-border-color, #b91c1c);
+  }
 
-.auk-alert [data-part="icon"] {
-  flex: none;
-  font-size: var(--auk-alert-icon-size, 1.125rem);
-  line-height: var(--auk-alert-line-height, 1.5);
-}
+  .auk-alert [data-part="icon"] {
+    flex: none;
+    font-size: var(--auk-alert-icon-size, 1.125rem);
+    line-height: var(--auk-alert-line-height, 1.5);
+  }
 
-.auk-alert [data-part="severity"] {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
+  .auk-alert [data-part="severity"] {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
 }
 ```
 
