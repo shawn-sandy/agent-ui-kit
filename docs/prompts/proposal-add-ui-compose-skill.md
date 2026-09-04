@@ -5,7 +5,7 @@ techniques: Long-context grounding, XML structure, Comparison tables, Positive f
 created: 2026-09-04
 modified: 2026-09-04
 status: converged
-generated-sha: 45fa8a583d5f8bddfc32794285c07b0d99b13ae00b8994b6f022d563fdfacd8e
+generated-sha: 833f8b279085a06145a1e5ae8134afdf27c3879c96aa075f8276184ac9395c76
 ---
 
 # Proposal: Add a ui-compose workflow skill so agent-built components follow Component Driven Design in component-based projects
@@ -205,7 +205,7 @@ assertion in `tests/objective.spec.ts`.
   template syntax to the target stack" in `ui-box` and `ui-button`, so the framework case has one
   owner.
 - A new every-skill assertion next to the Clarify one (`tests/objective.spec.ts:83-92`): the body
-  matches `/^\d+\. In a component-based project, follow `ui-compose`/m` for every component skill.
+  matches ``/^\d+\. In a component-based project, follow `ui-compose`/m`` for every component skill.
   Workflow skills are exempt.
 - Line budget after the change: popover 59, box 56, dialog 54, tabs 52, alert 50, button 47.
 
@@ -237,9 +237,10 @@ assertion in `tests/objective.spec.ts`.
 objective assertion from B, the evals from A.
 
 - The unit test mirrors `tests/unit/ui-theme-mapping.spec.ts`: every row name the mapping table
-  maps is one of the seven contract rows (`tests/objective.spec.ts:33`); every entry in every
-  component's `Props` row is covered by exactly one mapping rule (choice, fixed, boolean,
-  reference); the counts stated in the reference prose are measured from the six contract tables.
+  maps is one of the seven contract rows (`tests/objective.spec.ts:33`) or the qualifier line;
+  every entry in every component's `Props` row is covered by exactly one mapping rule (choice,
+  fixed, boolean, string, reference); the counts stated in the reference prose are measured from
+  the six contract tables.
 - What this proves: the guidance is present, complete against the contracts, and named in every
   component skill. What it does not prove: that an agent follows it. That needs Phase 5.
 </workstreams>
@@ -292,8 +293,9 @@ Appendix A - Contract row to public surface (grounded on the six contract tables
 |---|---|---|
 | `Element` | The component owns exactly one root, carrying the `auk-<slug>` class verbatim | `ui-button`: `<button>`; `ui-dialog`: `<dialog>`; `ui-tabs`: a `<div>` wrapping the tablist and panels |
 | `Props`, an entry with a choice | A prop named without its `data-` or `aria-` prefix, typed as the union | `data-variant` `"primary" \| "secondary" \| "destructive"` becomes `variant`; `popover` `"auto"` or `"manual"` becomes `mode` |
-| `Props`, an entry with one fixed value | Hard-coded in the root, never a prop | `ui-alert` `aria-atomic="true"`; `ui-popover` `role="group"` |
-| `Props`, a boolean attribute | A boolean prop, named for the state it expresses | `aria-disabled="true"` becomes `unavailable`; `data-icon-only` becomes `iconOnly`; `hidden` on a panel is derived from selection, not a prop |
+| `Props`, an entry with one fixed value, marked required | Hard-coded in the root, never a prop | `ui-alert` `aria-atomic="true"`; `ui-popover` `role="group"` |
+| `Props`, a boolean attribute, or a single-valued attribute that is absent by default | A boolean prop, named for the state it expresses | `aria-disabled="true"` becomes `unavailable`; `data-icon-only` becomes `iconOnly`; `hidden` on a panel is derived from selection, not a prop |
+| `Props`, a string entry | A string prop, required when the contract marks it required, otherwise optional | `id` on the dialog, the popover and every tab and panel; `aria-label` on an icon-only button |
 | `Props`, an id reference | Either generated inside the component or a required prop when the referent lives outside it | `aria-labelledby` on the dialog is generated from the heading slot; `data-dialog-open="<id>"` on an opener is a required prop of the opener |
 | `Slots` | Children, or a named slot per `data-part`; the part attribute is emitted verbatim | `ui-dialog`: `header`, `body`, `footer`; `ui-button`: children are the label, an icon child carries `data-part="icon"` |
 | `Variants` | The `variant` union; styling only, passes through to `data-variant`; never one boolean per variant | `ui-alert`: `info`, `success`, `warning`, `error`; `ui-box`: `invert` |
