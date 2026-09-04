@@ -95,11 +95,14 @@ describe.each(skills)('skills/%s', (name) => {
   // The pointer line is what carries the ui-compose rules into a selective install of
   // one component skill, so every component names it at a numbered Build it step with
   // all four rules on the line. Continuation indents are flattened first, so the line
-  // may wrap wherever it reads best. Workflow skills are exempt: they are the target.
+  // may wrap wherever it reads best. Only the Build it section is searched: the pointer
+  // is a step, and a matching sentence anywhere else would let the step itself be
+  // removed without this gate noticing. Workflow skills are exempt: they are the target.
   component('Build it points at ui-compose with the four rules on the line', () => {
     const source = readFileSync(skillPath, 'utf8');
     const body = source.replace(/^---\n[\s\S]*?\n---\n/, '').replace(/\n[ \t]+/g, ' ');
-    expect(body).toMatch(
+    const buildIt = body.split('\n## Build it\n')[1]?.split('\n## ')[0] ?? '';
+    expect(buildIt).toMatch(
       /^\d+\. In a component-based project, follow `ui-compose`: props from the contract table, split only on structure, compose sibling auk components, render alone\.$/m,
     );
   });
