@@ -45,64 +45,73 @@ correctly with no custom properties defined anywhere. The unavailable state uses
 muted palette rather than reduced opacity, because opacity lowers contrast below the
 1.4.3 threshold and an unavailable control still has to be readable.
 
+The block declares the `auk` cascade layer, so a rule written outside any layer wins
+over it whatever its order or specificity. A project's own reset and base rules must
+therefore sit in a layer declared before `auk`, for example `@layer reset, auk;`, with
+`auk` ahead of the project's utility layers; an unlayered reset outranks the component
+and strips its padding. Set a `--auk-button-*` property on `:root` for every instance,
+on an ancestor for one region, or on the element itself for one instance.
+
 ```css
-.auk-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--auk-button-gap, 0.5rem);
-  min-block-size: var(--auk-button-min-size, 2.75rem);
-  min-inline-size: var(--auk-button-min-size, 2.75rem);
-  padding-block: var(--auk-button-padding-block, 0.625rem);
-  padding-inline: var(--auk-button-padding-inline, 1rem);
-  border: var(--auk-button-border-width, 1px) solid var(--auk-button-border-color, transparent);
-  border-radius: var(--auk-button-radius, 0.375rem);
-  font-family: var(--auk-button-font-family, inherit);
-  font-size: var(--auk-button-font-size, 1rem);
-  font-weight: var(--auk-button-font-weight, 600);
-  line-height: var(--auk-button-line-height, 1.25);
-  color: var(--auk-button-color, #ffffff);
-  background-color: var(--auk-button-bg, #1a56db);
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.auk-button[data-variant="secondary"] {
-  color: var(--auk-button-secondary-color, #1f2937);
-  background-color: var(--auk-button-secondary-bg, #ffffff);
-  border-color: var(--auk-button-secondary-border-color, #6b7280);
-}
-
-.auk-button[data-variant="destructive"] {
-  color: var(--auk-button-destructive-color, #ffffff);
-  background-color: var(--auk-button-destructive-bg, #b91c1c);
-}
-
-.auk-button[data-icon-only] {
-  padding-inline: var(--auk-button-icon-padding-inline, 0.625rem);
-}
-
-.auk-button:hover:not([aria-disabled="true"]) {
-  filter: brightness(var(--auk-button-hover-brightness, 0.92));
-}
-
-.auk-button:focus-visible {
-  outline: var(--auk-button-focus-width, 3px) solid var(--auk-button-focus-color, #111827);
-  outline-offset: var(--auk-button-focus-offset, 2px);
-}
-
-.auk-button[aria-disabled="true"] {
-  color: var(--auk-button-disabled-color, #ffffff);
-  background-color: var(--auk-button-disabled-bg, #6b7280);
-  border-color: var(--auk-button-disabled-border-color, transparent);
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
+@layer auk {
   .auk-button {
-    transition: filter var(--auk-button-transition-duration, 120ms) ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--auk-button-gap, 0.5rem);
+    min-block-size: var(--auk-button-min-size, 2.75rem);
+    min-inline-size: var(--auk-button-min-size, 2.75rem);
+    padding-block: var(--auk-button-padding-block, 0.625rem);
+    padding-inline: var(--auk-button-padding-inline, 1rem);
+    border: var(--auk-button-border-width, 1px) solid var(--auk-button-border-color, transparent);
+    border-radius: var(--auk-button-radius, 0.375rem);
+    font-family: var(--auk-button-font-family, inherit);
+    font-size: var(--auk-button-font-size, 1rem);
+    font-weight: var(--auk-button-font-weight, 600);
+    line-height: var(--auk-button-line-height, 1.25);
+    color: var(--auk-button-color, #ffffff);
+    background-color: var(--auk-button-bg, #1a56db);
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .auk-button[data-variant="secondary"] {
+    color: var(--auk-button-secondary-color, #1f2937);
+    background-color: var(--auk-button-secondary-bg, #ffffff);
+    border-color: var(--auk-button-secondary-border-color, #6b7280);
+  }
+
+  .auk-button[data-variant="destructive"] {
+    color: var(--auk-button-destructive-color, #ffffff);
+    background-color: var(--auk-button-destructive-bg, #b91c1c);
+  }
+
+  .auk-button[data-icon-only] {
+    padding-inline: var(--auk-button-icon-padding-inline, 0.625rem);
+  }
+
+  .auk-button:hover:not([aria-disabled="true"]) {
+    filter: brightness(var(--auk-button-hover-brightness, 0.92));
+  }
+
+  .auk-button:focus-visible {
+    outline: var(--auk-button-focus-width, 3px) solid var(--auk-button-focus-color, #111827);
+    outline-offset: var(--auk-button-focus-offset, 2px);
+  }
+
+  .auk-button[aria-disabled="true"] {
+    color: var(--auk-button-disabled-color, #ffffff);
+    background-color: var(--auk-button-disabled-bg, #6b7280);
+    border-color: var(--auk-button-disabled-border-color, transparent);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .auk-button {
+      transition: filter var(--auk-button-transition-duration, 120ms) ease;
+    }
   }
 }
 ```

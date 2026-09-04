@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { validateSkill } from './lib/frontmatter.js';
+import { layerProblem } from './lib/layer.js';
 import { RULES, shouldLintFile } from '../scripts/lint-portability.mjs';
 import { skillKind } from '../scripts/skill-kind.mjs';
 
@@ -166,6 +167,15 @@ describe.each(skills)('skills/%s', (name) => {
     }
     // A nested var() inside the fallback would defeat the standalone guarantee.
     expect(css!).not.toMatch(/var\([^)]*var\(/);
+  });
+
+  component('reference css is wrapped in the auk cascade layer', () => {
+    // One shared layer name across every component. An unlayered rule the user writes
+    // then outranks all of it, whatever its order or specificity - see docs/theming.md.
+    // The check itself lives in tests/lib/layer.ts so tests/unit/layer.spec.ts can pin
+    // the shapes it must reject, an early-closed layer among them.
+    const css = fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!;
+    expect(layerProblem(css)).toBeNull();
   });
 
   component('demo works with no custom properties defined anywhere', () => {

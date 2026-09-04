@@ -65,75 +65,84 @@ Qualifiers: parts `header`, `title`, `body`, `footer`, `close`, `backdrop`; vari
 `<dialog>` is `display: none` until opened, so the visible rules are scoped to `[open]`.
 `::backdrop` is a real pseudo-element on the top layer; it needs no overlay div.
 
+The block declares the `auk` cascade layer, so a rule written outside any layer wins
+over it whatever its order or specificity. A project's own reset and base rules must
+therefore sit in a layer declared before `auk`, for example `@layer reset, auk;`, with
+`auk` ahead of the project's utility layers; an unlayered reset outranks the component
+and strips its padding. Set a `--auk-dialog-*` property on `:root` for every instance,
+on an ancestor for one region, or on the element itself for one instance.
+
 ```css
-.auk-dialog {
-  padding: 0;
-  border: var(--auk-dialog-border-width, 1px) solid var(--auk-dialog-border-color, #d1d5db);
-  border-radius: var(--auk-dialog-radius, 0.5rem);
-  inline-size: var(--auk-dialog-inline-size, min(32rem, calc(100vw - 2rem)));
-  max-block-size: var(--auk-dialog-max-block-size, calc(100vh - 4rem));
-  font-family: var(--auk-dialog-font-family, inherit);
-  color: var(--auk-dialog-color, #111827);
-  background-color: var(--auk-dialog-bg, #ffffff);
-}
+@layer auk {
+  .auk-dialog {
+    padding: 0;
+    border: var(--auk-dialog-border-width, 1px) solid var(--auk-dialog-border-color, #d1d5db);
+    border-radius: var(--auk-dialog-radius, 0.5rem);
+    inline-size: var(--auk-dialog-inline-size, min(32rem, calc(100vw - 2rem)));
+    max-block-size: var(--auk-dialog-max-block-size, calc(100vh - 4rem));
+    font-family: var(--auk-dialog-font-family, inherit);
+    color: var(--auk-dialog-color, #111827);
+    background-color: var(--auk-dialog-bg, #ffffff);
+  }
 
-.auk-dialog::backdrop {
-  background-color: var(--auk-dialog-backdrop-bg, rgba(17, 24, 39, 0.6));
-}
+  .auk-dialog::backdrop {
+    background-color: var(--auk-dialog-backdrop-bg, rgba(17, 24, 39, 0.6));
+  }
 
-.auk-dialog[open] {
-  display: flex;
-  flex-direction: column;
-}
+  .auk-dialog[open] {
+    display: flex;
+    flex-direction: column;
+  }
 
-.auk-dialog [data-part="header"] {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--auk-dialog-gap, 1rem);
-  padding: var(--auk-dialog-padding, 1.25rem);
-  border-block-end: var(--auk-dialog-divider-width, 1px) solid var(--auk-dialog-divider-color, #e5e7eb);
-}
+  .auk-dialog [data-part="header"] {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--auk-dialog-gap, 1rem);
+    padding: var(--auk-dialog-padding, 1.25rem);
+    border-block-end: var(--auk-dialog-divider-width, 1px) solid var(--auk-dialog-divider-color, #e5e7eb);
+  }
 
-.auk-dialog [data-part="header"] h2 {
-  margin: 0;
-  font-size: var(--auk-dialog-title-size, 1.125rem);
-  line-height: var(--auk-dialog-title-line-height, 1.4);
-}
+  .auk-dialog [data-part="header"] h2 {
+    margin: 0;
+    font-size: var(--auk-dialog-title-size, 1.125rem);
+    line-height: var(--auk-dialog-title-line-height, 1.4);
+  }
 
-.auk-dialog [data-part="body"] {
-  padding: var(--auk-dialog-padding, 1.25rem);
-  overflow-y: auto;
-  color: var(--auk-dialog-body-color, #374151);
-  line-height: var(--auk-dialog-line-height, 1.5);
-}
+  .auk-dialog [data-part="body"] {
+    padding: var(--auk-dialog-padding, 1.25rem);
+    overflow-y: auto;
+    color: var(--auk-dialog-body-color, #374151);
+    line-height: var(--auk-dialog-line-height, 1.5);
+  }
 
-.auk-dialog [data-part="footer"] {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--auk-dialog-gap, 1rem);
-  padding: var(--auk-dialog-padding, 1.25rem);
-  border-block-start: var(--auk-dialog-divider-width, 1px) solid var(--auk-dialog-divider-color, #e5e7eb);
-}
+  .auk-dialog [data-part="footer"] {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--auk-dialog-gap, 1rem);
+    padding: var(--auk-dialog-padding, 1.25rem);
+    border-block-start: var(--auk-dialog-divider-width, 1px) solid var(--auk-dialog-divider-color, #e5e7eb);
+  }
 
-.auk-dialog-close {
-  flex: none;
-  min-inline-size: var(--auk-dialog-close-size, 2.75rem);
-  min-block-size: var(--auk-dialog-close-size, 2.75rem);
-  border: var(--auk-dialog-close-border-width, 1px) solid var(--auk-dialog-close-border-color, transparent);
-  border-radius: var(--auk-dialog-close-radius, 0.375rem);
-  font-family: var(--auk-dialog-font-family, inherit);
-  font-size: var(--auk-dialog-close-font-size, 1.25rem);
-  color: var(--auk-dialog-close-color, #1f2937);
-  background-color: var(--auk-dialog-close-bg, transparent);
-  cursor: pointer;
-}
+  .auk-dialog-close {
+    flex: none;
+    min-inline-size: var(--auk-dialog-close-size, 2.75rem);
+    min-block-size: var(--auk-dialog-close-size, 2.75rem);
+    border: var(--auk-dialog-close-border-width, 1px) solid var(--auk-dialog-close-border-color, transparent);
+    border-radius: var(--auk-dialog-close-radius, 0.375rem);
+    font-family: var(--auk-dialog-font-family, inherit);
+    font-size: var(--auk-dialog-close-font-size, 1.25rem);
+    color: var(--auk-dialog-close-color, #1f2937);
+    background-color: var(--auk-dialog-close-bg, transparent);
+    cursor: pointer;
+  }
 
-.auk-dialog-close:focus-visible,
-.auk-dialog [data-part="footer"] .auk-button:focus-visible {
-  outline: var(--auk-dialog-focus-width, 3px) solid var(--auk-dialog-focus-color, #111827);
-  outline-offset: var(--auk-dialog-focus-offset, 2px);
+  .auk-dialog-close:focus-visible,
+  .auk-dialog [data-part="footer"] .auk-button:focus-visible {
+    outline: var(--auk-dialog-focus-width, 3px) solid var(--auk-dialog-focus-color, #111827);
+    outline-offset: var(--auk-dialog-focus-offset, 2px);
+  }
 }
 ```
 

@@ -17,21 +17,23 @@ p + p { margin-block-start: 0.5rem; }
 section { margin-block-end: 1.5rem; max-inline-size: 34rem; }
 
 /* Generated from ui-box.md by scripts/build-demos.mjs. Edit the reference, not this. */
-.auk-box {
-  box-sizing: border-box;
-  display: block;
-  padding: var(--auk-box-padding, 1rem);
-  border: var(--auk-box-border-width, 1px) solid var(--auk-box-border-color, transparent);
-  border-radius: var(--auk-box-radius, 0.375rem);
-  min-block-size: var(--auk-box-min-block-size, auto);
-  color: var(--auk-box-color, #1f2937);
-  background-color: var(--auk-box-bg, #ffffff);
-}
+@layer auk {
+  .auk-box {
+    box-sizing: border-box;
+    display: block;
+    padding: var(--auk-box-padding, 1rem);
+    border: var(--auk-box-border-width, 1px) solid var(--auk-box-border-color, transparent);
+    border-radius: var(--auk-box-radius, 0.375rem);
+    min-block-size: var(--auk-box-min-block-size, auto);
+    color: var(--auk-box-color, #1f2937);
+    background-color: var(--auk-box-bg, #ffffff);
+  }
 
-.auk-box[data-variant="invert"] {
-  color: var(--auk-box-invert-color, #f9fafb);
-  background-color: var(--auk-box-invert-bg, #1f2937);
-  border-color: var(--auk-box-invert-border-color, transparent);
+  .auk-box[data-variant="invert"] {
+    color: var(--auk-box-invert-color, #f9fafb);
+    background-color: var(--auk-box-invert-bg, #1f2937);
+    border-color: var(--auk-box-invert-border-color, transparent);
+  }
 }
 </style>
 </head>

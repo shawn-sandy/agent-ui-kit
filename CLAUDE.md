@@ -21,7 +21,11 @@ bash scripts/check.sh --prove               # what CI runs; adds failure proofs 
 npm test                                    # vitest only - the fast inner loop
 npm run test:e2e                            # Playwright only
 node scripts/build-demos.mjs                # regenerate demos from references
+node scripts/build-properties.mjs           # regenerate docs/properties.md from references
 ```
+
+`docs/properties.md` is generated from the references' css blocks and is never
+hand-edited; `tests/integration/properties-doc.spec.ts` fails when it drifts.
 
 There is no lint, format, or typecheck script and no ESLint/Prettier/Biome config.
 Do not add one. "Lint" here means `node scripts/lint-portability.mjs`, run from

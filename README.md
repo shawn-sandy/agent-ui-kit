@@ -134,6 +134,10 @@ demo that drifts from its reference fails the build.
   reaches the right skill, measured across three models.
 - [docs/vendor-support.md](docs/vendor-support.md) - what each vendor did with the
   tree, including the failures.
+- [docs/theming.md](docs/theming.md) - the three ways to restyle a component, and
+  the layer order a project declares so its own reset does not undo one.
+- [docs/properties.md](docs/properties.md) - every `--auk-*` property with its
+  fallback and kind, generated from the references.
 
 ## Principles
 
