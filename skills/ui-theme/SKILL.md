@@ -1,6 +1,6 @@
 ---
 name: ui-theme
-description: Theme workflow - binds a project's design system, whether a DTCG token file, Figma variables or a stylesheet's own tokens, to the auk role layer, so every component built from the ui- skills wears the project's brand instead of the shipped defaults. Emits at most 23 --auk-role-* lines beside the shipped roles file. Use when a design system, token file, Figma file or palette should drive the components, when they look off next to the rest of the page, when a dark or high-contrast scheme must apply to them, or when a request asks to match, re-skin or restyle auk components. Not for restyling elements that are not auk components, not for making one component differ from the brand, and not for building a component.
+description: Theme workflow - binds a design system to the auk role layer. Emits up to 23 --auk-role-* lines from tokens or Figma. Use when components must match a brand or dark scheme. Not for non-auk elements.
 license: MIT
 metadata:
   kind: workflow

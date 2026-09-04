@@ -1,6 +1,6 @@
 ---
 name: ui-dialog
-description: Accessible modal dialog - an overlay that blocks the page until dismissed. Use when adding a modal, a confirmation step, a blocking popup, or an overlay the keyboard must not escape, including focus trapping, Escape handling, and returning focus to the opener. Not a non-blocking alert.
+description: Accessible modal dialog - an overlay that blocks the page until dismissed. Use when adding a modal or confirmation step with focus trapping, Escape handling and focus return. Not a non-blocking alert.
 license: MIT
 ---
 
