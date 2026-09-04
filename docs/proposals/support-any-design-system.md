@@ -2,6 +2,7 @@
 status: proposal
 type: feature
 created: 2026-09-04
+modified: 2026-09-04
 repo-name: agent-ui-skills
 artifact-url: https://claude.ai/code/artifact/fe77138e-4ea8-4b51-a6de-a31057fa5653
 ---
@@ -15,7 +16,7 @@ artifact-url: https://claude.ai/code/artifact/fe77138e-4ea8-4b51-a6de-a31057fa56
 > This is a proposal for review, not an execution plan. It captures a survey of twelve
 > design systems and the token standard, measured against the repository's own theming
 > surface, and proposes publishing the role layer as the integration contract. The
-> load-bearing decisions are resolved (see Locked decisions); three remain open (see Open
+> load-bearing decisions are resolved (see Locked decisions); two remain open (see Open
 > questions); execution is handed off (see Next step).
 
 ## TL;DR
@@ -39,8 +40,9 @@ artifact-url: https://claude.ai/code/artifact/fe77138e-4ea8-4b51-a6de-a31057fa56
   density, token-file and Figma discovery in ui-theme, and generated per-component anatomy so
   Figma layer and variant names match `data-part` and `data-variant` one to one.
 - Nothing installs, nothing runs at runtime, every component still works with no property
-  defined anywhere, and the standalone guarantee the gates enforce stays untouched. Three
-  decisions remain with the human (see open questions).
+  defined anywhere, and the standalone guarantee the gates enforce stays untouched. The
+  design-side record is a generated design canvas, with a Figma kit built from it only on
+  request. Two decisions remain with the human (see open questions).
 
 ## Context
 
@@ -269,7 +271,26 @@ Resolved in the 2026-09-04 draft (author defaults, reversible at plan time):
 15. **Rejected for this repository, with reasons recorded in Appendix F:** shadow DOM and
     `::part()`, `@property` registration, a JavaScript theme provider, utility-class-only
     theming, `data-size` variants in contract tables, and shipped dark defaults via
-    `light-dark()` (pending open question 3).
+    `light-dark()` (pending open question 2).
+
+Resolved with the maintainer on 2026-09-04:
+
+16. **The design-side record is a generated design canvas, not a Figma kit.** A generator
+    renders one `.dc.html` artboard per component - anatomy, variants and states, tokens -
+    plus a Foundations artboard from the tokens file, into `docs/designs/components/`, from
+    the same block extraction the demo builder uses and the same property parser the tokens
+    file uses. Artboards are HTML, so the real shipped CSS paints the real component and a
+    check can prove the canvas matches the references; a Figma kit has to translate that CSS
+    into nodes, which the Figma MCP server's own procedure sizes at 20 to 100 write calls per
+    build, and drifts on the next reference edit. An internal skill under `.claude/skills/`
+    runs the generator, publishes through the built-in design skill and lets the artifacts
+    hook record the URL, exactly as the existing canvas under `docs/designs/` was recorded.
+    Nothing about the canvas goes under `skills/`: the artboard format is vendor-specific and
+    the public tree stays vendor-neutral; the tokens file remains the design-side contract.
+    A Figma kit, if a team asks for one, is built later from the canvas with the Figma MCP
+    server's `figma-generate-design` procedure, which takes an HTML page as its input.
+    Propagates to Workstreams D and G, Roadmap phases 7 and 8, Appendix E and F; closes the
+    former open question on a Figma kit.
 
 ## Workstreams
 
@@ -340,9 +361,10 @@ Resolved in the 2026-09-04 draft (author defaults, reversible at plan time):
   plan, a Code Connect template for the button that maps `Variant` to `data-variant` and
   `State=Disabled` to `aria-disabled="true"`. The template lives in `docs/`, not `skills/`,
   because it imports a package.
-- The `figma-generate-library` procedure the Figma MCP server ships can build the collection
-  and the component set from the tokens file; the proposal records the procedure and leaves
-  building a published community kit to a later phase (open question 2).
+- The design-side record is the generated canvas in Workstream G. The `figma-generate-library`
+  procedure the Figma MCP server ships can still build a variable collection and component
+  set from the tokens file; the proposal records the procedure and builds a published Figma
+  kit only when a team asks, from the canvas (decision 16).
 
 **E - Rules and guidelines.** The standard the ask requests, written once each.
 
@@ -363,6 +385,33 @@ Resolved in the 2026-09-04 draft (author defaults, reversible at plan time):
 shadcn", "our tokens are in Figma", "bind our Style Dictionary output") and one adjacent
 scenario that asks for a component-level override and must not bind a role. Recorded in
 `docs/evaluations.md` after a run, failures included.
+
+**G - The design canvas.** Generated from the references, published as a canvas, checked
+like every other generated file.
+
+- `scripts/build-design.mjs` reads each component reference through the demo builder's
+  block extraction and `scripts/auk-properties.mjs`, and writes
+  `docs/designs/components/<slug>.dc.html` with three panels: anatomy (the Structure block
+  with each `data-part` labelled), variants and states (the instances the demo renders, with
+  dialog and popover shown open by inlining the reference's script the way the demos do), and
+  tokens (the roles the component reads, its properties, the shipped fallbacks). It also
+  writes `foundations.dc.html` from the tokens file - the roles as chips with their shipped
+  values - and `canvas.json` laying the artboards out Foundations first, then components.
+- Two modes. Default renders the shipped fallbacks. `--roles <file>` binds a roles block over
+  the same artboards, so a design-system team reviews its own brand on the canvas without
+  opening Figma, and the specimen on the proposal page becomes an artboard pair.
+- `.claude/skills/design-kit/SKILL.md`, internal and not model-invocable like
+  `new-component`: runs the generator, hands the artboards to the built-in design skill to
+  publish, and moves the row the artifacts hook appends into the Designs table of
+  `docs/artifacts.md`.
+- `tests/integration/design-canvas.spec.ts` asserts every generated artboard and
+  `canvas.json` equal the generator's output byte for byte, the same pattern as
+  `docs/properties.md` and the tokens file.
+- Nothing under `skills/` names the canvas or its format. The public, vendor-neutral
+  design-side contract is the tokens file (Workstream A); the canvas is the maintainer's
+  record and review surface.
+- Bridge: `figma-generate-design` takes an HTML page and builds it in Figma, so a Figma kit
+  starts from the canvas rather than from scratch when one is wanted.
 
 ## Risks & tensions
 
@@ -396,6 +445,10 @@ scenario that asks for a component-level override and must not bind a role. Reco
 - **Renames are the pain every surveyed system paid for.** `--sds` to `--slds`, Primer v8.
   The repo says "pin a commit" today. The tokens file's `$deprecated` key is the place to
   record a rename; a deprecation policy is a next step, not this scope.
+- **The artboard format is one vendor's and may change.** The generator is its only writer
+  and the check its only reader, so a format change costs one script edit and one
+  regeneration; nothing a consumer installs depends on it, and the tokens file, not the
+  canvas, is the contract.
 - **Portability lint bans words a design-system guide naturally uses.** Nothing under `skills/`
   may name a framework, preprocessor or package; the Code Connect example and the tool names
   in the crosswalk footnotes live under `docs/`. The crosswalk cells themselves are custom
@@ -408,10 +461,6 @@ scenario that asks for a component-level override and must not bind a role. Reco
   and `auk.tokens.json` under `skills/ui-theme/references/` so an installed skill carries them.
   The alternative keeps ui-theme brand-only and puts the two files under a repo-root `tokens/`
   directory that installers never copy.
-- **A published Figma kit.** Recommended: not yet. Phase 5 records the `figma-generate-library`
-  procedure and a Code Connect example; building and publishing a community file is a
-  separate effort with its own maintenance cost, and the tokens file already gives a team what
-  they need to build their own.
 - **Shipped dark defaults via `light-dark()`.** Recommended: no. It would put an invented dark
   palette into every reference, contradict decision 5, need `color-scheme` set somewhere, and
   `light-dark()` reached Baseline in May 2024, so it is newer than the March 2022 layer
@@ -428,7 +477,8 @@ scenario that asks for a component-level override and must not bind a role. Reco
 | 4 | Workstream C: dimension roles, floors, missing target-size assertions, compact palette | M | 3, open question 1 |
 | 5 | Workstream D: anatomy generator, Figma section, Code Connect example | S | 2 |
 | 6 | Workstream E and F: spec rows, README section, CLAUDE.md line, evals run and recorded | S | 3 |
-| 7 | Optional: published Figma kit built with `figma-generate-library` from the tokens file | L | 5, open question 2 |
+| 7 | Workstream G: design generator, internal skill, canvas check, first published canvas | M | 2, 5 |
+| 8 | Only on request: a Figma kit built from the canvas with `figma-generate-design` | L | 7 |
 
 ## Appendix A - Survey: how twelve systems expose theming (verified 2026-09-04)
 
@@ -614,6 +664,7 @@ under any selector themes that subtree only:
 | Variant matrix cap of 30 | Contract tables stay small (button: 3 variants, 3 states) | Existing scope rule in the spec |
 | Code Connect template | `.figma.ts` mapping `Variant` and `State` to the HTML attributes | Example under `docs/`; Organization or Enterprise plan and a published library required |
 | Dev Mode and MCP `get_variable_defs` | ui-theme discovery source | Any plan; the agent reads names and values, never a rendered page |
+| A published component kit | The generated design canvas (Workstream G): HTML artboards painted by the shipped CSS | Pushed into Figma with `figma-generate-design` only when a team asks |
 
 ## Appendix F - Mechanisms considered and rejected
 
@@ -627,6 +678,7 @@ under any selector themes that subtree only:
 | Shipped dark defaults via `light-dark()` | Invents a palette the project did not choose; needs `color-scheme`; newer than the layer baseline | Decision 5; MDN `light-dark()` |
 | A component tier as the binding surface | Token explosion; SLDS 2 removed it; Carbon limits it | Brad Frost; Trailhead SLDS 2; Carbon button tokens |
 | A `forced-colors` theme block | Would let a theme defeat a reader's high-contrast setting | Decision 3 |
+| A hand-built Figma kit now | Translates CSS into nodes at 20 to 100 write calls per build and drifts on the next reference edit; Code Connect needs an Organization plan | `figma-generate-library` procedure; decision 16 |
 
 ## Appendix G - Design-system integration checklist (the rules and guidelines)
 
@@ -720,13 +772,13 @@ Spectrum tokens site (the GitHub repository was read instead).
 
 ## Next step
 
-Author an execution plan that delivers Workstreams A, B, D, E and F in roadmap order, with
+Author an execution plan that delivers Workstreams A, B, D, E, F and G in roadmap order, with
 Workstream C included only if open question 1 is answered yes. Draft real, actionable steps
-naming the files each one touches - the generator, the two generated files, the pinning test,
-the ui-theme reference sections, the spec rows, the theming guide sections, the README
-section, the e2e cases and the evals - and write each test before the change it proves. Treat
-the locked decisions as settled inputs, carry the three open questions into the plan's
-unresolved-questions section rather than answering them, and verify every crosswalk cell and
+naming the files each one touches - the two generators, the generated files, the pinning
+tests, the internal design-kit skill, the ui-theme reference sections, the spec rows, the
+theming guide sections, the README section, the e2e cases and the evals - and write each test
+before the change it proves. Treat the locked decisions as settled inputs, carry the two open
+questions into the plan's unresolved-questions section rather than answering them, and verify every crosswalk cell and
 every count against a live source or a parser run, never from memory.
 
 Convert to an execution plan:
