@@ -33,6 +33,14 @@ describe('kindOf reads the marker and defaults to component', () => {
     expect(kindOf(skill([...VALID, 'metadata:', '  kind: ""']))).toBe('component');
   });
 
+  it('treats any kind other than workflow as component, so a typo cannot exempt a skill', () => {
+    // The gates test kind === 'component', so an unrecognised value that came back
+    // verbatim would skip every strict assertion. Only the exact marker is exempt.
+    expect(kindOf(skill([...VALID, 'metadata:', '  kind: Workflow']))).toBe('component');
+    expect(kindOf(skill([...VALID, 'metadata:', '  kind: plugin']))).toBe('component');
+    expect(kindOf(skill([...VALID, 'metadata:', '  kind: workflow ']))).toBe('workflow');
+  });
+
   it('defaults when the frontmatter does not parse', () => {
     expect(kindOf('---\nmetadata: [kind: workflow\n---\n\n# Skill\n')).toBe('component');
   });
