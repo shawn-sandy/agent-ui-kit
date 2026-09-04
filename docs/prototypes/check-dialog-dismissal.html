@@ -341,7 +341,9 @@ var protoRecord; // set inside the records module; the live dialog calls it
    The fallback mirrors native light dismiss: press and release must both land on
    the dialog element itself, which is what the backdrop retargets to. The click
    target alone cannot tell, because a click whose press and release land on
-   different elements fires on their common ancestor, and that is the dialog. */
+   different elements fires on their common ancestor, and that is the dialog.
+   Under closedby="none" the fallback also swallows the cancel event Escape raises,
+   which is the other half of what the attribute controls. */
 function initDialog(dialog) {
   if (!dialog || !dialog.id) throw new Error('initDialog needs a <dialog> with an id');
 
@@ -369,6 +371,9 @@ function initDialog(dialog) {
     releasedOnDialog = false;
     if (hit && dialog.getAttribute('closedby') === 'any') dialog.close();
   }
+  function onCancel(event) {
+    if (dialog.getAttribute('closedby') === 'none') event.preventDefault();
+  }
   function onClose() {
     var fallbackId = dialog.getAttribute('data-dialog-fallback');
     var target = opener && opener.isConnected ? opener : (fallbackId ? document.getElementById(fallbackId) : null);
@@ -386,6 +391,7 @@ function initDialog(dialog) {
     dialog.addEventListener('pointerdown', onPointerDown);
     dialog.addEventListener('pointerup', onPointerUp);
     dialog.addEventListener('click', onDialogClick);
+    dialog.addEventListener('cancel', onCancel);
   }
   dialog.addEventListener('close', onClose);
 
@@ -395,6 +401,7 @@ function initDialog(dialog) {
     dialog.removeEventListener('pointerdown', onPointerDown);
     dialog.removeEventListener('pointerup', onPointerUp);
     dialog.removeEventListener('click', onDialogClick);
+    dialog.removeEventListener('cancel', onCancel);
     dialog.removeEventListener('close', onClose);
   };
 }
