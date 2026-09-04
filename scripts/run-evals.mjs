@@ -35,6 +35,25 @@ function workspaceFor(label) {
   if (FIXTURE_PROJECT) cpSync(FIXTURE_PROJECT, dir, { recursive: true });
   return dir;
 }
+/**
+ * A private copy of the plugin for one run: `.claude-plugin/` and `skills/` only.
+ *
+ * Why a copy and not `--plugin-dir ROOT` plus `--add-dir ROOT`: runs execute
+ * under `--permission-mode acceptEdits`, which auto-approves edits and `cp`/`mv`
+ * inside every added directory, so adding the live checkout would let
+ * EVAL_CONCURRENCY runs write into it at once. Without an add-dir at all, every
+ * read of the plugin's own `references/` from inside a run is denied and the
+ * model builds from the SKILL.md summary instead. Copying only the plugin also
+ * keeps `evals/` (the answer key) and `.claude/skills/` out of the run.
+ */
+function pluginFor(label) {
+  const dir = resolve(SANDBOX, 'plugin-' + label.replace(/[^a-z0-9]+/gi, '-'));
+  rmSync(dir, { recursive: true, force: true });
+  for (const sub of ['.claude-plugin', 'skills']) {
+    cpSync(resolve(ROOT, sub), resolve(dir, sub), { recursive: true });
+  }
+  return dir;
+}
 const MODELS = (process.env.EVAL_MODELS || 'haiku,sonnet,opus').split(',');
 const CONCURRENCY = Number(process.env.EVAL_CONCURRENCY || 4);
 if (!Number.isInteger(CONCURRENCY) || CONCURRENCY < 1) {
@@ -133,8 +152,12 @@ function skillsInvoked(streamJson) {
 
 async function skillsOne(sc, model) {
   const cwd = workspaceFor(`${model}-${sc.id}`);
+  const plugin = pluginFor(`${model}-${sc.id}`);
   const out = await claude([
-    '-p', '--model', model, '--plugin-dir', ROOT,
+    '-p', '--model', model, '--plugin-dir', plugin,
+    // --add-dir is variadic: the option after it is what stops it swallowing the
+    // prompt, so never make it the last option before the prompt.
+    '--add-dir', plugin,
     '--output-format', 'stream-json', '--verbose', '--max-turns', '8',
     '--strict-mcp-config', '--permission-mode', 'acceptEdits',
     ...(ISOLATE ? ['--setting-sources', 'project'] : []),

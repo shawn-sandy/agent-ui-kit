@@ -1,7 +1,10 @@
 # Evaluations
 
 Whether a realistically phrased request reaches the right skill, and what the models
-produce when it does not. Recorded 2026-09-02 against `agent-ui-skills` 0.2.0.
+produce when it does not. Recorded 2026-09-02 against `agent-ui-skills` 0.2.0. Those
+runs predate the harness passing `--add-dir`, so they could not read `references/` and
+built from the SKILL.md summary; triggering is captured at the Skill call, so the
+numbers below remain comparable.
 
 Scenarios live in `evals/*.json` - three per component. Runs are driven by
 `scripts/eval.sh`; `scripts/eval.sh print <skill> <index>` formats one for a manual
@@ -15,7 +18,7 @@ Skill ids use the `ui-` prefix, so the button component's scenarios live under
 | Run | Question | How |
 | --- | --- | --- |
 | **Baseline** | What does a model write with no skill available? | `claude -p --disable-slash-commands`, asked for the code only. |
-| **Isolated** | Does the description reach the right skill? | `claude -p --plugin-dir . --setting-sources project` - only this plugin's skills load. |
+| **Isolated** | Does the description reach the right skill? | `claude -p --plugin-dir <copy> --add-dir <copy> --setting-sources project` - only this plugin's skills load, from a per-run copy of `.claude-plugin/` and `skills/` so the run can read `references/` without being able to write into the checkout. |
 | **Crowded** | Same, in a session that also loads everything the operator already has. | The same, without `--setting-sources`. |
 
 All three run against a throwaway copy of a small project with a real `index.html`, on
