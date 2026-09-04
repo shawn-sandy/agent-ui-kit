@@ -1,5 +1,7 @@
 # Agent UI Skills
 
+![Agent UI Skills. Six hairline component specimens on a dot grid: box, button with a blue focus ring, alert, dialog over an inert page, tabs, and a popover rising above its cell. Six components, one skills tree, nothing installed.](docs/hero.png)
+
 Vendor-neutral UI component skills for AI coding agents.
 
 Each skill describes one UI component and ships a complete reference: semantic HTML

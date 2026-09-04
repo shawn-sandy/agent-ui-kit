@@ -102,3 +102,18 @@ under a context budget, so a trailing clause is lost.
 `tests/fixtures/` holds deliberately broken skills, kept outside `skills/` so the real
 gates stay clean. They are not bugs - do not fix them. `check.sh --prove` runs them to
 confirm gates 1-4 can still fail.
+
+## Project overview artifact
+
+A living overview of the project - goal, how the format works, what ships, gates,
+evidence, status and roadmap - is published as a claude.ai artifact at
+https://claude.ai/code/artifact/3474b8f0-f906-4f3a-95f7-45c9cf539de3. It is private
+to the maintainer's account unless shared from the page.
+
+Refresh it when the project moves: a merge that adds or changes a skill, a version
+bump, a plan changing status, or a new issue or pull request worth showing. Read the
+artifact with the Artifact tool, then update the meta strip (version, skill count,
+main SHA, CI state on main, open issue count, date), re-source each section from
+README, `docs/plans/*.md` frontmatter, `docs/evaluations.md`, `docs/vendor-support.md`
+and the GitHub issues and pull requests, add a row to the page-history table at the
+bottom, and republish to the same URL so the link never changes.
