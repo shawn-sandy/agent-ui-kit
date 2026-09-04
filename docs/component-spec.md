@@ -43,6 +43,21 @@ State is carried by ARIA where ARIA has an attribute for it (`aria-disabled`,
 `aria-selected`, `aria-expanded`); failing that by a native attribute (`hidden`,
 `open`); and by `data-state` only when neither exists.
 
+### Sources
+
+Before writing Structure, Styles or Behaviour, read the platform documentation for
+what the component builds on. Three sources are fixed:
+
+- MDN HTML reference - https://developer.mozilla.org/en-US/docs/Web/HTML/Reference -
+  the page for the root element and each named part: attributes, implicit role,
+  events and accessibility notes.
+- web.dev HTML - https://web.dev/html - structure and semantics.
+- web.dev CSS - https://web.dev/css - the Styles block.
+
+A reference may not contradict them. Where a page documents a native attribute,
+method or event that already does the job, the component uses it rather than a
+scripted substitute, as `ui-dialog` does with `showModal()`.
+
 ### Settled questions
 
 These come up on every component. They are answered once here so no author has to
@@ -350,6 +365,7 @@ Before a component is done:
 - [ ] `references/react-demo.tsx` exists as a typed React projection reference.
 - [ ] Demo opens from `file://` and matches the reference verbatim.
 - [ ] Every WCAG criterion claimed has a passing assertion in `tests/e2e/`.
+- [ ] The section 0 sources were read for the root element and each named part, and the reference does not contradict them.
 - [ ] Three evaluations exist with a recorded baseline.
 - [ ] `bash scripts/check.sh` exits zero.
 
