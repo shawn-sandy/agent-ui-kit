@@ -5,7 +5,7 @@ techniques: Long-context grounding, XML structure, Comparison tables, Positive f
 created: 2026-09-04
 modified: 2026-09-04
 status: converged
-generated-sha: 833f8b279085a06145a1e5ae8134afdf27c3879c96aa075f8276184ac9395c76
+generated-sha: 6552c76a8a03357438ef97490a83b3b2a5ddb80c36e07e1258ebd1aa228b748d
 ---
 
 # Proposal: Add a ui-compose workflow skill so agent-built components follow Component Driven Design in component-based projects
@@ -51,8 +51,9 @@ What exists today, measured:
 
 - Six component skills (`ui-alert`, `ui-box`, `ui-button`, `ui-dialog`, `ui-popover`, `ui-tabs`)
   and one workflow skill (`ui-theme`). SKILL.md body line counts, against a hard limit of under
-  60 lines (`tests/objective.spec.ts:76-81`): alert 48, box 54, button 45, dialog 52, popover 57,
-  tabs 50, theme 53. Popover has two lines of headroom.
+  60 lines (`tests/objective.spec.ts:76-81`), counted by a newline split that includes the trailing
+  empty element: alert 49, box 55, button 46, dialog 53, popover 58, tabs 51, theme 54. Popover has
+  one line of headroom.
 - The founding insight, `docs/plans/build-ui-component-skills.md:24`: "HTML structure, CSS and the
   accessibility contract are framework-agnostic, and only template syntax and reactivity binding
   are framework-specific." The spec turns that into a rule at `docs/component-spec.md:255-272`:
@@ -140,7 +141,7 @@ Resolved in the 2026-09-04 review:
 
 3. **Location: a new `ui-compose` workflow skill plus a two-line pointer in every component's
    `Build it`.** Rationale: one file to maintain, the `ui-theme` precedent already partitions the
-   gates, it ships through the skills CLI, and two lines fit popover's headroom. The pointer names
+   gates, it ships through the skills CLI, and two lines fit popover's headroom after a one-line trim. The pointer names
    the four rules so a selective install of one component skill still carries the gist.
    Propagates to Workstreams A, B, C and Appendix B.
 4. **Projections: fix composition only.** `ui-dialog` and `ui-popover` demos import and use
@@ -207,7 +208,8 @@ assertion in `tests/objective.spec.ts`.
 - A new every-skill assertion next to the Clarify one (`tests/objective.spec.ts:83-92`): the body
   matches ``/^\d+\. In a component-based project, follow `ui-compose`/m`` for every component skill.
   Workflow skills are exempt.
-- Line budget after the change: popover 59, box 56, dialog 54, tabs 52, alert 50, button 47.
+- Line budget after the change, as the gate counts: popover 60 unless one line is trimmed from its
+  body first, then 59; box 57, dialog 55, tabs 53, alert 51, button 48.
 
 **C - Spec, walker and README.** Scope: `docs/component-spec.md`,
 `.claude/skills/new-component/SKILL.md`, `README.md`.
@@ -257,8 +259,8 @@ objective assertion from B, the evals from A.
 - **Output shape stays unmeasured until Phase 5.** The gates prove presence, not compliance; the
   evals measure triggering and a few detect regexes on the produced file. Issue #15 scopes React
   out today and would need re-scoping.
-- **Popover's last headroom.** After B, `ui-popover/SKILL.md` sits at 59 lines. Any later addition
-  needs a trim first.
+- **Popover's last headroom.** `ui-popover/SKILL.md` sits at 58 lines under the gate's count, so B
+  trims one line before adding two and lands at 59. Any later addition needs another trim first.
 - **Wrap versus re-implement is explained, not resolved.** The rule for agent output says call the
   Behaviour module on mount; the React exemplars re-implement in hooks. The reference must say
   when re-implementation is right (the framework's rendering owns the attribute the module writes,

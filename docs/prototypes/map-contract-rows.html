@@ -73,22 +73,7 @@
 </div>
 
 <form id="add-form" novalidate>
-  <!-- <div class="field">
-    <label for="f-component">Component <span class="req">*</span></label>
-    <input id="f-component" name="component" type="text" data-required>
-  </div>
-  <div class="field">
-    <label for="f-row">Row <span class="req">*</span></label>
-    <input id="f-row" name="row" type="text" data-required>
-  </div>
-  <div class="field">
-    <label for="f-surface">Surface <span class="req">*</span></label>
-    <input id="f-surface" name="surface" type="text" data-required>
-  </div>
-  <div class="field">
-    <label for="f-rule">Rule <span class="req">*</span></label>
-    <input id="f-rule" name="rule" type="text" data-required>
-  </div>: one .field block per column, each with <label for> + typed input.
+  <!-- {{FORM_FIELDS}}: one .field block per column, each with <label for> + typed input.
        Mark required fields with data-required and a visible (*) marker. -->
   <div class="field">
     <label for="f-component">Component <span class="req">*</span></label>
@@ -114,10 +99,7 @@
   <caption>ui-compose contract mapping records — edits persist in this browser only.</caption>
   <thead>
     <tr>
-      <!-- <th scope="col" data-field="component" data-type="string">Component</th>
-      <th scope="col" data-field="row" data-type="string">Row</th>
-      <th scope="col" data-field="surface" data-type="string">Surface</th>
-      <th scope="col" data-field="rule" data-type="string">Rule</th>: one <th scope="col" data-field="key" data-type="string|number|date|bool">Label</th>
+      <!-- {{COLUMNS}}: one <th scope="col" data-field="key" data-type="string|number|date|bool">Label</th>
            per column. The JS derives the field order from these data-field attributes. -->
       <th scope="col" data-field="component" data-type="string">Component</th>
       <th scope="col" data-field="row" data-type="string">Row</th>
