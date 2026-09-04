@@ -1,3 +1,0 @@
-- [Prototype dual-script event ordering](prototype-dual-script-ordering.md) — table-script/live-preview coordination in docs/prototypes/*.html is usually correct-by-DOM-structure, not a bug
-- [Plan .md backtick code-span defect](plan-md-backtick-code-spans.md) — Why/Verify regex matching does not mean the Verify clause's Markdown renders correctly; check for stray backticks
-- [Run Playwright without npm install](local-playwright-without-install.md) — global @playwright/cli + cached chromium-1234, needs explicit executablePath
