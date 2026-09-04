@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    a { color: #1a56db; } a:hover { color: #1e429f; }
+  </style>
+</helmet>
+<div style="width: 880px; height: 600px; box-sizing: border-box; background: #ffffff; padding: 32px 36px; display: flex; flex-direction: column; gap: 22px; color: #111827;">
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <div style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; color: #6b7280;">STEP 9 · WHEN SHOULD THE SKILL FIRE?</div>
+    <div style="font-size: 21px; font-weight: 650;">evals/ui-theme.json — three scenarios</div>
+  </div>
+  <div style="display: flex; gap: 18px; flex-grow: 1;">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 12px; border: 1px solid #d1d5db; border-radius: 6px; padding: 18px;">
+      <div style="align-self: flex-start; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; font-weight: 650; letter-spacing: 0.06em; color: #14532d; background: #dcfce7; border-radius: 4px; padding: 3px 8px;">OBVIOUS</div>
+      <div style="font-size: 14px; line-height: 1.5; color: #374151; font-style: italic;">"Make these components match our brand."</div>
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #e5e7eb; padding-top: 12px;">
+        <div style="font-size: 12px; color: #14532d; font-weight: 600;">ui-theme fires</div>
+        <div style="font-size: 11.5px; color: #6b7280; line-height: 1.5;">Baseline failure: agent hand-edits component CSS instead of binding the properties.</div>
+      </div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 12px; border: 1px solid #d1d5db; border-radius: 6px; padding: 18px;">
+      <div style="align-self: flex-start; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; font-weight: 650; letter-spacing: 0.06em; color: #1e429f; background: #dbeafe; border-radius: 4px; padding: 3px 8px;">OBLIQUE</div>
+      <div style="font-size: 14px; line-height: 1.5; color: #374151; font-style: italic;">"The buttons look off next to the rest of the page."</div>
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #e5e7eb; padding-top: 12px;">
+        <div style="font-size: 12px; color: #1e429f; font-weight: 600;">ui-theme fires</div>
+        <div style="font-size: 11.5px; color: #6b7280; line-height: 1.5;">No word says "theme" — the mismatch between shipped defaults and the page is the signal.</div>
+      </div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 12px; border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 6px; padding: 18px;">
+      <div style="align-self: flex-start; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; font-weight: 650; letter-spacing: 0.06em; color: #6b7280; background: #e5e7eb; border-radius: 4px; padding: 3px 8px;">ADJACENT</div>
+      <div style="font-size: 14px; line-height: 1.5; color: #374151; font-style: italic;">"Restyle the marketing hero to match the new campaign."</div>
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #e5e7eb; padding-top: 12px;">
+        <div style="font-size: 12px; color: #6b7280; font-weight: 600;">ui-theme stays quiet</div>
+        <div style="font-size: 11.5px; color: #6b7280; line-height: 1.5;">No auk component is involved — a styling request alone is not this skill's trigger.</div>
+      </div>
+    </div>
+  </div>
+  <div style="border-top: 1px solid #e5e7eb; padding-top: 14px; font-size: 12px; color: #6b7280;">Same shape as the shipped evals: id, kind, expect, prompt, baselineFailure, detect. Landing here is what turns the phase-2 gate fully green.</div>
+</div>
+</x-dc>
+</body>
+</html>

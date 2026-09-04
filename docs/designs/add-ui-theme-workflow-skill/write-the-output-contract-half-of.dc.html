@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    a { color: #1a56db; } a:hover { color: #1e429f; }
+  </style>
+</helmet>
+<div style="width: 960px; height: 760px; box-sizing: border-box; background: #ffffff; padding: 32px 36px; display: flex; flex-direction: column; gap: 20px; color: #111827;">
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <div style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; color: #6b7280;">STEP 8 · WHAT THE SKILL WRITES INTO A PROJECT</div>
+    <div style="font-size: 21px; font-weight: 650;">Anatomy of the emitted block</div>
+  </div>
+  <div style="display: flex; gap: 24px; flex-grow: 1;">
+    <div style="flex: 1.25; border: 1px solid #1f2937; border-radius: 6px; overflow: hidden; display: flex; flex-direction: column;">
+      <div style="background: #1f2937; color: #9ca3af; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; padding: 8px 14px;">appended to the project's token stylesheet</div>
+      <div style="background: #111827; color: #d1d5db; padding: 16px 18px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.9; flex-grow: 1;">
+        <div style="color: #6b7280;">/* auk theme: binds project tokens */</div>
+        <div><span style="color: #f9fafb;">:root</span> {</div>
+        <div style="padding-left: 16px;">--auk-button-bg: <span style="color: #93c5fd;">var(--color-primary)</span>;</div>
+        <div style="padding-left: 16px;">--auk-tabs-selected-tab-color: <span style="color: #93c5fd;">var(--color-primary)</span>;</div>
+        <div style="padding-left: 16px;">--auk-dialog-color: <span style="color: #93c5fd;">var(--color-text)</span>;</div>
+        <div style="padding-left: 16px;">--auk-button-radius: <span style="color: #93c5fd;">var(--radius-md)</span>;</div>
+        <div style="padding-left: 16px;">--auk-alert-error-color: <span style="color: #fca5a5;">#b91c1c</span>; <span style="color: #6b7280;">/* no token — literal kept */</span></div>
+        <div>}</div>
+        <div style="margin-top: 8px;"><span style="color: #c4b5fd;">[data-theme="dark"]</span> { <span style="color: #6b7280;">/* the project's own selector, verbatim */</span></div>
+        <div style="padding-left: 16px;">--auk-dialog-backdrop-bg: <span style="color: #93c5fd;">var(--overlay-dark)</span>;</div>
+        <div style="padding-left: 16px;"><span style="color: #6b7280;">/* only tokens that change under dark */</span></div>
+        <div>}</div>
+      </div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; flex-direction: column; gap: 6px; border: 1px solid #d1d5db; border-radius: 6px; padding: 13px 16px;">
+        <div style="font-size: 12.5px; font-weight: 650;">Project token → no fallback</div>
+        <div style="font-size: 12px; color: #6b7280; line-height: 1.55;">If the token is later removed, the property goes invalid and the component's own <span style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace;">var(--auk-*, literal)</span> wins. Asserted in step 10, not trusted.</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; border: 1px solid #d1d5db; border-radius: 6px; padding: 13px 16px;">
+        <div style="font-size: 12.5px; font-weight: 650;">Brand-bearing only</div>
+        <div style="font-size: 12px; color: #6b7280; line-height: 1.55;">Never a size, spacing, duration or placement property. Never a forced-colors query — high-contrast settings stay the user's.</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; border: 1px solid #fde68a; background: #fffbeb; border-radius: 6px; padding: 13px 16px;">
+        <div style="font-size: 12.5px; font-weight: 650; color: #78350f;">Guard: no auk components yet</div>
+        <div style="font-size: 12px; color: #78350f; line-height: 1.55;">No stylesheet contains an <span style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace;">auk-</span> selector → the skill says so, points at the component skills, and emits nothing.</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; border: 1px solid #d1d5db; border-radius: 6px; padding: 13px 16px;">
+        <div style="font-size: 12.5px; font-weight: 650;">After emitting: re-measure</div>
+        <div style="font-size: 12px; color: #6b7280; line-height: 1.55;">Contrast and focus visibility are re-checked by the named e2e specs. A failing brand value is reported and asked about — never silently reverted.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
