@@ -1,0 +1,9 @@
+:root {
+  --color-brand: #7c3aed;
+  --color-brand-on: #ffffff;
+  --color-text: #18181b;
+  --color-surface: #ffffff;
+  --color-border: #e4e4e7;
+  --radius-md: 8px;
+  --font-sans: Inter, system-ui, sans-serif;
+}

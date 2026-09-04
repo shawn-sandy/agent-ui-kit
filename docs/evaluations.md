@@ -207,6 +207,81 @@ because it is the one Sonnet and Opus were measured on at 7 / 7; the rewrite was
 not run on them. This is the same limitation as above and is not treated as a
 defect to keep grinding at.
 
+## Box, popover and compose
+
+Recorded 2026-09-04 against `agent-ui-skills` 0.4.0, isolated run,
+`EVAL_SKILLS=ui-box,ui-popover,ui-compose`: 18 baseline calls and 27 skills calls.
+These three skills shipped after the 2026-09-02 sweep and had never been measured.
+
+The sweep used the committed fixture at `evals/project/`, which did not exist for the
+earlier runs. That is the one thing that keeps these numbers from being strictly
+comparable to the tables above: same harness, same scoring, different project on disk.
+
+### Baseline: what the models write unaided
+
+| Scenario | Model | Signals |
+| --- | --- | --- |
+| ui-box-obvious | haiku / sonnet / opus | foreground YES, background YES, **border no** on all three; none pinned a height |
+| ui-box-oblique | haiku | border YES, **forced-colours no**, foreground no |
+| ui-box-oblique | sonnet | border YES, forced-colours YES, foreground no |
+| ui-box-oblique | opus | border YES, forced-colours YES, foreground no |
+| ui-popover-obvious | haiku / sonnet / opus | declarative trigger YES, **explicit role no**, **accessible name no**, **trigger state no** on all three |
+| ui-popover-oblique | haiku | **top layer no** - hand-rolled stacking and outside-click dismissal instead |
+| ui-popover-oblique | sonnet / opus | top layer YES, no hand-rolling |
+| ui-compose-obvious | haiku / sonnet / opus | typed props surface YES, composed the project's Button YES |
+| ui-compose-oblique | haiku / sonnet / opus | **typed props surface no** on all three |
+
+Three gaps are unanimous. **No model draws a border** on the box request, so the
+container it writes is a colour change rather than a bounded region. **No model gives
+the popover an explicit role, an accessible name, or trigger state that tracks the
+layer** - the panel opens, and a screen reader is told nothing about what opened or
+whether it is still open. And on the oblique compose request **no model produces a
+typed surface at all**, though every one of them does when the request names the file.
+
+### Triggering: does the right skill fire?
+
+| Model | Isolated |
+| --- | --- |
+| Haiku | 5 / 9 |
+| Sonnet | 9 / 9 |
+| Opus | 9 / 9 |
+
+| Scenario | Kind | Haiku | Sonnet | Opus |
+| --- | --- | --- | --- | --- |
+| ui-box-obvious | obvious | FAIL (no skill) | PASS | PASS |
+| ui-box-oblique | oblique | FAIL (no skill) | PASS | PASS |
+| ui-box-adjacent | adjacent | PASS | PASS | PASS |
+| ui-popover-obvious | obvious | PASS | PASS | PASS |
+| ui-popover-oblique | oblique | PASS | PASS | PASS |
+| ui-popover-adjacent | adjacent | PASS | PASS (fired `ui-dialog`) | PASS (fired `ui-dialog`) |
+| ui-compose-obvious | obvious | FAIL (fired `ui-dialog`) | PASS | PASS |
+| ui-compose-oblique | oblique | FAIL (no skill) | PASS | PASS |
+| ui-compose-adjacent | adjacent | PASS | PASS (fired `ui-dialog`) | PASS (fired `ui-dialog`) |
+
+Sonnet and Opus take every scenario. Haiku's four misses are the known limitation
+recorded above and not wrong-skill matches: on three of them it invoked no plugin
+skill at all, and on `ui-compose-obvious` it fired `ui-dialog` - the component being
+wrapped, not the composition workflow. No description rewrite was attempted, because
+two were already tried for the same failure mode without moving the number.
+
+Both adjacent scenarios that fired `ui-dialog` are correct outcomes, the same pattern
+`ui-alert-adjacent` shows: a request to block the page until the user answers really
+is the dialog's job, and the skill under test staying out of it is what the scenario
+asserts.
+
+`ui-compose-adjacent` deserves its own note, because it is measured against a fixture
+that argues with it. The prompt frames the page as "a plain static page", which is the
+case where `ui-compose` must stay quiet, but the fixture carries `src/components/` -
+which `ui-compose` Discovery reads as component-based. It is therefore a harder test
+than written, and it still passed on all three models. `evals/project/README.md`
+records this so a future failure is not misread as description drift.
+
+Every one of the 27 runs reached a model, so no result here is a crash scored as a
+miss. Nineteen exited non-zero at the eight-turn cap, the same behaviour the ui-theme
+sweep surfaced; the trigger is captured at the `Skill` call, which happens well before
+the cap, so those runs are complete observations.
+
+
 ## Reproducing
 
 ```bash
@@ -217,6 +292,15 @@ EVAL_SKILLS=ui-theme scripts/eval.sh skills   # one skill's scenarios only
 ```
 
 `EVAL_MODELS`, `EVAL_CONCURRENCY` and `EVAL_SKILLS` control the sweep; `EVAL_PROJECT`
-points at the fixture project each run gets its own copy of. Results are scored by
+points at the fixture project each run gets its own copy of. The fixture is committed
+at `evals/project/`, so a `skills` sweep is reproducible:
+
+```bash
+EVAL_PROJECT="$PWD/evals/project" scripts/eval.sh skills
+```
+
+Without it the runner hands each scenario an empty directory, and the vendor record's
+finding applies - no skill fires for a request with no concrete file to act on, so the
+sweep measures the missing fixture rather than the descriptions. Results are scored by
 `scripts/score-evals.mjs`, kept separate from the runner so the correctness rule can be
 corrected without paying for another sweep.
