@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "agent-ui-skills",
   "displayName": "Agent UI Skills",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Vendor-neutral UI component skills. Each skill ships a complete reference - semantic HTML, plain CSS custom properties, and dependency-free JavaScript - that an agent builds into your project in your stack. No framework, no design system, no package to install.",
   "author": {
     "name": "Shawn Sandy",

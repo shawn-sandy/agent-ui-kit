@@ -34,6 +34,7 @@ These are settled. Do not re-decide them per component.
 | Variants | `data-variant="<value>"` | `data-variant="destructive"` |
 | Named content regions ("slots") | `data-slot="<name>"` on the wrapping element, or `none` | `data-slot="icon"` |
 | Custom property | `--auk-<component-slug>-<property>` | `--auk-button-bg` |
+| Reserved slug | `role` is never a component slug: `--auk-role-<name>` is the theme layer's namespace, and `tests/objective.spec.ts` rejects a `skills/ui-role` directory | `--auk-role-primary` |
 | Fallback | A literal value. Never a nested `var()`. | `var(--auk-button-bg, #1a56db)` |
 | Behaviour export | `export function init<Component>(root)` taking the root element, returning a teardown `() => void` | `export function initDialog(root)` |
 | Module shape | Named export. `demo.html` strips `export ` and calls the function by name, so a default export cannot work. | |
@@ -121,6 +122,11 @@ guess and no reviewer has to arbitrate.
 | Must every element in Structure be a named part? | No. Element lists the root and the named parts; a purely presentational wrapper or an `aria-hidden` glyph may carry no `data-part` at all. Add a part only when styles, the module or the contract need to address it. |
 | Is the `data-state` value set component-wide or per part? | Component-wide, and values are unique across parts. The Behaviour section names which element carries each one. |
 | May a `data-state` value never appear in CSS? | Yes, when the module writes it purely as a hook for the host page. Declare it on the qualifier line anyway - the line is the component's state vocabulary, not only its styling vocabulary. |
+| How does a design-system team bind its tokens? | Through the role layer: copy `skills/ui-theme/references/auk-roles.css` in and bind at most 23 `--auk-role-*` lines to the project's tokens, by hand or by running `ui-theme`. Never by editing a reference. The guide is `docs/theming.md`. |
+| Does a brand-bearing property need a role? | Yes, exactly one, in the mapping table of `skills/ui-theme/references/ui-theme.md`. `tests/integration/tokens-file.spec.ts` fails when a colour, radius or font-family property has no role or two. |
+| Does a measured property need a floor? | It carries a floor or `none` in `skills/ui-theme/references/auk.tokens.json`, and a floor only after an assertion in `tests/e2e/` measures it - the floor names the criterion and the spec file. No number is estimated into the token file. |
+| Do part, variant and state names have a design-tool form? | Yes, by rule and generated: a part is a Title Case layer name, a variant is a `Variant` value and a state a `State` value, with `Default` first. The anatomy tables in `docs/properties.md` carry them, so a designer and an agent name one thing the same way. |
+| May a reference set `color-scheme`, ship a dark value or read a role? | No to all three. A reference ships one set of literals; a dark form is the project's and `ui-theme` mirrors it; and a `var(--auk-role-*)` in a reference would break the standalone guarantee. `tests/objective.spec.ts` rejects `color-scheme`, `light-dark(`, `prefers-color-scheme` and any non-component `var()`. |
 
 Measured numbers — contrast ratios, target sizes — are never written into a
 reference from estimation. Either an assertion in `tests/e2e/` measures it at run
@@ -372,6 +378,11 @@ Before a component is done:
 - [ ] Every WCAG criterion claimed has a passing assertion in `tests/e2e/`.
 - [ ] The section 0 sources were read for the root element and each named part, and the reference does not contradict them.
 - [ ] Three evaluations exist with a recorded baseline.
+- [ ] The component slug is not `role`.
+- [ ] Every new brand-bearing property has exactly one row in the ui-theme mapping table, and `node scripts/build-tokens.mjs` was run.
+- [ ] Every new measured property carries `floor: none` or a floor an assertion in `tests/e2e/` measures.
+- [ ] Every part, variant and state name is lowercase kebab-case, and `node scripts/build-properties.mjs` was run so the anatomy table carries its design-tool name.
+- [ ] The css block sets no `color-scheme`, uses no `light-dark()`, queries no `prefers-color-scheme`, and reads no `--auk-role-*`.
 - [ ] `bash scripts/check.sh` exits zero.
 
 ## 9. Workflow skills

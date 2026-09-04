@@ -17,7 +17,7 @@ demo is reference material, not production code.
 
 ## Status
 
-Version 0.3.0. Seven skills ship: six components - **box**, **button**, **alert**,
+Version 0.4.0. Seven skills ship: six components - **box**, **button**, **alert**,
 **dialog**, **tabs** and **popover** - and one workflow, **theme**, which binds a
 project's existing colours, radius and type to the components' custom properties.
 The components were chosen to stress different parts of the format rather than to be
@@ -30,6 +30,27 @@ Both vendors load the tree and use it: see [docs/vendor-support.md](docs/vendor-
 for what actually happened, including what did not work.
 
 The reference format is still moving - pin a commit if you depend on it.
+
+## Fits your design system
+
+Every brand-bearing value chains to one of 23 semantic roles, so a brand is at most
+23 lines. Copy `skills/ui-theme/references/auk-roles.css` in, then bind the roles:
+
+```css
+:root {
+  --auk-role-primary: var(--color-action-primary);
+  --auk-role-on-primary: var(--color-action-on-primary);
+  --auk-role-text: var(--color-text-default);
+  --auk-role-surface: var(--color-surface-default);
+  --auk-role-border: var(--color-border-default);
+  --auk-role-radius: var(--radius-md);
+  --auk-role-font: var(--font-sans);
+}
+```
+
+Every unbound role keeps its shipped default. The same roles ship as
+`skills/ui-theme/references/auk.tokens.json`, a DTCG 2025.10 token file for a token
+build or, vendor-specific, a Figma or Penpot import. Procedure: [docs/theming.md](docs/theming.md).
 
 ## Install
 

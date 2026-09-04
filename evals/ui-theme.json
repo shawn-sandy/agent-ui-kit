@@ -8,7 +8,7 @@
       "prompt": "The buttons, the confirm dialog and the tabs in index.html were built from the ui- skills and still wear their default blue. styles/tokens.css declares our brand as --color-primary, --color-text, --color-bg, --color-border, --radius-md and --font-sans. Make these components match our brand.",
       "baselineFailure": "edits the component CSS in place or redeclares the --auk-* properties with copied hex literals, so the components stop following the project's tokens, and drags size and spacing properties along with the colours",
       "detect": {
-        "binds an auk property to a project token": "--auk-[a-z-]+:\\s*var\\(--(?!auk-)",
+        "binds a role to a project token": "--auk-role-[a-z-]+:\\s*var\\(--",
         "copies a literal instead of binding a token": "--auk-[a-z-]+:\\s*#[0-9a-fA-F]{3,8}",
         "touches a size or spacing property": "--auk-[a-z-]+-(?:width|size|gap|padding|offset|duration)[a-z-]*\\s*:"
       }
@@ -18,9 +18,9 @@
       "kind": "oblique",
       "expect": "ui-theme",
       "prompt": "The buttons and the confirm dialog in index.html look off next to the rest of the page - wrong blue, wrong corners, wrong font. The rest of the site gets its look from styles/tokens.css. Make them fit in.",
-      "baselineFailure": "restyles the auk selectors directly with new literals, or rewrites the component markup, instead of binding the tokens the site already has to the properties the components already read",
+      "baselineFailure": "restyles the auk selectors directly with new literals, or rewrites the component markup, instead of binding the tokens the site already has to the roles the components already read",
       "detect": {
-        "binds an auk property to a project token": "--auk-[a-z-]+:\\s*var\\(--(?!auk-)",
+        "binds a role to a project token": "--auk-role-[a-z-]+:\\s*var\\(--",
         "restyles a component selector directly": "\\.auk-[a-z-]+[^{]*\\{[^}]*(?:background(?:-color)?|color|border-radius|font-family)\\s*:\\s*(?!var\\(--auk-)"
       }
     },
@@ -31,6 +31,46 @@
       "prompt": "In index.html, the site header's navigation links should use our brand colour from styles/tokens.css and a slightly larger font. The header is plain markup, not one of the ui- components.",
       "baselineFailure": "n/a - this scenario asserts the theme skill stays quiet",
       "detect": {}
+    },
+    {
+      "id": "ui-theme-shadcn",
+      "kind": "obvious",
+      "expect": "ui-theme",
+      "prompt": "index.html has auk buttons and a confirm dialog built from the ui- skills. Our design system is shadcn/ui: styles/globals.css declares --primary, --background, --foreground, --border, --ring and --radius on :root and again under .dark. Make the components follow those tokens.",
+      "baselineFailure": "rewrites the component CSS with the shadcn values inline, or binds all 69 --auk-* properties one by one, instead of binding the roles once",
+      "detect": {
+        "binds a role to a project token": "--auk-role-[a-z-]+:\\s*var\\(--"
+      }
+    },
+    {
+      "id": "ui-theme-figma",
+      "kind": "oblique",
+      "expect": "ui-theme",
+      "prompt": "Our design tokens live in a Figma file at https://www.figma.com/design/AbC123xyz/Brand?node-id=1-2. The buttons and the tabs in index.html were built from the ui- skills and should use those tokens rather than the defaults they came with.",
+      "baselineFailure": "invents a palette or asks for hex values, instead of reading the file's variables or its exported token file and binding the roles",
+      "detect": {
+        "binds a role": "--auk-role-"
+      }
+    },
+    {
+      "id": "ui-theme-token-file",
+      "kind": "oblique",
+      "expect": "ui-theme",
+      "prompt": "Our token build writes tokens/brand.tokens.json, a DTCG file, and styles/tokens.css is generated from it. Bind the auk components in index.html to it so they stop looking like the defaults.",
+      "baselineFailure": "copies literal values out of the token file into the component CSS, so the next token build leaves the components behind",
+      "detect": {
+        "binds a role to a project token": "--auk-role-[a-z-]+:\\s*var\\(--"
+      }
+    },
+    {
+      "id": "ui-theme-override-adjacent",
+      "kind": "adjacent",
+      "expect": null,
+      "prompt": "In index.html, only the destructive button should get a darker red than the brand's danger colour - use #7f1d1d. Nothing else on the page may change.",
+      "baselineFailure": "n/a - this scenario asserts the theme skill stays quiet",
+      "detect": {
+        "binds a role": "--auk-role-"
+      }
     }
   ]
 }

@@ -12,8 +12,8 @@ usage:
   scripts/eval.sh baseline                run every scenario with all skills disabled
   scripts/eval.sh skills                  run every scenario with this repo loaded as a plugin
 
-skills: ui-button ui-alert ui-dialog ui-tabs
-env: EVAL_MODELS=haiku,sonnet,opus  EVAL_CONCURRENCY=4
+skills: ui-alert ui-box ui-button ui-dialog ui-popover ui-tabs ui-theme
+env: EVAL_MODELS=haiku,sonnet,opus  EVAL_CONCURRENCY=4  EVAL_SKILLS=ui-theme (limit a sweep)
 USAGE
 }
 

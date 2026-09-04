@@ -158,15 +158,65 @@ silent. `ui-alert-adjacent` - *"interrupts the user and blocks the page until th
 confirm"* - correctly fired the **dialog** skill on five of six runs. That is the right
 answer, and the alert skill staying out of it is exactly what the scenario tests.
 
+## Design-system requests
+
+Recorded 2026-09-04 against `agent-ui-skills` 0.4.0, isolated run, `ui-theme` only
+(`EVAL_SKILLS=ui-theme`, 21 calls). The four scenarios added with the role layer ask
+for a named system (shadcn/ui), a Figma file, a DTCG token file, and one component
+override that must not trigger the theme skill. The fixture project carries auk
+buttons, a dialog and tabs, a `styles/tokens.css`, a shadcn-shaped `styles/globals.css`
+and a `tokens/brand.tokens.json`. `PASS` on a triggering scenario means the model
+invoked `ui-theme`; on the adjacent scenario it means the theme skill stayed quiet,
+whatever else fired.
+
+| Scenario | Kind | Haiku | Sonnet | Opus |
+| --- | --- | --- | --- | --- |
+| ui-theme-shadcn | obvious | FAIL (no skill) | PASS | PASS |
+| ui-theme-figma | oblique | FAIL (fired the built-in `design` skill) | PASS | PASS |
+| ui-theme-token-file | oblique | FAIL (no skill) | PASS | PASS |
+| ui-theme-override-adjacent | adjacent | PASS | PASS | PASS (fired `ui-button`, which is the right answer) |
+
+The three earlier scenarios in the same sweep: Sonnet and Opus 3 / 3; Haiku passed
+only the adjacent one and fired the built-in `run` skill on the obvious request.
+Haiku's five misses are the known limitation above, not wrong-skill matches: on four
+of them it invoked no plugin skill at all.
+
+Two things about the run itself. Every Sonnet and Opus run that invoked `ui-theme`
+then exited non-zero at the eight-turn cap, because version two of the skill copies
+the roles file, reads discovery sources and writes the block before it verifies; the
+runner used to score any non-zero exit as "never reached a model", which turned ten
+correct triggers into failures. `scripts/run-evals.mjs` now records whether the
+stream held an assistant message (`reached`) and the exit reason, and both scorers
+count the trigger at the Skill call, which is what the earlier tables always
+measured. And the sweep was limited to one skill with the new `EVAL_SKILLS` filter,
+because re-measuring one description should not cost the other six skills' calls.
+
+One description rewrite was tried for Haiku, as the plan requires: the trigger words
+(shadcn/ui, Primer, Bootstrap, token file, Figma) moved to the first clause and the
+text shortened from 720 to 634 characters. Re-run on Haiku alone, seven calls:
+
+| Description | Haiku, isolated | New triggering scenarios |
+| --- | --- | --- |
+| Original (`Theme workflow - binds a project's design system, ...`), 720 chars | 2 / 7 | 0 / 3, one fired the built-in `design` skill |
+| Rewrite, trigger words first, 634 chars | 2 / 7 | 0 / 3, no skill invoked on any |
+
+Both pass only the two adjacent scenarios, so the criterion that the four new
+scenarios pass on all three models is not met, and the plan that added them stays
+in progress with this recorded as the blocker. The original description ships,
+because it is the one Sonnet and Opus were measured on at 7 / 7; the rewrite was
+not run on them. This is the same limitation as above and is not treated as a
+defect to keep grinding at.
+
 ## Reproducing
 
 ```bash
 scripts/eval.sh baseline    # what the models write with no skill
 scripts/eval.sh skills      # which skill fires, isolated by default
 EVAL_ISOLATE=0 scripts/eval.sh skills   # the same, in a crowded session
+EVAL_SKILLS=ui-theme scripts/eval.sh skills   # one skill's scenarios only
 ```
 
-`EVAL_MODELS` and `EVAL_CONCURRENCY` control the sweep; `EVAL_PROJECT` points at the
-fixture project each run gets its own copy of. Results are scored by
+`EVAL_MODELS`, `EVAL_CONCURRENCY` and `EVAL_SKILLS` control the sweep; `EVAL_PROJECT`
+points at the fixture project each run gets its own copy of. Results are scored by
 `scripts/score-evals.mjs`, kept separate from the runner so the correctness rule can be
 corrected without paying for another sweep.

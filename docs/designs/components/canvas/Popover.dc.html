@@ -1,0 +1,260 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #111827; background: #f9fafb; line-height: 1.5; }
+header, main { max-inline-size: 64rem; margin-inline: auto; padding: 1.5rem; }
+h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
+h2 { font-size: 1.25rem; margin: 0 0 1rem; }
+h3 { font-size: 1rem; margin: 1.5rem 0 0.5rem; }
+header p { margin: 0; color: #374151; }
+.chips { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 0.75rem; }
+.chips li { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.75rem; align-items: center; padding: 0.5rem; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.375rem; }
+.swatch { inline-size: 2.5rem; block-size: 2.5rem; border-radius: 0.25rem; border: 1px solid #e5e7eb; background: #ffffff; }
+.chips code { font-size: 0.8125rem; }
+.chips .meaning, .chips .value { display: block; font-size: 0.8125rem; color: #374151; }
+section.component { margin-block: 2.5rem; }
+.specimen { display: grid; gap: 1rem; justify-items: start; padding: 1.5rem; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.5rem; }
+.specimen dialog[open] { position: static; margin: 0; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; font-size: 0.875rem; inline-size: 100%; }
+th, td { text-align: left; padding: 0.375rem 0.5rem; border-block-end: 1px solid #e5e7eb; vertical-align: top; }
+@media print { body { background: #ffffff; } section.component { break-inside: avoid; } }
+a { color: #1a56db; } a:hover { color: #1e429f; }
+.specimen [popover] { display: flex; flex-direction: column; position: static; inset: auto; margin: 0; }
+@layer auk {
+  .auk-popover {
+    inline-size: var(--auk-popover-inline-size, min(22rem, calc(100vw - 2rem)));
+    max-block-size: var(--auk-popover-max-block-size, calc(100vh - 4rem));
+    padding: 0;
+    border: var(--auk-popover-border-width, 1px) solid var(--auk-popover-border-color, #d1d5db);
+    border-radius: var(--auk-popover-radius, 0.5rem);
+    font-family: var(--auk-popover-font-family, inherit);
+    color: var(--auk-popover-color, #111827);
+    background-color: var(--auk-popover-bg, #ffffff);
+    box-shadow: var(--auk-popover-box-shadow, 0 10px 25px rgba(17, 24, 39, 0.18));
+  }
+
+  .auk-popover:popover-open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .auk-popover[data-placement="center"]:popover-open {
+    inset: 0;
+    margin: auto;
+  }
+
+  .auk-popover[data-placement="top"]:popover-open {
+    inset-block: var(--auk-popover-page-offset, 1rem) auto;
+    inset-inline: 0;
+    margin-block: 0 auto;
+    margin-inline: auto;
+  }
+
+  .auk-popover[data-placement="bottom"]:popover-open {
+    inset-block: auto var(--auk-popover-page-offset, 1rem);
+    inset-inline: 0;
+    margin-block: auto 0;
+    margin-inline: auto;
+  }
+
+  .auk-popover[data-placement="left"]:popover-open {
+    inset-block: 0;
+    inset-inline: var(--auk-popover-page-offset, 1rem) auto;
+    margin-block: auto;
+    margin-inline: 0 auto;
+  }
+
+  .auk-popover[data-placement="right"]:popover-open {
+    inset-block: 0;
+    inset-inline: auto var(--auk-popover-page-offset, 1rem);
+    margin-block: auto;
+    margin-inline: auto 0;
+  }
+
+  @supports (position-area: block-end) {
+    .auk-popover:not([data-placement]):popover-open,
+    .auk-popover[data-placement="trigger"]:popover-open {
+      inset: auto;
+      margin: var(--auk-popover-offset, 0.25rem) 0 0;
+      position-area: var(--auk-popover-position-area, block-end span-inline-end);
+      position-try-fallbacks: var(--auk-popover-position-try-fallbacks, flip-block, flip-inline, flip-block flip-inline);
+    }
+  }
+
+  .auk-popover [data-part="header"] {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--auk-popover-gap, 0.75rem);
+    padding: var(--auk-popover-padding, 1rem);
+    border-block-end: var(--auk-popover-divider-width, 1px) solid var(--auk-popover-divider-color, #e5e7eb);
+  }
+
+  .auk-popover [data-part="title"] {
+    margin: 0;
+    font-size: var(--auk-popover-title-size, 1rem);
+    line-height: var(--auk-popover-title-line-height, 1.4);
+  }
+
+  .auk-popover [data-part="body"] {
+    padding: var(--auk-popover-padding, 1rem);
+    overflow-y: auto;
+    color: var(--auk-popover-body-color, #374151);
+    line-height: var(--auk-popover-line-height, 1.5);
+  }
+
+  .auk-popover [data-part="close"] {
+    flex: none;
+    min-inline-size: var(--auk-popover-close-size, 2.75rem);
+    min-block-size: var(--auk-popover-close-size, 2.75rem);
+    border: var(--auk-popover-close-border-width, 1px) solid var(--auk-popover-close-border-color, transparent);
+    border-radius: var(--auk-popover-close-radius, 0.375rem);
+    font-family: var(--auk-popover-font-family, inherit);
+    font-size: var(--auk-popover-close-font-size, 1.25rem);
+    color: var(--auk-popover-close-color, #1f2937);
+    background-color: var(--auk-popover-close-bg, transparent);
+    cursor: pointer;
+  }
+
+  .auk-popover [data-part="close"]:focus-visible,
+  .auk-popover [data-part="body"] :focus-visible {
+    outline: var(--auk-popover-focus-width, 3px) solid var(--auk-popover-focus-color, #111827);
+    outline-offset: var(--auk-popover-focus-offset, 2px);
+  }
+}
+/* Generated by node scripts/build-tokens.mjs from the component references and the mapping table in ui-theme.md. Edit those, not this file. */
+@layer auk {
+  :root {
+    --auk-button-bg: var(--auk-role-primary);
+    --auk-button-border-color: var(--auk-role-primary);
+    --auk-tabs-selected-tab-color: var(--auk-role-primary);
+    --auk-tabs-selected-tab-border-block-end-color: var(--auk-role-primary);
+    --auk-button-color: var(--auk-role-on-primary);
+    --auk-button-destructive-color: var(--auk-role-on-primary);
+    --auk-box-color: var(--auk-role-text);
+    --auk-button-secondary-color: var(--auk-role-text);
+    --auk-dialog-color: var(--auk-role-text);
+    --auk-dialog-body-color: var(--auk-role-text);
+    --auk-dialog-close-color: var(--auk-role-text);
+    --auk-popover-color: var(--auk-role-text);
+    --auk-popover-body-color: var(--auk-role-text);
+    --auk-popover-close-color: var(--auk-role-text);
+    --auk-tabs-color: var(--auk-role-text);
+    --auk-tabs-tab-color: var(--auk-role-text);
+    --auk-box-bg: var(--auk-role-surface);
+    --auk-button-secondary-bg: var(--auk-role-surface);
+    --auk-dialog-bg: var(--auk-role-surface);
+    --auk-dialog-close-bg: var(--auk-role-surface);
+    --auk-popover-bg: var(--auk-role-surface);
+    --auk-popover-close-bg: var(--auk-role-surface);
+    --auk-tabs-tab-bg: var(--auk-role-surface);
+    --auk-box-border-color: var(--auk-role-border);
+    --auk-button-secondary-border-color: var(--auk-role-border);
+    --auk-dialog-border-color: var(--auk-role-border);
+    --auk-dialog-close-border-color: var(--auk-role-border);
+    --auk-popover-border-color: var(--auk-role-border);
+    --auk-popover-close-border-color: var(--auk-role-border);
+    --auk-tabs-border-color: var(--auk-role-border);
+    --auk-dialog-divider-color: var(--auk-role-divider);
+    --auk-popover-divider-color: var(--auk-role-divider);
+    --auk-button-focus-color: var(--auk-role-focus);
+    --auk-dialog-focus-color: var(--auk-role-focus);
+    --auk-popover-focus-color: var(--auk-role-focus);
+    --auk-tabs-focus-color: var(--auk-role-focus);
+    --auk-alert-color: var(--auk-role-info);
+    --auk-alert-border-color: var(--auk-role-info);
+    --auk-alert-bg: var(--auk-role-info-surface);
+    --auk-alert-error-color: var(--auk-role-danger);
+    --auk-alert-error-border-color: var(--auk-role-danger);
+    --auk-button-destructive-bg: var(--auk-role-danger);
+    --auk-alert-error-bg: var(--auk-role-danger-surface);
+    --auk-alert-success-color: var(--auk-role-success);
+    --auk-alert-success-border-color: var(--auk-role-success);
+    --auk-alert-success-bg: var(--auk-role-success-surface);
+    --auk-alert-warning-color: var(--auk-role-warning);
+    --auk-alert-warning-border-color: var(--auk-role-warning);
+    --auk-alert-warning-bg: var(--auk-role-warning-surface);
+    --auk-button-disabled-bg: var(--auk-role-muted);
+    --auk-button-disabled-border-color: var(--auk-role-muted);
+    --auk-button-disabled-color: var(--auk-role-on-muted);
+    --auk-box-invert-bg: var(--auk-role-inverse);
+    --auk-box-invert-border-color: var(--auk-role-inverse);
+    --auk-box-invert-color: var(--auk-role-on-inverse);
+    --auk-dialog-backdrop-bg: var(--auk-role-overlay);
+    --auk-popover-box-shadow: var(--auk-role-shadow);
+    --auk-alert-radius: var(--auk-role-radius);
+    --auk-box-radius: var(--auk-role-radius);
+    --auk-button-radius: var(--auk-role-radius);
+    --auk-dialog-radius: var(--auk-role-radius);
+    --auk-dialog-close-radius: var(--auk-role-radius);
+    --auk-popover-radius: var(--auk-role-radius);
+    --auk-popover-close-radius: var(--auk-role-radius);
+    --auk-alert-font-family: var(--auk-role-font);
+    --auk-button-font-family: var(--auk-role-font);
+    --auk-dialog-font-family: var(--auk-role-font);
+    --auk-popover-font-family: var(--auk-role-font);
+    --auk-tabs-font-family: var(--auk-role-font);
+  }
+}
+  </style>
+</helmet>
+<div style="width: 880px; height: 720px; box-sizing: border-box; overflow: auto; background: #f9fafb; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+  <h2 style="margin: 0; font-size: 20px;">ui-popover</h2>
+<div class="specimen">
+<button class="auk-button" type="button" id="filters-trigger"
+        popovertarget="filters-popover" aria-expanded="false">
+  Filters
+</button>
+
+<div class="auk-popover" id="filters-popover" popover="auto" data-placement="trigger"
+     role="group" aria-labelledby="filters-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="filters-popover-title">Filter results</h2>
+  </div>
+  <div data-part="body">
+    <p>An auto popover closes on Escape and on a click outside it.</p>
+    <button class="auk-button" type="button" id="filters-apply" autofocus>Apply</button>
+  </div>
+</div>
+
+<button class="auk-button" type="button" id="notes-trigger"
+        popovertarget="notes-popover" aria-expanded="false">
+  Release notes
+</button>
+
+<div class="auk-popover" id="notes-popover" popover="manual" data-placement="center"
+     role="group" aria-labelledby="notes-popover-title">
+  <div data-part="header">
+    <h2 data-part="title" id="notes-popover-title">What changed</h2>
+    <button data-part="close" type="button" popovertarget="notes-popover"
+            popovertargetaction="hide" aria-label="Close release notes">
+      <span aria-hidden="true">&#215;</span>
+    </button>
+  </div>
+  <div data-part="body">
+    <p>A manual popover ignores Escape and outside clicks. It closes only here.</p>
+  </div>
+</div>
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th scope="col">Kind</th><th scope="col">Name</th><th scope="col">In code</th><th scope="col">Figma name</th></tr></thead>
+<tbody><tr><td>part</td><td>header</td><td><code>data-part=&quot;header&quot;</code></td><td><code>Header</code></td></tr>
+<tr><td>part</td><td>title</td><td><code>data-part=&quot;title&quot;</code></td><td><code>Title</code></td></tr>
+<tr><td>part</td><td>body</td><td><code>data-part=&quot;body&quot;</code></td><td><code>Body</code></td></tr>
+<tr><td>part</td><td>close</td><td><code>data-part=&quot;close&quot;</code></td><td><code>Close</code></td></tr>
+<tr><td>state</td><td>default</td><td>no attribute</td><td><code>State=Default</code></td></tr>
+<tr><td>state</td><td>open</td><td><code>:popover-open</code></td><td><code>State=Open</code></td></tr>
+<tr><td>state</td><td>focus</td><td><code>:focus-visible</code></td><td><code>State=Focus</code></td></tr></tbody>
+</table></div>
+</div>
+</x-dc>
+</body>
+</html>

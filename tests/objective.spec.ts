@@ -42,6 +42,12 @@ it('the repository has components in it', () => {
   expect(skills.length).toBeGreaterThan(0);
 });
 
+it('the slug role is reserved for the role layer', () => {
+  // --auk-role-<name> parses under the property grammar as component `role`, so a
+  // skills/ui-role directory would collide with every role binding a project writes.
+  expect(skills).not.toContain('ui-role');
+});
+
 describe.each(skills)('skills/%s', (name) => {
   const dir = join(SKILLS_DIR, name);
   const skillPath = join(dir, 'SKILL.md');
@@ -167,6 +173,21 @@ describe.each(skills)('skills/%s', (name) => {
     }
     // A nested var() inside the fallback would defeat the standalone guarantee.
     expect(css!).not.toMatch(/var\([^)]*var\(/);
+  });
+
+  // A reference never decides the colour scheme: it ships one set of literals, and a
+  // project's dark form is mirrored by ui-theme, never invented here. Each of the three
+  // ways a stylesheet could smuggle a scheme in is rejected by name.
+  component('reference css never sets color-scheme', () => {
+    expect(fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!).not.toMatch(/color-scheme/);
+  });
+
+  component('reference css never uses light-dark()', () => {
+    expect(fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!).not.toMatch(/light-dark\(/);
+  });
+
+  component('reference css never queries prefers-color-scheme', () => {
+    expect(fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!).not.toMatch(/prefers-color-scheme/);
   });
 
   component('reference css is wrapped in the auk cascade layer', () => {

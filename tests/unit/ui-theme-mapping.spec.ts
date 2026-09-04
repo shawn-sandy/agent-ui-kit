@@ -36,9 +36,27 @@ describe('the mapping table is a faithful copy of the component references', () 
     expect(brandBearing.length).toBeGreaterThan(0);
   });
 
-  it('has twenty-one role rows, each naming at least one property', () => {
-    expect(rows.length).toBe(21);
+  it('has twenty-three role rows, each naming at least one property', () => {
+    expect(rows.length).toBe(23);
     for (const row of rows) expect(row, 'row names no property').toMatch(/`--auk-/);
+  });
+
+  it('no role chains a text colour to its own background', () => {
+    // Binding one role to one value paints every property in its row the same colour.
+    // A row that holds both the `-bg` and the `-color` of one component and qualifier
+    // therefore blanks that control's text the moment a project binds the role - which
+    // is exactly what `muted` and `inverse` did before on-muted and on-inverse existed.
+    const offenders = rows
+      .map((row) => {
+        const role = row.split('|')[1].trim();
+        const names = [...row.split('|')[3].matchAll(/`(--auk-[a-z0-9-]+)`/g)].map((m) => m[1]);
+        const stems = (suffix: RegExp) => names.filter((n) => suffix.test(n)).map((n) => n.replace(suffix, ''));
+        const bg = new Set(stems(/-bg$/));
+        const clash = stems(/-color$/).filter((stem) => bg.has(stem));
+        return clash.length ? `${role}: ${clash.join(', ')}` : null;
+      })
+      .filter(Boolean);
+    expect(offenders).toEqual([]);
   });
 
   it('every property in the table exists in a shipped component reference', () => {
@@ -74,6 +92,43 @@ describe('the counts the reference states are the measured ones', () => {
   });
 
   it('the intro line under the table agrees with the Scope paragraph', () => {
-    expect(section).toMatch(new RegExp(`Twenty-one roles onto ${brandBearing.length} properties`));
+    expect(section).toMatch(new RegExp(`Twenty-three roles onto ${brandBearing.length} properties`));
+  });
+});
+
+describe('the crosswalk is data an agent can act on', () => {
+  // Every cell is a name an agent will bind a role to, so a cell that is not a custom
+  // property, or a row that is not a role, would emit a broken binding. The date says
+  // when the cells were last read off each system's live documentation.
+  const crosswalk = reference.split('\n## Crosswalk\n')[1]?.split('\n## ')[0] ?? '';
+  const roles = new Set(rows.map((row) => row.split('|')[1].trim()));
+  const tableRows = crosswalk.split('\n').filter((line) => line.startsWith('| '));
+  const header = tableRows[0] ?? '';
+  const body = tableRows.slice(2);
+
+  it('the section exists and its intro line carries a verification date', () => {
+    expect(crosswalk, 'no "## Crosswalk" section').not.toBe('');
+    expect(crosswalk.split('\n|')[0]).toMatch(/verified 2026-\d\d-\d\d/);
+  });
+
+  it('the header row names at least four systems', () => {
+    const systems = header.split('|').slice(2, -1).map((c) => c.trim()).filter(Boolean);
+    expect(systems.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('every row is a role from the mapping table', () => {
+    expect(body.length).toBeGreaterThan(0);
+    expect(body.map((row) => row.split('|')[1].trim()).filter((r) => !roles.has(r))).toEqual([]);
+  });
+
+  it('every other cell is blank or one backticked custom property', () => {
+    const bad = body.flatMap((row) =>
+      row.split('|').slice(2, -1).map((c) => c.trim()).filter((c) => c !== '' && !/^`--[a-z0-9-]+`$/i.test(c)),
+    );
+    expect(bad).toEqual([]);
+  });
+
+  it('a Sources line under the table names the pages read', () => {
+    expect(crosswalk).toMatch(/^Sources: .*https:\/\//m);
   });
 });

@@ -1,0 +1,63 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "Foundations",
+      "x": 0,
+      "y": 0,
+      "w": 1200,
+      "h": 760
+    },
+    {
+      "file": "Alert.dc.html",
+      "title": "ui-alert",
+      "x": 0,
+      "y": 880,
+      "w": 880,
+      "h": 720
+    },
+    {
+      "file": "Box.dc.html",
+      "title": "ui-box",
+      "x": 960,
+      "y": 880,
+      "w": 880,
+      "h": 720
+    },
+    {
+      "file": "Button.dc.html",
+      "title": "ui-button",
+      "x": 1920,
+      "y": 880,
+      "w": 880,
+      "h": 720
+    },
+    {
+      "file": "Dialog.dc.html",
+      "title": "ui-dialog",
+      "x": 0,
+      "y": 1720,
+      "w": 880,
+      "h": 720
+    },
+    {
+      "file": "Popover.dc.html",
+      "title": "ui-popover",
+      "x": 960,
+      "y": 1720,
+      "w": 880,
+      "h": 720
+    },
+    {
+      "file": "Tabs.dc.html",
+      "title": "ui-tabs",
+      "x": 1920,
+      "y": 1720,
+      "w": 880,
+      "h": 720
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}
