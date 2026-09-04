@@ -29,6 +29,7 @@ from the same frontmatter.
 | [Plan: Ship a non-modal popover skill on the native popover attribute](https://claude.ai/code/artifact/4e94d7ac-07d7-48cc-b1a7-2917796d9c77) | completed | `docs/plans/add-ui-popover-skill.md` |
 | [Plan: Prove each skill by testing what an agent actually builds from it](https://claude.ai/code/artifact/dee6ed17-545d-4356-b5ba-2063e66d4436) | todo | `docs/plans/add-build-layer-for-agent-built-components.md` |
 | [Plan: Add the ui-theme workflow skill that binds a project's styles to the auk custom properties](https://claude.ai/code/artifact/f21dc0a6-79c1-453a-b568-9bc98ef8ec2b) | completed | `docs/plans/add-ui-theme-workflow-skill.md` |
+| [Plan: Bring ui-dialog back in line with the native dialog element](https://claude.ai/code/artifact/f56741f9-bfb0-4616-bc12-78e829d5d996) | todo | `docs/plans/sync-ui-dialog-with-native-spec.md` |
 
 ## Designs
 
