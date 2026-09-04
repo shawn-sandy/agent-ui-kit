@@ -40,6 +40,7 @@ const FLOORS = {
   '--auk-dialog-focus-width': { criterion: '2.4.7', bound: 'above 0', spec: 'tests/e2e/ui-dialog.spec.ts' },
   '--auk-popover-focus-width': { criterion: '2.4.7', bound: 'above 0', spec: 'tests/e2e/ui-popover.spec.ts' },
   '--auk-tabs-focus-width': { criterion: '2.4.7', bound: 'above 0', spec: 'tests/e2e/ui-tabs.spec.ts' },
+  '--auk-button-transition-duration': { criterion: '2.3.3', bound: '0s under prefers-reduced-motion: reduce', spec: 'tests/e2e/ui-button.spec.ts' },
 };
 
 /** The DTCG type a property's category maps to. `string` is not a DTCG type: it is the honest label for a keyword list the format cannot express. */

@@ -1311,7 +1311,11 @@
             "component": "button",
             "kind": "measured",
             "fallback": "120ms",
-            "floor": "none",
+            "floor": {
+              "criterion": "2.3.3",
+              "bound": "0s under prefers-reduced-motion: reduce",
+              "spec": "tests/e2e/ui-button.spec.ts"
+            },
             "guard": "prefers-reduced-motion: no-preference"
           }
         }

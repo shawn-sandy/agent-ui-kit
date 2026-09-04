@@ -156,7 +156,7 @@ leaving the measured properties alone.
 | Button target size | 24 by 24 CSS pixels (2.5.8) | `tests/e2e/ui-button.spec.ts` |
 | Focus outline width | above 0 (2.4.7) | the button, dialog, popover and tabs specs, and `tests/e2e/ui-theme.spec.ts` under a bound palette |
 | Focus ring contrast | 3:1 against the surface it is drawn over (1.4.11) | `tests/e2e/ui-theme.spec.ts` |
-| Button transition | runs only inside `@media (prefers-reduced-motion: no-preference)` | the reference css, recorded as `guard` on the token |
+| Button transition | `0s` under `prefers-reduced-motion: reduce` (2.3.3); it runs only inside the `no-preference` guard, recorded as `guard` on the token | `tests/e2e/ui-button.spec.ts` |
 
 The tab, dialog-close and popover-close target sizes are not asserted, so their tokens
 carry `floor: none` rather than a number nobody measured. Dimension roles - spacing

@@ -52,6 +52,18 @@ test('2.5.8 Target Size (Minimum): the default size clears 24 by 24', async ({ p
   }
 });
 
+test('2.3.3 Animation from Interactions: the hover transition is off when a reader asks for less motion', async ({ page }) => {
+  // The floor auk.tokens.json records for --auk-button-transition-duration. The
+  // reference keeps the transition inside the no-preference guard, so a reader who
+  // asked for less motion gets none however the duration is themed - read from
+  // computed styles under both settings rather than trusted from the css text.
+  const duration = () => page.locator('#primary').evaluate((el) => getComputedStyle(el).transitionDuration);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  expect(await duration()).toBe('0.12s');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  expect(await duration()).toBe('0s');
+});
+
 test('4.1.2 Name, Role, Value: an icon-only button still has a name', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Close', exact: true })).toBeVisible();
   // The glyph itself contributes nothing to the name.
