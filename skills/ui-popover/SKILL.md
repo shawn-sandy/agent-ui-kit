@@ -21,8 +21,7 @@ fully usable.
 - Anything the user must answer before continuing. That is `ui-dialog`, which is
   modal by construction and makes the page behind inert.
 - A message that sits in the page flow rather than above it. That is `ui-alert`.
-- A destructive confirmation. Non-modal means the confirmation can be ignored, which
-  is the opposite of what a confirmation is for.
+- A destructive confirmation. A layer that can be ignored cannot confirm anything.
 
 ## Clarify when needed
 
@@ -45,7 +44,9 @@ proceed and state any assumptions.
 4. Choose placement: omit `data-placement` or use `trigger`, or set a viewport placement.
 5. Copy the Behaviour module and call `initPopover(popoverElement)` once per popover.
 6. Copy the Styles block as-is. Override `--auk-popover-*` to theme it.
-7. Open `references/demo.html` and check the behaviours listed there.
+7. In a component-based project, follow `ui-compose`: props from the contract table,
+   split only on structure, compose sibling auk components, render alone.
+8. Open `references/demo.html` and check the behaviours listed there.
 
 ## Non-negotiable
 

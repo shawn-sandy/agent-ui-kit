@@ -1,4 +1,8 @@
 import * as React from 'react';
+// The sibling projection, composed rather than re-typed - see ui-compose. Under a
+// selective install of this skill alone the import dangles; the file is reference
+// material and is never executed.
+import { AukButton } from '../../ui-button/references/react-demo';
 
 type FocusRef = { current: HTMLElement | null };
 
@@ -120,15 +124,14 @@ export function AukDialogDemo() {
 
   return (
     <div>
-      <button
-        className="auk-button"
+      <AukButton
         type="button"
         data-dialog-open="confirm-delete"
         ref={openerRef}
         onClick={() => setOpen(true)}
       >
         Delete account
-      </button>
+      </AukButton>
 
       <AukDialog
         id="confirm-delete"
@@ -138,19 +141,18 @@ export function AukDialogDemo() {
         returnFocusRef={openerRef}
         footer={
           <>
-            <button
-              className="auk-button"
+            <AukButton
               type="button"
-              data-variant="secondary"
+              variant="secondary"
               data-dialog-close=""
               autoFocus
               onClick={() => setOpen(false)}
             >
               Keep account
-            </button>
-            <button className="auk-button" type="button" data-variant="destructive">
+            </AukButton>
+            <AukButton type="button" variant="destructive">
               Delete permanently
-            </button>
+            </AukButton>
           </>
         }
       >

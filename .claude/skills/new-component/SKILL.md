@@ -33,7 +33,9 @@ on any conflict - read it first, and do not rely on this file restating it.
    `ui-button` and `ui-alert` are CSS-only, `ui-dialog` and `ui-tabs` ship a JavaScript module.
    `ui-alert` has a live region, `ui-dialog` does focus management, `ui-tabs` does keyboard
    navigation.
-3. Write `skills/ui-$ARGUMENTS/SKILL.md` per spec section 1.
+3. Write `skills/ui-$ARGUMENTS/SKILL.md` per spec section 1, including the Build it step
+   that points at `ui-compose` - the line is identical in every component skill, and
+   `tests/objective.spec.ts` asserts it with the four rules on it.
 4. Write `skills/ui-$ARGUMENTS/references/ui-$ARGUMENTS.md` per spec section 2.
 5. Create `skills/ui-$ARGUMENTS/references/demo.html` from the demo of the component you
    picked in step 2, and take the one with the matching shape - copying a CSS-only demo
@@ -44,14 +46,19 @@ on any conflict - read it first, and do not rely on this file restating it.
    loop over every component, it aborts the build for all of them, not just this one.
    Then replace the hand-written parts around the markers - the markup, page chrome and
    wiring - and run `node scripts/build-demos.mjs` to fill the generated regions.
-6. Write `tests/e2e/ui-$ARGUMENTS.spec.ts` per spec section 6. Every WCAG criterion in the
+6. Write `skills/ui-$ARGUMENTS/references/react-demo.tsx` exporting `Auk<Component>Props`
+   and `Auk<Component>Demo` over the same DOM contract and rendering the `auk-$ARGUMENTS`
+   root class - `tests/objective.spec.ts` asserts all three. Where the demo needs a
+   button, compose `AukButton` from `../../ui-button/references/react-demo` rather than
+   hand-typing one. It is the one file the portability lint excludes.
+7. Write `tests/e2e/ui-$ARGUMENTS.spec.ts` per spec section 6. Every WCAG criterion in the
    contract table needs a test whose title starts with that criterion, and any number
    stated in the reference must be measured here rather than estimated.
-7. Write `evals/ui-$ARGUMENTS.json` per spec section 4: at least three scenarios, whose
+8. Write `evals/ui-$ARGUMENTS.json` per spec section 4: at least three scenarios, whose
    kinds include `obvious`, `oblique` and `adjacent`. Copy the shape from
    `evals/ui-button.json`.
-8. Run `npm run check`. It must exit zero. Fix what it names; do not weaken a gate.
-9. Work through the checklist in spec section 8 and report each item's status honestly,
+9. Run `npm run check`. It must exit zero. Fix what it names; do not weaken a gate.
+10. Work through the checklist in spec section 8 and report each item's status honestly,
    including anything not verified. One item cannot be closed here: "Three evaluations
    exist with a recorded baseline" needs an evaluation sweep, which this skill does not
    run - say so and leave the baseline to whoever runs it.

@@ -40,7 +40,9 @@ request already maps cleanly to the contract, proceed and state any assumptions.
    makes the panel announce its own name.
 3. Copy the Behaviour module and call `initTabs(root)` once per tab set.
 4. Copy the Styles block as-is. Override `--auk-tabs-*` to theme it.
-5. Open `references/demo.html` and drive it with the keyboard only.
+5. In a component-based project, follow `ui-compose`: props from the contract table,
+   split only on structure, compose sibling auk components, render alone.
+6. Open `references/demo.html` and drive it with the keyboard only.
 
 ## Non-negotiable
 

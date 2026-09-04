@@ -1,0 +1,36 @@
+{
+  "skill": "ui-compose",
+  "scenarios": [
+    {
+      "id": "ui-compose-obvious",
+      "kind": "obvious",
+      "expect": "ui-compose",
+      "prompt": "Add the confirm dialog from the ui-dialog skill as src/components/ConfirmDialog.tsx. We already have src/components/Button.tsx wrapping the auk button, and the dialog's footer needs a cancel and a delete action. Type the props the way the rest of src/components does.",
+      "baselineFailure": "hand-types the footer buttons with the auk-button class instead of composing the project's Button component, and shapes the props from habit rather than the contract table, so a required attribute such as aria-labelledby becomes optional or vanishes",
+      "detect": {
+        "exports a typed props surface": "export\\s+(?:interface|type)\\s+\\w*Props\\b",
+        "composes the project's Button": "<Button\\b",
+        "hand-types the sibling button": "class(?:Name)?=[\"']auk-button"
+      }
+    },
+    {
+      "id": "ui-compose-oblique",
+      "kind": "oblique",
+      "expect": "ui-compose",
+      "prompt": "The confirm dialog we built from the ui-dialog skill is sitting in index.html as plain markup. Make it fit our component setup under src/components so it can be used like the others there.",
+      "baselineFailure": "wraps the markup in a component with an untyped props bag, re-types the sibling button markup inside it, and leaves the dialog tied to page-level ids so it cannot render on its own",
+      "detect": {
+        "exports a typed props surface": "export\\s+(?:interface|type)\\s+\\w*Props\\b",
+        "hand-types the sibling button": "class(?:Name)?=[\"']auk-button"
+      }
+    },
+    {
+      "id": "ui-compose-adjacent",
+      "kind": "adjacent",
+      "expect": null,
+      "prompt": "In index.html, add a confirm dialog before deleting an account, with a cancel and a delete button. It is a plain static page.",
+      "baselineFailure": "n/a - this scenario asserts the compose skill stays quiet",
+      "detect": {}
+    }
+  ]
+}
