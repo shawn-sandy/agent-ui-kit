@@ -9,7 +9,7 @@ import { resolve } from 'node:path';
 import matter from 'gray-matter';
 
 const ROOT = resolve(import.meta.dirname, '../..');
-const ARTIFACT_URL = /https:\/\/claude\.ai\/code\/artifact\/[0-9a-f-]+/g;
+const ARTIFACT_URL = /https:\/\/claude\.ai\/code\/artifact\/[0-9a-f-]+/;
 
 const doc = readFileSync(resolve(ROOT, 'docs/artifacts.md'), 'utf8');
 const plansDir = resolve(ROOT, 'docs/plans');
@@ -28,7 +28,6 @@ describe('docs/artifacts.md lists every artifact URL the repo records', () => {
     for (const key of URL_KEYS) {
       const url = data[key];
       if (typeof url !== 'string' || !ARTIFACT_URL.test(url)) continue;
-      ARTIFACT_URL.lastIndex = 0;
       it(`${file} ${key}`, () => {
         expect(doc).toContain(url);
       });
@@ -36,7 +35,7 @@ describe('docs/artifacts.md lists every artifact URL the repo records', () => {
   }
 
   it('CLAUDE.md overview artifact', () => {
-    const urls = readFileSync(resolve(ROOT, 'CLAUDE.md'), 'utf8').match(ARTIFACT_URL) ?? [];
+    const urls = readFileSync(resolve(ROOT, 'CLAUDE.md'), 'utf8').match(new RegExp(ARTIFACT_URL, 'g')) ?? [];
     expect(urls.length).toBeGreaterThan(0);
     for (const url of urls) expect(doc).toContain(url);
   });
