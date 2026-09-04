@@ -1,0 +1,12 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "color": {
+    "brand": { "$type": "color", "$value": "#7c3aed" },
+    "brand-on": { "$type": "color", "$value": "#ffffff" },
+    "text": { "$type": "color", "$value": "#18181b" },
+    "surface": { "$type": "color", "$value": "#ffffff" },
+    "border": { "$type": "color", "$value": "#e4e4e7" }
+  },
+  "radius": { "md": { "$type": "dimension", "$value": "8px" } },
+  "font": { "sans": { "$type": "fontFamily", "$value": "Inter, system-ui, sans-serif" } }
+}

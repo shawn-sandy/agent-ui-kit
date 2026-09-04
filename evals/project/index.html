@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Northwind Console</title>
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/globals.css">
+</head>
+<body>
+  <header>
+    <h1>Northwind Console</h1>
+    <p>Workspace: Acme Production</p>
+  </header>
+
+  <main>
+    <section id="plan">
+      <h2>Plan</h2>
+      <div class="pricing-details">
+        <h3>Team</h3>
+        <p>$24 per seat, per month. Billed annually.</p>
+        <p>Includes 20 projects, audit history and priority support.</p>
+      </div>
+      <div class="out-of-stock-notice">
+        <h3>Enterprise add-on</h3>
+        <p>Currently unavailable. Talk to sales about the next allocation window.</p>
+      </div>
+    </section>
+
+    <section id="features">
+      <h2>What you get</h2>
+      <div class="feature-card">
+        <h3>Audit history</h3>
+        <p>Every change, who made it, and when.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Environments</h3>
+        <p>Promote a build from staging to production in one step.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Access control</h3>
+        <p>Per-project roles that follow your directory groups.</p>
+      </div>
+    </section>
+
+    <section id="settings">
+      <h2>Settings</h2>
+      <div class="settings-summary">
+        <h3>Current configuration</h3>
+        <p>Region: eu-west-1</p>
+        <p>Retention: 90 days</p>
+        <p>Two-factor authentication: required for all members</p>
+      </div>
+      <p>Changing region requires a maintenance window.</p>
+    </section>
+
+    <section id="deployments">
+      <h2>Deployments</h2>
+
+      <div class="table-toolbar">
+        <button type="button" class="auk-button" data-variant="secondary" id="columns-button">Columns</button>
+        <button type="button" class="auk-button" data-variant="secondary" id="more-actions-button">More actions</button>
+      </div>
+
+      <table id="deployments-table">
+        <caption>Recent deployments</caption>
+        <thead>
+          <tr>
+            <th scope="col">Build</th>
+            <th scope="col">Environment</th>
+            <th scope="col">Status</th>
+            <th scope="col">Finished</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>4821</td>
+            <td>production</td>
+            <td>succeeded</td>
+            <td>2026-09-04 14:02</td>
+          </tr>
+          <tr>
+            <td>4820</td>
+            <td>staging</td>
+            <td>succeeded</td>
+            <td>2026-09-04 13:41</td>
+          </tr>
+          <tr>
+            <td>4819</td>
+            <td>production</td>
+            <td>rolled back</td>
+            <td>2026-09-04 11:17</td>
+          </tr>
+          <tr>
+            <td>4818</td>
+            <td>staging</td>
+            <td>failed</td>
+            <td>2026-09-04 10:56</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="danger">
+      <h2>Danger zone</h2>
+      <p>Deleting a workspace removes every project and build in it.</p>
+      <button type="button" class="auk-button" data-variant="destructive" id="delete-workspace-button">Delete workspace</button>
+    </section>
+
+    <section id="account">
+      <h2>Account</h2>
+      <button type="button" class="auk-button" data-variant="destructive" id="delete-account-button">Delete account</button>
+
+      <dialog class="auk-dialog" id="confirm-delete-account" aria-labelledby="confirm-delete-account-title">
+        <h2 data-part="title" id="confirm-delete-account-title">Delete this account?</h2>
+        <div data-part="body">
+          <p>This removes every workspace you own. It cannot be undone.</p>
+        </div>
+        <div data-part="footer">
+          <button type="button" class="auk-button" data-variant="secondary" data-close>Cancel</button>
+          <button type="button" class="auk-button" data-variant="destructive">Delete</button>
+        </div>
+      </dialog>
+    </section>
+  </main>
+
+  <script type="module">
+    const dialog = document.getElementById('confirm-delete-account');
+    document.getElementById('delete-account-button')?.addEventListener('click', () => dialog?.showModal());
+    dialog?.querySelector('[data-close]')?.addEventListener('click', () => dialog.close());
+  </script>
+</body>
+</html>
