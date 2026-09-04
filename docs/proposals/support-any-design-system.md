@@ -41,8 +41,10 @@ artifact-url: https://claude.ai/code/artifact/fe77138e-4ea8-4b51-a6de-a31057fa56
   Figma layer and variant names match `data-part` and `data-variant` one to one.
 - Nothing installs, nothing runs at runtime, every component still works with no property
   defined anywhere, and the standalone guarantee the gates enforce stays untouched. The
-  design-side record is a generated design canvas, with a Figma kit built from it only on
-  request. Two decisions remain with the human (see open questions).
+  design-side record is a generated HTML component sheet; a Claude Design canvas and a Figma
+  kit are optional projections, labelled as vendor-specific, and every such surface in the
+  proposal is listed with its neutral alternative (Appendix I). Two decisions remain with the
+  human (see open questions).
 
 ## Context
 
@@ -275,22 +277,30 @@ Resolved in the 2026-09-04 draft (author defaults, reversible at plan time):
 
 Resolved with the maintainer on 2026-09-04:
 
-16. **The design-side record is a generated design canvas, not a Figma kit.** A generator
-    renders one `.dc.html` artboard per component - anatomy, variants and states, tokens -
-    plus a Foundations artboard from the tokens file, into `docs/designs/components/`, from
-    the same block extraction the demo builder uses and the same property parser the tokens
-    file uses. Artboards are HTML, so the real shipped CSS paints the real component and a
-    check can prove the canvas matches the references; a Figma kit has to translate that CSS
-    into nodes, which the Figma MCP server's own procedure sizes at 20 to 100 write calls per
-    build, and drifts on the next reference edit. An internal skill under `.claude/skills/`
-    runs the generator, publishes through the built-in design skill and lets the artifacts
-    hook record the URL, exactly as the existing canvas under `docs/designs/` was recorded.
-    Nothing about the canvas goes under `skills/`: the artboard format is vendor-specific and
-    the public tree stays vendor-neutral; the tokens file remains the design-side contract.
-    A Figma kit, if a team asks for one, is built later from the canvas with the Figma MCP
-    server's `figma-generate-design` procedure, which takes an HTML page as its input.
-    Propagates to Workstreams D and G, Roadmap phases 7 and 8, Appendix E and F; closes the
-    former open question on a Figma kit.
+16. **The design-side record is a generated HTML component sheet; a design canvas and a Figma
+    kit are projections of it, labelled as vendor-specific.** A generator renders one
+    self-contained page - Foundations from the tokens file, then one section per component
+    with anatomy, variants and states, and tokens - into `docs/designs/components/`, from the
+    same block extraction the demo builder uses and the same property parser the tokens file
+    uses. The sheet opens from disk in any browser with no network, exactly as the demos do,
+    prints to PDF for hand-off, and is what the check pins to the references. The real shipped
+    CSS paints the real component, so nothing is redrawn. From that sheet the generator can
+    also emit a Claude Design canvas (`.dc.html` artboards plus `canvas.json`), which only
+    Claude Code can publish, and the Figma MCP server's `figma-generate-design` procedure can
+    push it into Figma, which needs an editing seat; both are optional projections, named as
+    such wherever they appear, and neither is the record. A hand-built Figma kit is out for
+    now: translating the CSS into nodes is sized by Figma's own procedure at 20 to 100 write
+    calls per build and drifts on the next reference edit. Propagates to Workstreams D and G,
+    Roadmap phases 7 and 8, Appendix E, F and I; closes the former open question on a Figma
+    kit.
+17. **Vendor-specific surfaces are projections, never the record, and each is listed with its
+    neutral alternative.** The repository's goal is one tree that any agent and any design
+    tool can use. So the canonical form of every deliverable is vendor-neutral - plain HTML
+    and CSS, a DTCG file, markdown under `docs/` - and anything that depends on one vendor (a
+    Claude Design canvas, a claude.ai artifact, an internal skill under `.claude/skills/`, a
+    Figma write through the MCP server, Code Connect) is labelled where it appears and paired
+    with the neutral path in Appendix I. Appendix G carries the authoring rule. Propagates to
+    every workstream that names a vendor.
 
 ## Workstreams
 
@@ -361,10 +371,12 @@ Resolved with the maintainer on 2026-09-04:
   plan, a Code Connect template for the button that maps `Variant` to `data-variant` and
   `State=Disabled` to `aria-disabled="true"`. The template lives in `docs/`, not `skills/`,
   because it imports a package.
-- The design-side record is the generated canvas in Workstream G. The `figma-generate-library`
-  procedure the Figma MCP server ships can still build a variable collection and component
-  set from the tokens file; the proposal records the procedure and builds a published Figma
-  kit only when a team asks, from the canvas (decision 16).
+- The design-side record is the generated sheet in Workstream G. The Figma steps above are
+  vendor-specific and labelled so: the tokens file imports natively into Figma on any plan and
+  into Penpot; an agent with the Figma MCP server and an editing seat can instead create the
+  role collection with modes and code syntax through `use_figma`, and on an Organization or
+  Enterprise plan save Code Connect mappings, all optional; a published Figma kit is built
+  from the sheet only when a team asks (decision 16, Appendix I).
 
 **E - Rules and guidelines.** The standard the ask requests, written once each.
 
@@ -386,32 +398,39 @@ shadcn", "our tokens are in Figma", "bind our Style Dictionary output") and one 
 scenario that asks for a component-level override and must not bind a role. Recorded in
 `docs/evaluations.md` after a run, failures included.
 
-**G - The design canvas.** Generated from the references, published as a canvas, checked
-like every other generated file.
+**G - The component sheet and its projections.** Generated from the references, neutral by
+default, checked like every other generated file.
 
 - `scripts/build-design.mjs` reads each component reference through the demo builder's
   block extraction and `scripts/auk-properties.mjs`, and writes
-  `docs/designs/components/<slug>.dc.html` with three panels: anatomy (the Structure block
-  with each `data-part` labelled), variants and states (the instances the demo renders, with
-  dialog and popover shown open by inlining the reference's script the way the demos do), and
-  tokens (the roles the component reads, its properties, the shipped fallbacks). It also
-  writes `foundations.dc.html` from the tokens file - the roles as chips with their shipped
-  values - and `canvas.json` laying the artboards out Foundations first, then components.
+  `docs/designs/components/index.html`: a self-contained page that opens from disk with no
+  network, under the same rules as the demos. Foundations first - the roles as chips with
+  their shipped values, from the tokens file - then one section per component with three
+  panels: anatomy (the Structure block with each `data-part` labelled), variants and states
+  (the instances the demo renders, with dialog and popover shown open by inlining the
+  reference's script the way the demos do), and tokens (the roles the component reads, its
+  properties, the shipped fallbacks). Print to PDF is the export.
 - Two modes. Default renders the shipped fallbacks. `--roles <file>` binds a roles block over
-  the same artboards, so a design-system team reviews its own brand on the canvas without
-  opening Figma, and the specimen on the proposal page becomes an artboard pair.
-- `.claude/skills/design-kit/SKILL.md`, internal and not model-invocable like
-  `new-component`: runs the generator, hands the artboards to the built-in design skill to
-  publish, and moves the row the artifacts hook appends into the Designs table of
-  `docs/artifacts.md`.
-- `tests/integration/design-canvas.spec.ts` asserts every generated artboard and
-  `canvas.json` equal the generator's output byte for byte, the same pattern as
-  `docs/properties.md` and the tokens file.
-- Nothing under `skills/` names the canvas or its format. The public, vendor-neutral
-  design-side contract is the tokens file (Workstream A); the canvas is the maintainer's
-  record and review surface.
-- Bridge: `figma-generate-design` takes an HTML page and builds it in Figma, so a Figma kit
-  starts from the canvas rather than from scratch when one is wanted.
+  the same sheet, so a design-system team reviews its own brand in a browser, with no design
+  tool at all, and the specimen on the proposal page becomes a section of the sheet.
+- `--canvas` additionally emits the Claude Design projection: one `.dc.html` artboard per
+  sheet section plus `canvas.json`, into `docs/designs/components/canvas/`. Labelled in the
+  generator's output and in `docs/theming.md` as Claude-only. `.claude/skills/design-kit/`,
+  internal and not model-invocable like `new-component`, runs the generator with `--canvas`,
+  hands the artboards to the built-in design skill to publish, and moves the row the
+  artifacts hook appends into the Designs table of `docs/artifacts.md`. An agent without
+  that skill runs the script and opens the sheet; nothing is lost but the pan-and-zoom page.
+- `tests/integration/design-sheet.spec.ts` asserts the sheet, and the canvas files when
+  present, equal the generator's output byte for byte, the same pattern as
+  `docs/properties.md` and the tokens file. The sheet also runs through the browser suite's
+  axe scan, since it renders every component.
+- Nothing under `skills/` names the sheet, the canvas or their formats. The public,
+  vendor-neutral design-side contract is the tokens file (Workstream A); the sheet is the
+  maintainer's record and a team's review surface; the canvas and any Figma push are
+  projections.
+- Bridges, each labelled: the Figma MCP server's `figma-generate-design` takes an HTML page
+  and builds it in Figma, so a Figma kit starts from the sheet when a team on an editing seat
+  asks; the tokens file imports natively into Figma and into Penpot, which is open source.
 
 ## Risks & tensions
 
@@ -445,10 +464,11 @@ like every other generated file.
 - **Renames are the pain every surveyed system paid for.** `--sds` to `--slds`, Primer v8.
   The repo says "pin a commit" today. The tokens file's `$deprecated` key is the place to
   record a rename; a deprecation policy is a next step, not this scope.
-- **The artboard format is one vendor's and may change.** The generator is its only writer
-  and the check its only reader, so a format change costs one script edit and one
-  regeneration; nothing a consumer installs depends on it, and the tokens file, not the
-  canvas, is the contract.
+- **Every projection is one vendor's and may change or vanish.** The canvas format, the
+  artifact host, Figma's write API and Code Connect are each outside the repository's
+  control. The record never depends on them: the sheet is plain HTML, the tokens file is
+  DTCG, and each projection is generated from those by a script that is its only writer, so
+  a vendor change costs one script edit or one deleted flag, never a lost record.
 - **Portability lint bans words a design-system guide naturally uses.** Nothing under `skills/`
   may name a framework, preprocessor or package; the Code Connect example and the tool names
   in the crosswalk footnotes live under `docs/`. The crosswalk cells themselves are custom
@@ -477,8 +497,8 @@ like every other generated file.
 | 4 | Workstream C: dimension roles, floors, missing target-size assertions, compact palette | M | 3, open question 1 |
 | 5 | Workstream D: anatomy generator, Figma section, Code Connect example | S | 2 |
 | 6 | Workstream E and F: spec rows, README section, CLAUDE.md line, evals run and recorded | S | 3 |
-| 7 | Workstream G: design generator, internal skill, canvas check, first published canvas | M | 2, 5 |
-| 8 | Only on request: a Figma kit built from the canvas with `figma-generate-design` | L | 7 |
+| 7 | Workstream G: sheet generator, sheet check, canvas projection and internal skill, first published canvas | M | 2, 5 |
+| 8 | Only on request: a Figma kit built from the sheet with `figma-generate-design` | L | 7 |
 
 ## Appendix A - Survey: how twelve systems expose theming (verified 2026-09-04)
 
@@ -664,7 +684,7 @@ under any selector themes that subtree only:
 | Variant matrix cap of 30 | Contract tables stay small (button: 3 variants, 3 states) | Existing scope rule in the spec |
 | Code Connect template | `.figma.ts` mapping `Variant` and `State` to the HTML attributes | Example under `docs/`; Organization or Enterprise plan and a published library required |
 | Dev Mode and MCP `get_variable_defs` | ui-theme discovery source | Any plan; the agent reads names and values, never a rendered page |
-| A published component kit | The generated design canvas (Workstream G): HTML artboards painted by the shipped CSS | Pushed into Figma with `figma-generate-design` only when a team asks |
+| A published component kit | The generated HTML component sheet (Workstream G), painted by the shipped CSS; a canvas or Figma kit is a labelled projection of it | Pushed into Figma with `figma-generate-design` only when a team asks |
 
 ## Appendix F - Mechanisms considered and rejected
 
@@ -692,6 +712,9 @@ For a component author, enforced by the gates:
    `Variant` and `State` names; `role` is not a component slug.
 4. The css block lives in `@layer auk`; values that honour a user setting stay literal.
 5. A measured number appears in a reference or a token file only after `tests/e2e/` asserts it.
+6. A vendor-specific surface - a canvas, an artifact, an internal skill, a Figma write, Code
+   Connect - is labelled as such where it appears and paired with its neutral alternative;
+   the canonical record is always the neutral one (Appendix I).
 
 For a team integrating the components, written into `docs/theming.md`:
 
@@ -770,6 +793,22 @@ Not verified because the pages block fetching, and therefore not relied on above
 Salesforce LWC styling-hooks page, the Nathan Curtis interview, and the JavaScript-rendered
 Spectrum tokens site (the GitHub repository was read instead).
 
+## Appendix I - Vendor-specific surfaces and their neutral alternatives
+
+Every surface in this proposal that depends on one vendor, with the neutral path that stands
+in for it. The neutral column is always the record; the vendor column is a projection of it.
+
+| Surface | Vendor and gate | Neutral alternative, always the record |
+|---|---|---|
+| Design canvas (`.dc.html`, `canvas.json`, the pan-and-zoom page) | Claude Code and Claude Design; publishing needs the built-in design skill | The generated HTML component sheet in `docs/designs/components/`, opened from disk in any browser; print to PDF for hand-off; GitHub Pages for a link |
+| Published proposal and plan pages (claude.ai artifacts) | Claude Code; private to one account until shared | The markdown under `docs/`, which every page is generated from and which `docs/artifacts.md` names as the source |
+| Internal skills under `.claude/skills/` (`new-component`, `design-kit`) | Claude Code only; they use `disable-model-invocation`, which the portability lint bans under `skills/` | The scripts they run are plain Node under `scripts/`, and their running order is written in `CLAUDE.md` and `docs/`, so any agent follows it by hand |
+| ui-theme discovery through the Figma MCP server (`get_variable_defs`) | Figma; any plan, but a Figma server must be connected | A DTCG token file on disk, which Figma, Penpot and Tokens Studio all export, is the first discovery source, ahead of Figma and of stylesheets (decision 11) |
+| Agent-run role collection in Figma (`use_figma`: modes, scopes, code syntax) | Figma; an editing seat on a paid plan; modes capped per plan | Native import of `auk.tokens.json` into Figma on any plan or into Penpot, which is open source; a Style Dictionary or Terrazzo build for the CSS side |
+| Code Connect mappings and templates | Figma; Organization or Enterprise plan; a published library; per-file node ids | The generated anatomy section: `data-part`, `data-variant` and state names that double as layer, Variant and State names by rule, readable by any tool or person |
+| A Figma kit built from the sheet (`figma-generate-design`) | Figma; editing seat; built only on request | The sheet itself and the tokens file; the kit is never maintained by hand |
+| The React projection demo (`references/react-demo.tsx`) | React; already scoped by `docs/component-spec.md` as a projection, not the contract | The reference's Structure, Styles and Behaviour blocks: plain HTML, CSS and an ES module |
+
 ## Next step
 
 Author an execution plan that delivers Workstreams A, B, D, E, F and G in roadmap order, with
@@ -779,7 +818,9 @@ tests, the internal design-kit skill, the ui-theme reference sections, the spec 
 theming guide sections, the README section, the e2e cases and the evals - and write each test
 before the change it proves. Treat the locked decisions as settled inputs, carry the two open
 questions into the plan's unresolved-questions section rather than answering them, and verify every crosswalk cell and
-every count against a live source or a parser run, never from memory.
+every count against a live source or a parser run, never from memory. Keep every
+vendor-specific step optional and labelled, with its neutral alternative beside it, as
+decision 17 and Appendix I require.
 
 Convert to an execution plan:
 `/plan-agent:implementation-plan Support any design system by publishing the auk role layer as a contract --from-prompt docs/prompts/proposal-support-any-design-system.md`
