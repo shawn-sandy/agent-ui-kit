@@ -47,8 +47,9 @@ function propsEntries(skill: string): PropsEntry[] {
 
 /**
  * The five Props rules exactly as the mapping table states them, each an independent
- * predicate over the entry's type and default, so an entry two rules both claim, or
- * none claims, is caught rather than resolved by whichever rule is checked first.
+ * predicate over the entry's type and default - and, for an id reference written
+ * `attribute="<id>"`, its name - so an entry two rules both claim, or none claims, is
+ * caught rather than resolved by whichever rule is checked first.
  */
 const quoted = (type: string) => type.match(/"[^"]*"/g)?.length ?? 0;
 const RULE: Record<PropsRule, (e: PropsEntry) => boolean> = {

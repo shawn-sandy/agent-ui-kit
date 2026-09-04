@@ -17,8 +17,8 @@ emits no `--auk-*` binding - that is `ui-theme`.
 
 The mapping table below covers the 31 Props entries across the 6 shipped contract
 tables: 11 choices, 1 fixed value, 7 booleans, 4 strings and 8 id references. Every
-entry matches exactly one of the five Props rules, decided by the entry's type and
-default and nothing else, so two authors map the same entry the same way.
+entry matches exactly one of the five Props rules, decided by the entry's type,
+name and default and nothing else, so two authors map the same entry the same way.
 
 `tests/unit/ui-compose-mapping.spec.ts` pins the table to the component references:
 every row it maps must be one of the seven contract rows or the qualifier line, each
