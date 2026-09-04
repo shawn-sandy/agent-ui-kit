@@ -1,0 +1,20 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "Overview", "x": 0, "y": 0, "w": 1200, "h": 640 },
+    { "file": "create-scripts-skill-kind-mjs-exporting.dc.html", "title": "Step 1 · skill-kind.mjs", "x": 0, "y": 780, "w": 880, "h": 560 },
+    { "file": "branch-tests-objective-spec-ts-on.dc.html", "title": "Step 2 · kept vs skipped", "x": 960, "y": 780, "w": 880, "h": 640 },
+    { "file": "add-the-broken-fixture-tests-fixtures.dc.html", "title": "Step 4 · fixture and proof", "x": 1920, "y": 780, "w": 880, "h": 560 },
+    { "file": "add-a-short-section-to-docs.dc.html", "title": "Step 5 · spec section", "x": 2880, "y": 780, "w": 880, "h": 560 },
+    { "file": "write-the-discovery-half-of-skills.dc.html", "title": "Step 7 · discovery + mapping", "x": 0, "y": 1560, "w": 960, "h": 760 },
+    { "file": "write-the-output-contract-half-of.dc.html", "title": "Step 8 · output contract", "x": 1040, "y": 1560, "w": 960, "h": 760 },
+    { "file": "author-evals-ui-theme-json-with.dc.html", "title": "Step 9 · eval scenarios", "x": 2080, "y": 1560, "w": 880, "h": 600 },
+    { "file": "write-tests-e2e-ui-theme-spec.dc.html", "title": "Step 10 · palette run", "x": 0, "y": 2460, "w": 1000, "h": 680 },
+    { "file": "add-the-override-sentence-override-auk.dc.html", "title": "Step 11 · override sentence", "x": 1080, "y": 2460, "w": 880, "h": 560 },
+    { "file": "update-readme-md-six-becomes-seven.dc.html", "title": "Step 12 · README + version", "x": 2040, "y": 2460, "w": 760, "h": 620 },
+    { "file": "close-the-loop-in-docs-link.dc.html", "title": "Step 13 · paper trail", "x": 2880, "y": 2460, "w": 880, "h": 560 }
+  ],
+  "annotations": [
+    { "id": "coverage-note", "x": 1260, "y": 40, "w": 300, "text": "One artboard per user-facing plan step (11) plus this overview.\nHousekeeping steps 3, 6 and 14 have no surface to draw.\nPlan: docs/plans/add-ui-theme-workflow-skill.md · issue #18" }
+  ],
+  "launch": { "view": "canvas" }
+}
