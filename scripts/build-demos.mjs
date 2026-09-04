@@ -26,6 +26,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { skillKind } from './skill-kind.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CHECK = process.argv.includes('--check');
@@ -80,6 +81,9 @@ function build(name) {
 const names = readdirSync(SKILLS_DIR, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
+  // A workflow skill ships no demo. Skipping it here is what keeps one such
+  // directory from aborting this check for every component at once.
+  .filter((name) => skillKind(join(SKILLS_DIR, name)) === 'component')
   .sort();
 
 const results = names.map(build);

@@ -7,6 +7,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { validateSkill } from './lib/frontmatter.js';
 import { RULES, shouldLintFile } from '../scripts/lint-portability.mjs';
+import { skillKind } from '../scripts/skill-kind.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const SKILLS_DIR = resolve(ROOT, 'skills');
@@ -47,8 +48,18 @@ describe.each(skills)('skills/%s', (name) => {
   const demoPath = join(dir, 'references', 'demo.html');
   const reactDemoPath = join(dir, 'references', 'react-demo.tsx');
 
-  it('has the three canonical portable files', () => {
+  // A workflow skill ships a procedure, not a component. It keeps the SKILL.md,
+  // portability and evals rules and skips every assertion about a reference, a demo,
+  // a projection or a WCAG row. The default is component, so a directory that never
+  // declares a kind faces every rule below - see scripts/skill-kind.mjs.
+  const kind = skillKind(dir);
+  const component = it.runIf(kind === 'component');
+
+  it('has a SKILL.md', () => {
     expect(existsSync(skillPath), `${skillPath} missing`).toBe(true);
+  });
+
+  component('has the three canonical portable files', () => {
     expect(existsSync(referencePath), `${referencePath} missing`).toBe(true);
     expect(existsSync(demoPath), `${demoPath} missing`).toBe(true);
   });
@@ -81,7 +92,9 @@ describe.each(skills)('skills/%s', (name) => {
   });
 
   it('contains no vendor-specific or framework-specific token', () => {
-    for (const file of [skillPath, referencePath, demoPath]) {
+    // A component must have all three; a workflow skill is linted over what it ships.
+    const files = [skillPath, referencePath, demoPath].filter((f) => kind === 'component' || existsSync(f));
+    for (const file of files) {
       const text = readFileSync(file, 'utf8');
       for (const [rule, pattern] of RULES) {
         expect(pattern.test(text), `${file} breaks ${rule}`).toBe(false);
@@ -89,7 +102,7 @@ describe.each(skills)('skills/%s', (name) => {
     }
   });
 
-  it('requires a React projection demo with a typed props surface', () => {
+  component('requires a React projection demo with a typed props surface', () => {
     expect(existsSync(reactDemoPath), `${reactDemoPath} missing`).toBe(true);
     const source = readFileSync(reactDemoPath, 'utf8');
     const slug = componentSlug(name);
@@ -118,20 +131,20 @@ describe.each(skills)('skills/%s', (name) => {
     expect(shouldLintFile(join(dir, 'react-demo.tsx'))).toBe(true);
   });
 
-  it('reference has the full contract table', () => {
+  component('reference has the full contract table', () => {
     const reference = readFileSync(referencePath, 'utf8');
     for (const row of REQUIRED_CONTRACT_ROWS) {
       expect(reference, `contract row "${row}" missing`).toMatch(new RegExp(`^\\| ${row} \\|`, 'm'));
     }
   });
 
-  it('reference has the five body sections in order', () => {
+  component('reference has the five body sections in order', () => {
     const reference = readFileSync(referencePath, 'utf8');
     const headings = [...reference.matchAll(/^## (.+)$/gm)].map((m) => m[1].trim());
     expect(headings.filter((h) => REQUIRED_SECTIONS.includes(h))).toEqual(REQUIRED_SECTIONS);
   });
 
-  it('the Styles section declares its qualifiers', () => {
+  component('the Styles section declares its qualifiers', () => {
     const reference = readFileSync(referencePath, 'utf8');
     const styles = reference.split('\n## Styles\n')[1] ?? '';
     expect(styles, 'no "Qualifiers:" line at the top of Styles').toMatch(
@@ -139,7 +152,7 @@ describe.each(skills)('skills/%s', (name) => {
     );
   });
 
-  it('every themeable CSS value is a var(--auk-<component>-*) with a literal fallback', () => {
+  component('every themeable CSS value is a var(--auk-<component>-*) with a literal fallback', () => {
     const css = fencedBlock(readFileSync(referencePath, 'utf8'), 'css');
     const slug = componentSlug(name);
     expect(css, 'reference has no css block').not.toBeNull();
@@ -155,7 +168,7 @@ describe.each(skills)('skills/%s', (name) => {
     expect(css!).not.toMatch(/var\([^)]*var\(/);
   });
 
-  it('demo works with no custom properties defined anywhere', () => {
+  component('demo works with no custom properties defined anywhere', () => {
     const demo = readFileSync(demoPath, 'utf8');
     expect(demo).not.toMatch(/--auk-[a-z0-9-]+\s*:/);
   });
@@ -170,7 +183,7 @@ describe.each(skills)('skills/%s', (name) => {
   // demo's stylesheet must END with the reference css, and its script must BEGIN
   // with the reference module. Editing either copy breaks the match.
 
-  it('demo stylesheet ends with the reference css, byte for byte', () => {
+  component('demo stylesheet ends with the reference css, byte for byte', () => {
     const css = fencedBlock(readFileSync(referencePath, 'utf8'), 'css')!;
     // Guard the guard: every string ends with '', so an emptied fence would make the
     // assertion below pass against any demo at all.
@@ -181,7 +194,7 @@ describe.each(skills)('skills/%s', (name) => {
     expect(style!.trimEnd().endsWith(css.trim()), 'demo css has drifted from the reference').toBe(true);
   });
 
-  it('demo page chrome claims none of this component selectors', () => {
+  component('demo page chrome claims none of this component selectors', () => {
     // The chrome is everything before the injected css. A rule for THIS component
     // hiding up there would style it from a place the reference never ships, so the
     // browser suite would be testing something the user does not get.
@@ -198,7 +211,7 @@ describe.each(skills)('skills/%s', (name) => {
     );
   });
 
-  it('demo script begins with the reference module, exports stripped', () => {
+  component('demo script begins with the reference module, exports stripped', () => {
     const js = fencedBlock(readFileSync(referencePath, 'utf8'), 'js');
     if (js === null) return; // CSS-only component
     const stripped = js.replace(/^export /gm, '').trim();
@@ -211,7 +224,7 @@ describe.each(skills)('skills/%s', (name) => {
     expect(script!.trimStart().startsWith(stripped), 'demo module has drifted from the reference').toBe(true);
   });
 
-  it('every WCAG criterion claimed has an assertion in the browser suite', () => {
+  component('every WCAG criterion claimed has an assertion in the browser suite', () => {
     const reference = readFileSync(referencePath, 'utf8');
     const row = reference.match(/^\| WCAG \| (.+) \|$/m);
     expect(row, 'contract has no WCAG row').not.toBeNull();

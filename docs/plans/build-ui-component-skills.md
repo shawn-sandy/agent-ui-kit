@@ -147,7 +147,9 @@ Finally, open each component's demo page directly in a browser with no build ste
   ```
 
 - Add an optional design-token bridge
-  Wish list — lets components inherit a project's theme automatically.
+  Wish list — lets components inherit a project's theme automatically. Designed in
+  docs/prompts/proposal-add-ui-theme-skill.md and delivered by the `ui-theme` workflow
+  skill (docs/plans/add-ui-theme-workflow-skill.md).
   ```text
   In ~/devbox/agent-ui-skills, components ship literal CSS using var(--auk-*, fallback). Design and document an optional mapping layer that lets a project with a design-token file bind its tokens to the --auk-* custom properties so components pick up the project's theme automatically. This must stay optional: every component must keep working with no token file present. Write the design to docs/ as a proposal first and report the path.
   ```

@@ -36,7 +36,8 @@ request already maps cleanly to the contract, proceed and state any assumptions.
 2. Copy the Structure block. The root is a native `<dialog>` with an `id`; openers
    reference it with `data-dialog-open="<id>"`.
 3. Copy the Behaviour module and call `initDialog(dialogElement)` once per dialog.
-4. Copy the Styles block as-is, including the `::backdrop` rule.
+4. Copy the Styles block as-is, including the `::backdrop` rule. Override
+   `--auk-dialog-*` to theme it.
 5. Open `references/demo.html` and check the four behaviours listed there.
 
 ## Non-negotiable

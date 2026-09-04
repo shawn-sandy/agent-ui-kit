@@ -54,7 +54,7 @@ guess and no reviewer has to arbitrate.
 | Where do behavioural options go? | Arguments to the init function, not DOM attributes: `initTabs(root, { wrap: false })`. `data-*` describes what the element *is*, never how the script should treat it. |
 | What belongs in the Props row? | Every attribute a consumer is expected to set or read, including ARIA ones. Attributes the module writes and nobody sets go in the Behaviour section instead. |
 | How is a union type written in a table cell? | With quoted values and the word `or`, not a pipe: `"true" or "false" or "mixed"`. A raw pipe breaks the table. |
-| What is the full custom property grammar? | `--auk-<component-slug>[-<variant-or-state>][-<part>]-<property>`. The property is always last; qualifiers sit between the component slug and the property, variant or state before part. `--auk-dialog-close-bg`, `--auk-alert-success-bg`, `--auk-tab-selected-indicator-color`. Segments are omitted when there is only one of the thing. |
+| What is the full custom property grammar? | `--auk-<component-slug>[-<variant-or-state>][-<part>]-<property>`. The property is always last; qualifiers sit between the component slug and the property, variant or state before part. `--auk-dialog-close-bg`, `--auk-alert-success-bg`, `--auk-tabs-selected-tab-border-block-end-color`. Segments are omitted when there is only one of the thing. |
 | How do skill names and component slugs map? | The skill name and directory are `ui-<component-slug>`. Strip exactly one leading `ui-` for the root class (`auk-icon-button`), custom properties, init function (`initIconButton`), React projection names and H1. |
 | Are `###` subheadings allowed inside a section? | No. Sections are flat. The Accessibility section uses the bold labels **Keyboard**, **ARIA**, **Focus management** and **WCAG 2.2 AA criteria claimed**, in that order. |
 | Is an applicable-but-unclaimed WCAG criterion a defect? | No. Only an unbacked claim is. Claim what the browser suite actually asserts, and leave the rest out rather than writing an assertion-free promise. |
@@ -318,6 +318,7 @@ Six gates, in order. Any failure stops the run.
 
 1. **Vitest** — `tests/objective.spec.ts` (frontmatter conforms, no vendor token,
    demo matches reference), `tests/unit/frontmatter.spec.ts` (the validator itself),
+   `tests/unit/skill-kind.spec.ts` (the workflow partition, section 9),
    `tests/integration/manifests.spec.ts` (both plugin manifests agree).
 2. **Portability lint** — `scripts/lint-portability.mjs`, over `skills/` only,
    except `skills/<skill-name>/references/react-demo.tsx`: `${CLAUDE_PLUGIN_ROOT}`,
@@ -351,3 +352,35 @@ Before a component is done:
 - [ ] Every WCAG criterion claimed has a passing assertion in `tests/e2e/`.
 - [ ] Three evaluations exist with a recorded baseline.
 - [ ] `bash scripts/check.sh` exits zero.
+
+## 9. Workflow skills
+
+A skill under `skills/` may ship a procedure instead of a component. It says so
+with the standard `metadata` key:
+
+```yaml
+metadata:
+  kind: workflow
+```
+
+`scripts/skill-kind.mjs` reads the marker, and every gate that walks `skills/` asks
+it - `tests/objective.spec.ts`, `tests/e2e/demos.spec.ts` and
+`scripts/build-demos.mjs`. Anything short of that explicit value - no `metadata`,
+no `kind`, a file that fails to parse - is a component, so a directory never escapes
+the strict gates by being unreadable.
+
+A workflow skill keeps these rules: the `ui-` name matching its directory, the
+frontmatter rules in section 1, the body rules (under 60 lines, no component code,
+the `## Clarify when needed` heading with its vocabulary), the portability lint over
+every file it ships, the external-resource guard, and the three evaluation scenarios
+in section 4. It stays public - it never sets `metadata.internal` - and the plugin
+validation sees it like any other skill.
+
+It carries no component, so it is exempt from `references/<skill-name>.md` in the
+section 2 shape, `references/demo.html`, `references/react-demo.tsx`, the contract
+table, the qualifier line, the `var(--auk-*)` rules, the demo-drift pins and the
+WCAG row. It may still ship files under `references/` - a procedure needs somewhere
+to live - and `tests/e2e/` may still measure what it emits. `ui-theme` is the first
+workflow skill, and `tests/e2e/ui-theme.spec.ts` is its measurement.
+`tests/fixtures/workflow-skill/` is the deliberately broken workflow skill that
+`check.sh --prove` runs to show the partition can still fail.

@@ -44,7 +44,7 @@ proceed and state any assumptions.
    control carrying `popovertargetaction="hide"`.
 4. Choose placement: omit `data-placement` or use `trigger`, or set a viewport placement.
 5. Copy the Behaviour module and call `initPopover(popoverElement)` once per popover.
-6. Copy the Styles block as-is.
+6. Copy the Styles block as-is. Override `--auk-popover-*` to theme it.
 7. Open `references/demo.html` and check the behaviours listed there.
 
 ## Non-negotiable
