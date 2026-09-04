@@ -447,7 +447,8 @@ function initDialog(dialog) {
     if (e.target !== dialog) return;
     if (downOnBackdrop && upOnBackdrop) settle('Backdrop click', currentPolicy() === 'any');
     else if (downOnBackdrop) settle('Press on backdrop, release on dialog text', false);
-    else settle('Drag from dialog text, release on backdrop', false);
+    else if (upOnBackdrop) settle('Drag from dialog text, release on backdrop', false);
+    // Otherwise both ends landed on dialog content and no dismissal gesture happened.
     downOnBackdrop = false;
     upOnBackdrop = false;
   }, true);
