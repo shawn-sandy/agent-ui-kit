@@ -1,6 +1,6 @@
 ---
 name: ui-theme
-description: Theme workflow - binds a design system to the auk role layer. Emits up to 23 --auk-role-* lines from tokens or Figma. Use when components must match a brand or dark scheme. Not for non-auk elements.
+description: Theme workflow - binds a design system to the auk role layer. Roles come from tokens or Figma. Use when components must match a brand or dark scheme. Not for non-auk elements or one-off overrides.
 license: MIT
 metadata:
   kind: workflow
