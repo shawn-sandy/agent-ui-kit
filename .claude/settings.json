@@ -10,6 +10,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Artifact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" 2>/dev/null || exit 0; [ -f scripts/record-artifact.mjs ] || exit 0; node scripts/record-artifact.mjs",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }
