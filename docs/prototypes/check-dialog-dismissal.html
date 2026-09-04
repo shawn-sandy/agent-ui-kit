@@ -120,7 +120,7 @@
     <button type="button" class="btn" data-dialog-open="confirm-delete" id="open-top">Delete account</button>
     <button type="button" class="btn btn-secondary" id="force-fallback">Hide native closedby and use the JavaScript fallback</button>
   </div>
-  <p class="note" id="support-note"></p>
+  <p class="note" id="support-note" aria-live="polite"></p>
 </section>
 
 <dialog class="auk-dialog" id="confirm-delete" role="alertdialog" closedby="any"
@@ -273,6 +273,11 @@ var protoRecord; // set inside the records module; the live dialog calls it
     records.splice(idx, 1);
     save(records);
     render();
+    // render() rebuilt every row, so the clicked button is gone; land focus on the
+    // next row's button, or the reset button when the table is empty.
+    var buttons = rowsEl.querySelectorAll('button');
+    var next = buttons[Math.min(idx, buttons.length - 1)];
+    (next || resetBtn).focus();
     announce('Check deleted. ' + records.length + ' remaining.');
   }
 
@@ -396,6 +401,7 @@ function initDialog(dialog) {
   var forceBtn = document.getElementById('force-fallback');
   var teardown = initDialog(dialog);
   var downOnBackdrop = false;
+  var upOnBackdrop = false;
 
   function currentPolicy() {
     return dialog.hasAttribute('closedby') ? dialog.getAttribute('closedby') : 'absent';
@@ -418,12 +424,18 @@ function initDialog(dialog) {
     }, 0);
   }
 
+  // A click whose press and release land on different elements targets their
+  // common ancestor, which is the dialog, so both ends are tracked to tell a real
+  // backdrop click from a drag in either direction.
   dialog.addEventListener('pointerdown', function (e) { downOnBackdrop = e.target === dialog; }, true);
+  dialog.addEventListener('pointerup', function (e) { upOnBackdrop = e.target === dialog; }, true);
   dialog.addEventListener('click', function (e) {
     if (e.target !== dialog) return;
-    if (downOnBackdrop) settle('Backdrop click', currentPolicy() === 'any');
+    if (downOnBackdrop && upOnBackdrop) settle('Backdrop click', currentPolicy() === 'any');
+    else if (downOnBackdrop) settle('Press on backdrop, release on dialog text', false);
     else settle('Drag from dialog text, release on backdrop', false);
     downOnBackdrop = false;
+    upOnBackdrop = false;
   }, true);
   dialog.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') settle('Escape', currentPolicy() !== 'none');
