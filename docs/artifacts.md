@@ -15,6 +15,8 @@ is stable: republishing updates the page in place, so links here never need to c
 | Artifact | What it is | Recorded in |
 | --- | --- | --- |
 | [ui-theme Proposal](https://claude.ai/code/artifact/35196d3b-8a93-4af5-a0ba-17cfa4956446) | Published page for the proposal to add a ui-theme skill. | not linked from the repo; source is `docs/proposals/add-ui-theme-skill.md` |
+| [ui-compose Proposal](https://claude.ai/code/artifact/46ed2463-87fe-411e-9126-9c5f5084520d) | Published page for the proposal to add a ui-compose workflow skill so agent-built components follow Component Driven Design in component-based projects. | not linked from the repo; source is `docs/prompts/proposal-add-ui-compose-skill.md` |
+| [Role Layer Proposal](https://claude.ai/code/artifact/fe77138e-4ea8-4b51-a6de-a31057fa5653) | Published page for the proposal to support any design system by publishing the auk role layer as a contract; carries a live specimen of the role chain. | `artifact-url` in `docs/proposals/support-any-design-system.md` and `docs/prompts/proposal-support-any-design-system.md` |
 
 ## Plans
 
@@ -66,3 +68,4 @@ Rows the hook appended. Keep this table last in the file: the hook appends to th
 | Artifact | Date |
 | --- | --- |
 | [Plan: Make restyling an auk component a one-line job, whichever door a user picks](https://claude.ai/code/artifact/40ddb8f5-3d38-4923-b9c8-c49a0060b12f) | 2026-09-04 |
+| [Plan: Add the ui-compose workflow skill so agent-built components follow Component Driven Design](https://claude.ai/code/artifact/5acfc646-e9c4-42b5-a36e-48efc40ffe5a) | 2026-09-04 |
