@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Platform sources for component authoring</title>
+</head>
+<body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper: #f6f7fa; --surface: #ffffff; --ink: #1b2230; --muted: #5c6675;
+    --line: #d8dde7; --accent: #1a56db; --accent-soft: #e8eefc; --accent-ink: #123f9f;
+    --new: #0f7a4b; --new-soft: #e3f4ec;
+    --diagram-card: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0f141c; --surface: #171e2a; --ink: #e7ebf2; --muted: #98a3b5;
+      --line: #2b3545; --accent: #7fa6ff; --accent-soft: #1c2b4a; --accent-ink: #b5caff;
+      --new: #5fd19a; --new-soft: #14352a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0f141c; --surface: #171e2a; --ink: #e7ebf2; --muted: #98a3b5;
+    --line: #2b3545; --accent: #7fa6ff; --accent-soft: #1c2b4a; --accent-ink: #b5caff;
+    --new: #5fd19a; --new-soft: #14352a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 16px/1.6 "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  }
+  main { max-width: 72ch; margin: 0 auto; padding: 48px 20px 80px; }
+  h1, h2, h3 { text-wrap: balance; line-height: 1.2; margin: 0; }
+  h1 { font-size: 2rem; font-weight: 600; letter-spacing: -0.01em; }
+  h2 { font-size: 1.3rem; font-weight: 600; margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); }
+  h3 { font-size: 1.05rem; font-weight: 600; margin-top: 28px; }
+  p { margin: 12px 0 0; }
+  .eyebrow { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+  .lede { color: var(--muted); margin-top: 8px; }
+  code, .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+  code { background: var(--accent-soft); color: var(--accent-ink); padding: 1px 5px; border-radius: 3px; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 28px; }
+  .stat { background: var(--surface); padding: 14px 16px; }
+  .stat b { display: block; font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .stat span { display: block; font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+  @media (max-width: 560px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .card { background: var(--surface); border: 1px solid var(--line); padding: 20px 22px; margin-top: 18px; }
+  .card h3 { margin-top: 0; }
+  .facts { display: grid; grid-template-columns: 7.5em 1fr; gap: 10px 16px; margin-top: 14px; }
+  .facts dt { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; padding-top: 3px; }
+  .facts dd { margin: 0; }
+  @media (max-width: 560px) { .facts { grid-template-columns: 1fr; gap: 2px; } .facts dd { margin-bottom: 8px; } }
+  .diagram { background: var(--diagram-card); border: 1px solid var(--line); padding: 18px; margin-top: 18px; overflow-x: auto; }
+  .caption { color: var(--muted); font-size: 0.9rem; margin-top: 10px; }
+  .scroll { overflow-x: auto; margin-top: 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+  td:first-child { font-weight: 500; }
+  .tag { display: inline-block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; padding: 2px 7px; border-radius: 3px; vertical-align: middle; }
+  .tag.new { background: var(--new-soft); color: var(--new); }
+  .tag.rej { background: var(--paper); color: var(--muted); border: 1px solid var(--line); }
+  ul, ol { padding-left: 1.3em; margin: 10px 0 0; }
+  li { margin-top: 6px; }
+  .why { margin-top: 10px; }
+  .rejected { margin-top: 10px; padding-left: 0; list-style: none; }
+  .rejected li { padding: 8px 0 0 0; }
+  dl.gloss { margin: 14px 0 0; }
+  dl.gloss dt { font-weight: 600; margin-top: 12px; }
+  dl.gloss dd { margin: 2px 0 0; color: var(--ink); }
+  .files li { margin-top: 8px; }
+  footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.85rem; }
+  .diagram svg { display: block; margin: 0 auto; height: auto; }
+</style>
+
+<main>
+  <p class="eyebrow">Team recap</p>
+  <h1>Platform sources for component authoring</h1>
+  <p class="lede">What moved in the agent-ui-skills repository on 4 September 2026, for the engineer who touches the spec next and the teammate who only needs to know what changed.</p>
+
+  <h2 id="glance">At a glance</h2>
+  <div class="stats" role="list">
+    <div class="stat" role="listitem"><b>1</b><span>commit</span></div>
+    <div class="stat" role="listitem"><b>1</b><span>file, 16 lines added</span></div>
+    <div class="stat" role="listitem"><b>3</b><span>decisions</span></div>
+    <div class="stat" role="listitem"><b>3</b><span>open items</span></div>
+  </div>
+  <p>The repository now names three web pages that anyone writing a component skill must read first: the MDN HTML reference, web.dev's HTML hub and web.dev's CSS hub. The rule lives in the authoring contract, <code>docs/component-spec.md</code>, so it reaches every future component without touching any other file. The change is on <a href="https://github.com/shawn-sandy/agent-ui-skills/pull/23">pull request #23</a>, which passed every check and is waiting for a merge decision.</p>
+
+  <h2 id="changed">What changed</h2>
+
+  <section class="card">
+    <h3>Component authors now have a fixed reading list</h3>
+    <dl class="facts">
+      <dt>Who it affects</dt>
+      <dd>Teammates and agents who write or edit a component skill under <code>skills/</code>. End users of the components see nothing different.</dd>
+      <dt>What is different</dt>
+      <dd>Section 0 of the spec, the part that fixes conventions once so nobody re-decides them, has a new <code>Sources</code> block. Before writing a component's Structure, Styles or Behaviour, an author reads the MDN page for the root element and each named part, plus web.dev's HTML and CSS hubs. A reference may not contradict those pages. Where the platform already supplies a native attribute, method or event that does the job, the component uses it instead of a scripted copy. The section 8 checklist gained one matching line, so a finished component has to tick it.</dd>
+      <dt>How to reach it</dt>
+      <dd><code>docs/component-spec.md</code>, section 0, heading <code>Sources</code>. The three links: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference">MDN HTML reference</a>, <a href="https://web.dev/html">web.dev HTML</a>, <a href="https://web.dev/css">web.dev CSS</a>.</dd>
+    </dl>
+  </section>
+
+  <section class="card">
+    <h3>The change shipped as pull request #23</h3>
+    <dl class="facts">
+      <dt>Who it affects</dt>
+      <dd>Reviewers and whoever merges.</dd>
+      <dt>What is different</dt>
+      <dd>One commit, <code>1d313f2</code>, on branch <code>claude/dialog-component-reference-26b5d3</code>. The full local gate, <code>npm run check</code>, passed all six of its checks before the PR was opened, including 76 browser tests. On GitHub the merge state is clean and both CI jobs are green. Two bots commented; neither finding changed the PR (see Decisions).</dd>
+      <dt>How to reach it</dt>
+      <dd><a href="https://github.com/shawn-sandy/agent-ui-skills/pull/23">github.com/shawn-sandy/agent-ui-skills/pull/23</a></dd>
+    </dl>
+  </section>
+
+  <h2 id="how">How it works now</h2>
+  <p>The authoring flow gained one mandatory step at the front and one line at the end. The diagram shows the path a new component takes; the two new pieces are drawn with a heavier border.</p>
+  <div class="diagram">
+<svg id="mermaid-1788493441729" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 422.265625px;" viewBox="0 0 422.265625 766" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#mermaid-1788493441729{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-1788493441729 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-1788493441729 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-1788493441729 .error-icon{fill:#552222;}#mermaid-1788493441729 .error-text{fill:#552222;stroke:#552222;}#mermaid-1788493441729 .edge-thickness-normal{stroke-width:1px;}#mermaid-1788493441729 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1788493441729 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1788493441729 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1788493441729 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1788493441729 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1788493441729 .marker{fill:#333333;stroke:#333333;}#mermaid-1788493441729 .marker.cross{stroke:#333333;}#mermaid-1788493441729 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1788493441729 p{margin:0;}#mermaid-1788493441729 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-1788493441729 .cluster-label text{fill:#333;}#mermaid-1788493441729 .cluster-label span{color:#333;}#mermaid-1788493441729 .cluster-label span p{background-color:transparent;}#mermaid-1788493441729 .label text,#mermaid-1788493441729 span{fill:#333;color:#333;}#mermaid-1788493441729 .node rect,#mermaid-1788493441729 .node circle,#mermaid-1788493441729 .node ellipse,#mermaid-1788493441729 .node polygon,#mermaid-1788493441729 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-1788493441729 .rough-node .label text,#mermaid-1788493441729 .node .label text,#mermaid-1788493441729 .image-shape .label,#mermaid-1788493441729 .icon-shape .label{text-anchor:middle;}#mermaid-1788493441729 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-1788493441729 .rough-node .label,#mermaid-1788493441729 .node .label,#mermaid-1788493441729 .image-shape .label,#mermaid-1788493441729 .icon-shape .label{text-align:center;}#mermaid-1788493441729 .node.clickable{cursor:pointer;}#mermaid-1788493441729 .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#mermaid-1788493441729 .arrowheadPath{fill:#333333;}#mermaid-1788493441729 .edgePaths .path{stroke:#333333;stroke-width:1px;}#mermaid-1788493441729 .flowchart-link{stroke:#333333;fill:none;}#mermaid-1788493441729 .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#mermaid-1788493441729 .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#mermaid-1788493441729 .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#mermaid-1788493441729 .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#mermaid-1788493441729 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-1788493441729 .cluster text{fill:#333;}#mermaid-1788493441729 .cluster span{color:#333;}#mermaid-1788493441729 .node .collapsed-indicator{fill:#aaaa33;stroke:none;opacity:0.6;}#mermaid-1788493441729 .node .collapsed-separator{stroke:#aaaa33;stroke-width:0.75px;}#mermaid-1788493441729 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1788493441729 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#mermaid-1788493441729 rect.text{fill:none;stroke-width:0;}#mermaid-1788493441729 .icon-shape,#mermaid-1788493441729 .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#mermaid-1788493441729 .icon-shape p,#mermaid-1788493441729 .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#mermaid-1788493441729 .icon-shape .label rect,#mermaid-1788493441729 .image-shape .label rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#mermaid-1788493441729 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-1788493441729 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-1788493441729 .node .neo-node{stroke:#9370DB;}#mermaid-1788493441729 [data-look="neo"].node rect,#mermaid-1788493441729 [data-look="neo"].cluster rect,#mermaid-1788493441729 [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#mermaid-1788493441729 [data-look="neo"].swimlane.cluster rect{filter:none;}#mermaid-1788493441729 [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#mermaid-1788493441729 [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#mermaid-1788493441729 [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#mermaid-1788493441729 [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#mermaid-1788493441729 [data-look="neo"].node circle .state-start{fill:#000000;}#mermaid-1788493441729 [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#mermaid-1788493441729 [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#mermaid-1788493441729 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="mermaid-1788493441729_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1788493441729_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1788493441729_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1788493441729_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="mermaid-1788493441729_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1788493441729_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1788493441729_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1788493441729_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1788493441729_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1788493441729_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1788493441729_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="mermaid-1788493441729_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M211.133,62L211.133,66.167C211.133,70.333,211.133,78.667,211.133,86.333C211.133,94,211.133,101,211.133,104.5L211.133,108" id="mermaid-1788493441729-L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MjExLjEzMjgxMjUsInkiOjYyfSx7IngiOjIxMS4xMzI4MTI1LCJ5Ijo4N30seyJ4IjoyMTEuMTMyODEyNSwieSI6MTEyfV0=" data-look="classic" marker-end="url(#mermaid-1788493441729_flowchart-v2-pointEnd)"></path><path d="M211.133,166L211.133,170.167C211.133,174.333,211.133,182.667,211.133,190.333C211.133,198,211.133,205,211.133,208.5L211.133,212" id="mermaid-1788493441729-L_B_S_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_S_0" data-points="W3sieCI6MjExLjEzMjgxMjUsInkiOjE2Nn0seyJ4IjoyMTEuMTMyODEyNSwieSI6MTkxfSx7IngiOjIxMS4xMzI4MTI1LCJ5IjoyMTZ9XQ==" data-look="classic" marker-end="url(#mermaid-1788493441729_flowchart-v2-pointEnd)"></path><path d="M211.133,294L211.133,298.167C211.133,302.333,211.133,310.667,211.133,318.333C211.133,326,211.133,333,211.133,336.5L211.133,340" id="mermaid-1788493441729-L_S_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S_C_0" data-points="W3sieCI6MjExLjEzMjgxMjUsInkiOjI5NH0seyJ4IjoyMTEuMTMyODEyNSwieSI6MzE5fSx7IngiOjIxMS4xMzI4MTI1LCJ5IjozNDR9XQ==" data-look="classic" marker-end="url(#mermaid-1788493441729_flowchart-v2-pointEnd)"></path><path d="M211.133,422L211.133,426.167C211.133,430.333,211.133,438.667,211.133,446.333C211.133,454,211.133,461,211.133,464.5L211.133,468" id="mermaid-1788493441729-L_C_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_D_0" data-points="W3sieCI6MjExLjEzMjgxMjUsInkiOjQyMn0seyJ4IjoyMTEuMTMyODEyNSwieSI6NDQ3fSx7IngiOjIxMS4xMzI4MTI1LCJ5Ijo0NzJ9XQ==" data-look="classic" marker-end="url(#mermaid-1788493441729_flowchart-v2-pointEnd)"></path><path d="M211.133,526L211.133,530.167C211.133,534.333,211.133,542.667,211.133,550.333C211.133,558,211.133,565,211.133,568.5L211.133,572" id="mermaid-1788493441729-L_D_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_E_0" data-points="W3sieCI6MjExLjEzMjgxMjUsInkiOjUyNn0seyJ4IjoyMTEuMTMyODEyNSwieSI6NTUxfSx7IngiOjIxMS4xMzI4MTI1LCJ5Ijo1NzZ9XQ==" data-look="classic" marker-end="url(#mermaid-1788493441729_flowchart-v2-pointEnd)"></path><path d="M211.133,630L211.133,634.167C211.133,638.333,211.133,646.667,211.133,654.333C211.133,662,211.133,669,211.133,672.5L211.133,676" id="mermaid-1788493441729-L_E_F_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_E_F_0" data-points="W3sieCI6MjExLjEzMjgxMjUsInkiOjYzMH0seyJ4IjoyMTEuMTMyODEyNSwieSI6NjU1fSx7IngiOjIxMS4xMzI4MTI1LCJ5Ijo2ODB9XQ==" data-look="classic" marker-end="url(#mermaid-1788493441729_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_B_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_S_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S_C_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_C_D_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_D_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_E_F_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="mermaid-1788493441729-flowchart-A-0" data-look="classic" transform="translate(211.1328125, 35)"><rect class="basic label-container" style="" x="-137.109375" y="-27" width="274.21875" height="54"></rect><g class="label" style="" transform="translate(-107.109375, -12)"><rect></rect><foreignObject width="214.21875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>Request for a new component</p></span></div></foreignObject></g></g><g class="node default" id="mermaid-1788493441729-flowchart-B-1" data-look="classic" transform="translate(211.1328125, 139)"><rect class="basic label-container" style="" x="-142.828125" y="-27" width="285.65625" height="54"></rect><g class="label" style="" transform="translate(-112.828125, -12)"><rect></rect><foreignObject width="225.65625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>Read docs/component-spec.md</p></span></div></foreignObject></g></g><g class="node default" id="mermaid-1788493441729-flowchart-S-3" data-look="classic" transform="translate(211.1328125, 255)"><rect class="basic label-container" style="stroke-width:3px !important" x="-191.5625" y="-39" width="383.125" height="78"></rect><g class="label" style="" transform="translate(-161.5625, -24)"><rect></rect><foreignObject width="323.125" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>Read the platform sources for the element<br>MDN reference, web.dev HTML, web.dev CSS</p></span></div></foreignObject></g></g><g class="node default" id="mermaid-1788493441729-flowchart-C-5" data-look="classic" transform="translate(211.1328125, 383)"><rect class="basic label-container" style="" x="-203.1328125" y="-39" width="406.265625" height="78"></rect><g class="label" style="" transform="translate(-173.1328125, -24)"><rect></rect><foreignObject width="346.265625" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>Write SKILL.md and the reference:<br>Structure, Styles, Behaviour, Accessibility, Demo</p></span></div></foreignObject></g></g><g class="node default" id="mermaid-1788493441729-flowchart-D-7" data-look="classic" transform="translate(211.1328125, 499)"><rect class="basic label-container" style="" x="-165.25" y="-27" width="330.5" height="54"></rect><g class="label" style="" transform="translate(-135.25, -12)"><rect></rect><foreignObject width="270.5" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>Build demo, write e2e tests and evals</p></span></div></foreignObject></g></g><g class="node default" id="mermaid-1788493441729-flowchart-E-9" data-look="classic" transform="translate(211.1328125, 603)"><rect class="basic label-container" style="" x="-107.984375" y="-27" width="215.96875" height="54"></rect><g class="label" style="" transform="translate(-77.984375, -12)"><rect></rect><foreignObject width="155.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>npm run check passes</p></span></div></foreignObject></g></g><g class="node default" id="mermaid-1788493441729-flowchart-F-11" data-look="classic" transform="translate(211.1328125, 719)"><rect class="basic label-container" style="stroke-width:3px !important" x="-194.3125" y="-39" width="388.625" height="78"></rect><g class="label" style="" transform="translate(-164.3125, -24)"><rect></rect><foreignObject width="328.625" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 420px; text-align: center;"><span class="nodeLabel"><p>Section 8 checklist,<br>now including: sources read, no contradiction</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="mermaid-1788493441729-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="mermaid-1788493441729-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs></svg>
+  </div>
+  <p class="caption">The heavy-bordered steps are new. Everything else in the flow already existed.</p>
+
+  <h2 id="before-after">Before and after</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Rule</th><th>Before</th><th>After</th></tr></thead>
+      <tbody>
+        <tr><td>What an author reads before writing a component</td><td>Nothing stated. Each skill reasoned from the HTML and ARIA specs implicitly.</td><td>Three fixed sources, named in section 0 of the spec.</td></tr>
+        <tr><td>Native platform feature versus scripted copy</td><td>Implied per skill, for example the dialog skill's ban on hand-written <code>role="dialog"</code>.</td><td>Stated once for every component: use the native attribute, method or event when the source documents one.</td></tr>
+        <tr><td>Done checklist in section 8</td><td>11 items.</td><td>12 items. The new one: sources read, reference does not contradict them.</td></tr>
+        <tr><td>Scope of the request</td><td>First message named only the MDN <code>&lt;dialog&gt;</code> page.</td><td>Second message broadened it to the MDN HTML reference plus the two web.dev hubs.</td></tr>
+        <tr><td>Pull request</td><td>None.</td><td>#23, open, CI green, not merged.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="decisions">Decisions</h2>
+
+  <h3>Put the rule in the spec, not in CLAUDE.md, the new-component command, or each skill</h3>
+  <p class="why"><strong>Why.</strong> <code>docs/component-spec.md</code> is the authoring contract. The project's CLAUDE.md says it wins on any conflict, and the <code>/new-component</code> command reads it in full as step one and says it does not restate spec rules. A rule placed there reaches every future component with zero other edits.</p>
+  <ul class="rejected">
+    <li><span class="tag rej">Rejected</span> <strong>CLAUDE.md.</strong> It already delegates authoring rules to the spec. Duplicating the rule there would create two places that can disagree.</li>
+    <li><span class="tag rej">Rejected</span> <strong>The <code>/new-component</code> command.</strong> Its own text says the spec holds every rule.</li>
+    <li><span class="tag rej">Rejected</span> <strong>A <code>Sources</code> line in each reference file.</strong> The spec fixes a reference's shape to exactly five sections, and the test suite pins their order. A citation could still go in prose, but that serves consuming agents, not authors, and was deferred (see Open items).</li>
+  </ul>
+
+  <h3>Keep the web.dev hub URLs the user asked for, not the /learn/ pages a bot suggested</h3>
+  <p class="why"><strong>Why.</strong> The claude-review bot said <code>https://web.dev/html</code> and <code>https://web.dev/css</code> were likely dead and proposed <code>/learn/html</code> and <code>/learn/css</code>. A direct HTTP check showed both hub URLs return 200 with no redirect, and an earlier fetch showed they are web.dev's HTML and CSS index pages, which link to those very courses. They are also the exact URLs the user gave. Under the review-bot triage rules the finding is an incorrect claim that blocks nothing, so it was reported to the user rather than fixed or replied to.</p>
+  <ul class="rejected">
+    <li><span class="tag rej">Rejected</span> <strong>Swapping to the /learn/ pages.</strong> Would change what the user asked for on the strength of a false premise.</li>
+    <li><span class="tag rej">Rejected</span> <strong>Replying on the thread.</strong> The rules say replies are for humans; a bot forgets between runs, and the finding was not blocking.</li>
+  </ul>
+
+  <h3>Read the request as "record the sources", not "audit the dialog against MDN"</h3>
+  <p class="why"><strong>Why.</strong> The first message was ambiguous between the two. The branch was already named <code>dialog-component-reference</code>, which points at recording a reference. A spot check of the shipped dialog skill against MDN's <code>&lt;dialog&gt;</code> page was done anyway and found no contradiction: <code>showModal()</code> over <code>show()</code>, no hand-written role or <code>aria-modal</code>, native <code>autofocus</code>, no <code>tabindex</code> on the dialog, a <code>::backdrop</code> rule, close handled through the <code>close</code> event.</p>
+  <ul class="rejected">
+    <li><span class="tag rej">Rejected</span> <strong>Editing the dialog skill.</strong> Nothing needed changing, and the second message confirmed the broader reading.</li>
+  </ul>
+
+  <h2 id="learnings">Learnings</h2>
+  <ul>
+    <li><strong>Verify a link before changing a citation.</strong> A review bot inferred that two URLs were wrong from a convention elsewhere in the repo. One HTTP request settled it. The bot's reasoning was plausible and its conclusion was false.</li>
+    <li><strong>No test parses the spec.</strong> A change to <code>docs/component-spec.md</code> is verified by reading it back and by the gates staying green, not by any assertion. The new checklist line is enforced by the human or agent working the checklist, nothing else.</li>
+    <li><strong>zsh gotcha.</strong> A shell word starting with <code>=</code> is expanded as a command path in zsh, so <code>echo =====</code> as a separator fails with <code>===== not found</code>. Quote separators or use dashes.</li>
+  </ul>
+
+  <h2 id="open">Open items</h2>
+  <ul>
+    <li><strong>Merge decision on PR #23.</strong> Everything is green and the merge state is clean. Merging was not authorised in the session and needs an explicit go-ahead.</li>
+    <li><strong>Per-skill source citation.</strong> A prose line in each <code>references/ui-&lt;component&gt;.md</code> naming the MDN page it was built against would let the citation travel with the skill to consuming agents. Deferred because the spec rule already reaches authors. If picked up: prose only, no new <code>##</code> heading, since the reference shape is fixed at five sections.</li>
+    <li><strong>The bot thread on line 55 of the spec is open.</strong> It was left unreplied and unresolved on purpose, per the review-bot triage rules. Anyone who wants the PR page tidy can resolve it by hand; the evidence is in Decisions above.</li>
+  </ul>
+
+  <h2 id="files">Files touched</h2>
+  <p class="eyebrow">Authoring contract</p>
+  <ul class="files">
+    <li><code>docs/component-spec.md</code> — section 0 gained the <code>Sources</code> block; the section 8 checklist gained one line. 16 lines added, nothing removed.</li>
+  </ul>
+  <p class="eyebrow" style="margin-top:20px">Session record</p>
+  <ul class="files">
+    <li><code>docs/plans/sessions/add-component-authoring-sources-session.md</code> — this recap, the committed record that holds the published artifact URL.</li>
+  </ul>
+
+  <h2 id="glossary">Glossary</h2>
+  <dl class="gloss">
+    <dt>Agent Skill</dt><dd>A folder with a <code>SKILL.md</code> that an AI coding agent reads to learn how to do one thing; this repository ships UI components in that form instead of as a library.</dd>
+    <dt>Authoring contract</dt><dd><code>docs/component-spec.md</code>, the document every component skill must follow; it wins over any other instruction file on conflict.</dd>
+    <dt>Reference file</dt><dd><code>skills/ui-&lt;component&gt;/references/ui-&lt;component&gt;.md</code>, the file that carries a component's markup, styles, script and accessibility contract in five fixed sections.</dd>
+    <dt>/new-component</dt><dd>The repository's internal command that walks an agent through scaffolding a new component skill.</dd>
+    <dt>Section 0 and section 8</dt><dd>The spec's "conventions fixed once" section and its end-of-work checklist.</dd>
+    <dt>MDN</dt><dd>Mozilla Developer Network, the standard reference documentation for web platform features.</dd>
+    <dt>web.dev</dt><dd>Google's developer education site; its HTML and CSS hubs index courses and articles.</dd>
+    <dt>showModal()</dt><dd>The native browser method that opens a <code>&lt;dialog&gt;</code> as a modal, making the rest of the page unreachable without any custom script.</dd>
+    <dt>Gate, npm run check</dt><dd>The repository's single local check; it runs six gates including unit tests, a portability lint and the browser suite.</dd>
+    <dt>Playwright</dt><dd>The browser-automation tool that runs the end-to-end tests.</dd>
+    <dt>Vitest</dt><dd>The unit test runner.</dd>
+    <dt>CI</dt><dd>Continuous integration: the checks GitHub runs automatically on a pull request.</dd>
+    <dt>CodeRabbit and claude-review</dt><dd>The two automated review bots on this repository.</dd>
+    <dt>Review-bot triage rules</dt><dd>The maintainer's standing rule set for bot comments: verify a claim before fixing it, report declined findings to the user, never treat a re-fired review as a new instruction.</dd>
+    <dt>Worktree</dt><dd>A separate checkout of the same git repository in its own folder, so one branch can be worked on without disturbing another.</dd>
+    <dt>PR</dt><dd>Pull request, a proposed change on GitHub that others review before it merges.</dd>
+  </dl>
+
+  <footer>Session 1a76753f, 4 September 2026. Record: <span class="mono">docs/plans/sessions/add-component-authoring-sources-session.md</span>.</footer>
+</main>
+
+</body>
+</html>
